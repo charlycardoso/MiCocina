@@ -12,7 +12,22 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
 
+    // Properties
+    
+    
     var body: some View {
+        Text("Hello, world!")
+    }
+}
+
+#Preview {
+    ContentView()
+        .modelContainer(for: Item.self, inMemory: true)
+}
+
+extension ContentView {
+    @ViewBuilder
+    private func ExampleView() -> some View {
         NavigationSplitView {
             List {
                 ForEach(items) { item in
@@ -53,9 +68,4 @@ struct ContentView: View {
             }
         }
     }
-}
-
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
