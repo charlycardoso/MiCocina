@@ -9,11 +9,12 @@ import Foundation
 
 struct RecipeMatcher {
     func canCook(recipe: Recipe, with pantry: Set<Ingredient>) -> Bool {
-        let requiredIngredients = recipe.ingredients
-            .filter { $0.isRequired }
-            .map { $0.ingredient }
+        guard !recipe.ingredients.isEmpty else { return false }
 
-        return Set(requiredIngredients).isSubset(of: pantry)
+        let allIngredients = recipe.ingredients.map { $0.ingredient }
+        let missingIngredients = Set(allIngredients).subtracting(pantry)
+
+        return missingIngredients.count <= 3
     }
 
     func possibleRecipes(from recipes: [Recipe], pantry: Set<Ingredient>) -> [Recipe] {

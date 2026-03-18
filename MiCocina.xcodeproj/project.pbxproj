@@ -40,11 +40,6 @@
 			path = MiCocinaTests;
 			sourceTree = "<group>";
 		};
-		27802A382F644A1300F1A59C /* MiCocinaUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MiCocinaUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +72,6 @@
 			children = (
 				27802A1E2F644A1200F1A59C /* MiCocina */,
 				27802A2E2F644A1300F1A59C /* MiCocinaTests */,
-				27802A382F644A1300F1A59C /* MiCocinaUITests */,
 				27802A1D2F644A1200F1A59C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -152,9 +146,6 @@
 			);
 			dependencies = (
 				27802A372F644A1300F1A59C /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				27802A382F644A1300F1A59C /* MiCocinaUITests */,
 			);
 			name = MiCocinaUITests;
 			packageProductDependencies = (
