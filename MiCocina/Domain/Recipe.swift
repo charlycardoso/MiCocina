@@ -10,5 +10,5 @@ import Foundation
 struct Recipe: Equatable {
     let id = UUID()
     let name: String
-    let ingredients: Set<Ingredient>
+    let ingredients: Set<RecipeIngredient>
 }
