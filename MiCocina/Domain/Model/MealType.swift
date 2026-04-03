@@ -27,4 +27,13 @@ enum MealType: Comparable {
     static func < (lhs: MealType, rhs: MealType) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
+
+    static func rawValue(_ rawValue: String) -> Self {
+        switch rawValue.lowercased() {
+        case "breakfast": .breakFast
+        case "lunch": .lunch
+        case "dinner": .dinner
+        default: .other
+        }
+    }
 }
