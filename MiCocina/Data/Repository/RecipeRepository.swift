@@ -5,8 +5,20 @@
 //  Created by Carlos Cardoso on 19/03/26.
 //
 
+import Foundation
+
 protocol RecipeRepository {
+    // READ
     func getAll() -> [Recipe]
+    func getByID(_ id: UUID) -> Recipe?
+    func getByName(_ name: String) -> Recipe?
+    func getByMealType(_ mealType: MealType) -> [Recipe]
+    func getFavorites() -> [Recipe]
+    // WRITE
+    func save(_ recipe: Recipe) throws
+    func delete(_ recipe: Recipe) throws
+    // UPDATE
+    func update(_ recipe: Recipe) throws
 }
 
 final class MockRecipeRepository: RecipeRepository {
@@ -18,5 +30,33 @@ final class MockRecipeRepository: RecipeRepository {
 
     func getAll() -> [Recipe] {
         recipes
+    }
+
+    func getByID(_ id: UUID) -> Recipe? {
+        nil
+    }
+    
+    func getByName(_ name: String) -> Recipe? {
+        nil
+    }
+    
+    func getByMealType(_ mealType: MealType) -> [Recipe] {
+        []
+    }
+    
+    func getFavorites() -> [Recipe] {
+        []
+    }
+    
+    func save(_ recipe: Recipe) throws {
+        
+    }
+    
+    func delete(_ recipe: Recipe) throws {
+        
+    }
+
+    func update(_ recipe: Recipe) throws {
+        
     }
 }

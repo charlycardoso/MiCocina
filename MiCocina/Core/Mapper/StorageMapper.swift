@@ -26,7 +26,7 @@ final class StorageMapper {
         }
 
         // Crear nuevo si no existe
-        let new = SDIngredient(name: name)
+        let new = SDIngredient(id: ingredient.id, name: name)
         context.insert(new)
         return new
     }
@@ -43,10 +43,8 @@ final class StorageMapper {
             isFavorite: domain.isFavorite
         )
 
-        // Insertar receta primero
         context.insert(sdRecipe)
 
-        // Mapear ingredientes
         domain.ingredients.forEach { recipeIngredient in
             let sdIngredient = StorageMapper.toStorage(
                 with: recipeIngredient.ingredient,
@@ -60,10 +58,8 @@ final class StorageMapper {
                 isRequired: recipeIngredient.isRequired
             )
 
-            // 🔥 ESTO ES LO QUE TE FALTABA
-            sdRecipe.ingredients.append(sdRecipeIngredient)
-
             context.insert(sdRecipeIngredient)
+            sdRecipe.ingredients.append(sdRecipeIngredient)
         }
 
         return sdRecipe

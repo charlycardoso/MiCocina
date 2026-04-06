@@ -192,4 +192,20 @@ struct DomainMapperTests {
         #expect(requiredCount == 1)
         #expect(optionalCount == 1)
     }
+
+    @Test
+    func toDomain_ingredient_preserves_spaces() {
+        // Given - Two ingredients with similar names but different spacing
+        let sdOliveOil = SDIngredient(name: "Olive Oil")
+        let sdOliveOilNoSpace = SDIngredient(name: "OliveOil")
+
+        // When
+        let oliveOil = DomainMapper.toDomain(ingredient: sdOliveOil)
+        let oliveOilNoSpace = DomainMapper.toDomain(ingredient: sdOliveOilNoSpace)
+
+        // Then - Spaces should be preserved after normalization
+        #expect(oliveOil.name == "olive oil")
+        #expect(oliveOilNoSpace.name == "oliveoil")
+        #expect(oliveOil.name != oliveOilNoSpace.name)
+    }
 }

@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import MiCocina
 
 @MainActor
@@ -84,6 +85,31 @@ extension RecipeUseCasesTests {
         func getAll() -> [Recipe] {
             recipes
         }
+
+        func getByID(_ id: UUID) -> Recipe? {
+            nil
+        }
+
+        func getByName(_ name: String) -> Recipe? {
+            nil
+        }
+
+        func getByMealType(_ mealType: MealType) -> [Recipe] {
+            []
+        }
+
+        func getFavorites() -> [Recipe] {
+            []
+        }
+
+        func save(_ recipe: Recipe) throws {
+        }
+
+        func delete(_ recipe: Recipe) throws {
+        }
+
+        func update(_ recipe: Recipe) throws {
+        }
     }
     
     struct FakePantryRepository: PantryRepository {
@@ -95,6 +121,22 @@ extension RecipeUseCasesTests {
 
         func getPantry() -> Set<Ingredient> {
             pantry
+        }
+
+        func add(_ ingredient: Ingredient) throws {
+        }
+
+        func remove(_ ingredient: Ingredient) throws {
+        }
+
+        func update(_ ingredient: Ingredient) throws {
+        }
+
+        func clear() throws {
+        }
+
+        func exists(_ ingredient: Ingredient) -> Bool {
+            false
         }
     }
     

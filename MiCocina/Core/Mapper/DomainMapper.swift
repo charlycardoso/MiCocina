@@ -16,6 +16,7 @@ final class DomainMapper {
             recipeIngredients.insert(recipeIngredient)
         }
         return .init(
+            id: recipe.id,
             name: recipe.name,
             ingredients: recipeIngredients,
             mealType: MealType.rawValue(recipe.mealType),
@@ -25,7 +26,7 @@ final class DomainMapper {
 
     // MARK: Ingredient
     static func toDomain(ingredient: SDIngredient) -> Ingredient {
-        return .init(name: ingredient.name)
+        return .init(id: ingredient.id, name: ingredient.name)
     }
 
     // MARK: RecipeIngredient

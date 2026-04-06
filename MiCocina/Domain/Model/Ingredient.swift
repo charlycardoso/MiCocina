@@ -7,20 +7,13 @@
 
 import Foundation
 
-struct Ingredient: Equatable, Hashable {
-    let id = UUID()
+struct Ingredient: Identifiable, Equatable, Hashable {
+    let id: UUID
     let name: String
     let quantity: Int = 0
 
-    init(name: String) {
+    init(id: UUID = .init(), name: String) {
+        self.id = id
         self.name = name.normalize()
-    }
-
-    static func == (lhs: Ingredient, rhs: Ingredient) -> Bool {
-        lhs.name == rhs.name
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
     }
 }
