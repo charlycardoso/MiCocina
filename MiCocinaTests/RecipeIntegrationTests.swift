@@ -55,8 +55,8 @@ struct RecipeIntegrationTests {
         let pantry: Set<Ingredient> = [agua, limon, fresas]
 
         let sut = RecipeUseCasesImpl(
-            RecipeProtocolRepository: MockRecipeProtocolRepository(recipes: recipes),
-            PantryProtocolRepository: MockPantryProtocolRepository(pantry: pantry),
+            RecipeProtocolRepository: MockRecipeRepository(recipes: recipes),
+            PantryProtocolRepository: MockPantryRepository(pantry: pantry),
             matcher: RecipeMatcher()
         )
 
@@ -112,8 +112,8 @@ struct RecipeIntegrationTests {
         let pantry: Set<Ingredient> = [pasta, tomato]
 
         let sut = RecipeUseCasesImpl(
-            RecipeProtocolRepository: MockRecipeProtocolRepository(recipes: [recipe]),
-            PantryProtocolRepository: MockPantryProtocolRepository(pantry: pantry),
+            RecipeProtocolRepository: MockRecipeRepository(recipes: [recipe]),
+            PantryProtocolRepository: MockPantryRepository(pantry: pantry),
             matcher: RecipeMatcher()
         )
 
@@ -174,8 +174,8 @@ struct RecipeIntegrationTests {
         let pantry: Set<Ingredient> = [water, salt]
 
         let sut = RecipeUseCasesImpl(
-            RecipeProtocolRepository: MockRecipeProtocolRepository(recipes: [recipe1, recipe2, recipe3]),
-            PantryProtocolRepository: MockPantryProtocolRepository(pantry: pantry),
+            RecipeProtocolRepository: MockRecipeRepository(recipes: [recipe1, recipe2, recipe3]),
+            PantryProtocolRepository: MockPantryRepository(pantry: pantry),
             matcher: RecipeMatcher()
         )
 
@@ -201,8 +201,8 @@ struct RecipeIntegrationTests {
         )
 
         let sut = RecipeUseCasesImpl(
-            RecipeProtocolRepository: MockRecipeProtocolRepository(recipes: [recipe]),
-            PantryProtocolRepository: MockPantryProtocolRepository(pantry: [water]),
+            RecipeProtocolRepository: MockRecipeRepository(recipes: [recipe]),
+            PantryProtocolRepository: MockPantryRepository(pantry: [water]),
             matcher: RecipeMatcher()
         )
 
@@ -246,8 +246,8 @@ struct RecipeIntegrationTests {
         ]
 
         let sut = RecipeUseCasesImpl(
-            RecipeProtocolRepository: MockRecipeProtocolRepository(recipes: recipes),
-            PantryProtocolRepository: MockPantryProtocolRepository(pantry: [water]),
+            RecipeProtocolRepository: MockRecipeRepository(recipes: recipes),
+            PantryProtocolRepository: MockPantryRepository(pantry: [water]),
             matcher: RecipeMatcher()
         )
 
@@ -277,8 +277,8 @@ struct RecipeIntegrationTests {
         )
 
         let sut = RecipeUseCasesImpl(
-            RecipeProtocolRepository: MockRecipeProtocolRepository(recipes: [recipe]),
-            PantryProtocolRepository: MockPantryProtocolRepository(pantry: []),
+            RecipeProtocolRepository: MockRecipeRepository(recipes: [recipe]),
+            PantryProtocolRepository: MockPantryRepository(pantry: []),
             matcher: RecipeMatcher()
         )
 
@@ -333,8 +333,8 @@ struct RecipeIntegrationTests {
         ]
 
         let sut = RecipeUseCasesImpl(
-            RecipeProtocolRepository: MockRecipeProtocolRepository(recipes: recipes),
-            PantryProtocolRepository: MockPantryProtocolRepository(pantry: [water]),
+            RecipeProtocolRepository: MockRecipeRepository(recipes: recipes),
+            PantryProtocolRepository: MockPantryRepository(pantry: [water]),
             matcher: RecipeMatcher()
         )
 

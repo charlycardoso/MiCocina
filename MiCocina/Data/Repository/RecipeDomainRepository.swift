@@ -8,41 +8,41 @@
 import Foundation
 
 final class RecipeDomainRepository: RecipeProtocolRepository {
-    private let RecipeProtocolRepository: RecipeProtocolRepository
+    private let recipeRepository: RecipeProtocolRepository
 
     init(RecipeProtocolRepository: RecipeProtocolRepository) {
-        self.RecipeProtocolRepository = RecipeProtocolRepository
+        self.recipeRepository = RecipeProtocolRepository
     }
 
     func getAll() -> [Recipe] {
-        RecipeProtocolRepository.getAll()
+        recipeRepository.getAll()
     }
 
     func getByID(_ id: UUID) -> Recipe? {
-        RecipeProtocolRepository.getByID(id)
+        recipeRepository.getByID(id)
     }
 
     func getByName(_ name: String) -> Recipe? {
-        RecipeProtocolRepository.getByName(name)
+        recipeRepository.getByName(name)
     }
 
     func getByMealType(_ mealType: MealType) -> [Recipe] {
-        RecipeProtocolRepository.getByMealType(mealType)
+        recipeRepository.getByMealType(mealType)
     }
 
     func getFavorites() -> [Recipe] {
-        RecipeProtocolRepository.getFavorites()
+        recipeRepository.getFavorites()
     }
 
     func save(_ recipe: Recipe) throws {
-        try RecipeProtocolRepository.save(recipe)
+        try recipeRepository.save(recipe)
     }
 
     func delete(_ recipe: Recipe) throws {
-        try RecipeProtocolRepository.delete(recipe)
+        try recipeRepository.delete(recipe)
     }
 
     func update(_ recipe: Recipe) throws {
-        try RecipeProtocolRepository.update(recipe)
+        try recipeRepository.update(recipe)
     }
 }

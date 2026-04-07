@@ -1,11 +1,11 @@
 //
-//  MockPantryProtocolRepository.swift
+//  MockPantryRepository.swift
 //  MiCocina
 //
 //  Created by Carlos Cardoso on 19/03/26.
 //
 
-final class MockPantryProtocolRepository: PantryProtocolRepository {
+final class MockPantryRepository: PantryProtocolRepository {
     private var pantry: Set<Ingredient>
 
     init(pantry: Set<Ingredient> = []) {

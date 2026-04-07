@@ -8,33 +8,33 @@
 import Foundation
 
 final class PantryDomainRepository: PantryProtocolRepository {
-    private let PantryProtocolRepository: PantryProtocolRepository
+    private let pantryRepository: PantryProtocolRepository
 
     init(PantryProtocolRepository: PantryProtocolRepository) {
-        self.PantryProtocolRepository = PantryProtocolRepository
+        self.pantryRepository = PantryProtocolRepository
     }
 
     func getPantry() -> Set<Ingredient> {
-        PantryProtocolRepository.getPantry()
+        pantryRepository.getPantry()
     }
 
     func add(_ ingredient: Ingredient) throws {
-        try PantryProtocolRepository.add(ingredient)
+        try pantryRepository.add(ingredient)
     }
 
     func remove(_ ingredient: Ingredient) throws {
-        try PantryProtocolRepository.remove(ingredient)
+        try pantryRepository.remove(ingredient)
     }
 
     func update(_ ingredient: Ingredient) throws {
-        try PantryProtocolRepository.update(ingredient)
+        try pantryRepository.update(ingredient)
     }
 
     func clear() throws {
-        try PantryProtocolRepository.clear()
+        try pantryRepository.clear()
     }
 
     func exists(_ ingredient: Ingredient) -> Bool {
-        PantryProtocolRepository.exists(ingredient)
+        pantryRepository.exists(ingredient)
     }
 }
