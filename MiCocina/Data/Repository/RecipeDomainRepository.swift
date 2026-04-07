@@ -1,5 +1,5 @@
 //
-//  DefaultRecipeRepository.swift
+//  RecipeDomainRepository.swift
 //  MiCocina
 //
 //  Created by Carlos Cardoso on 07/04/26.
@@ -9,7 +9,7 @@ import Foundation
 
 /// An adapter implementation of `RecipeProtocolRepository` that delegates to another repository.
 ///
-/// `DefaultRecipeRepository` serves as a wrapper or adapter around another `RecipeProtocolRepository`
+/// `RecipeDomainRepository` serves as a wrapper or adapter around another `RecipeProtocolRepository`
 /// implementation. This pattern enables:
 /// - Additional cross-cutting concerns without modifying the original implementation
 /// - Composition-based extension of functionality
@@ -21,9 +21,9 @@ import Foundation
 /// - Example:
 /// ```swift
 /// let baseRepository = SDRecipeProtocolRepository(context: modelContext)
-/// let domainRepository = DefaultRecipeRepository(RecipeProtocolRepository: baseRepository)
+/// let domainRepository = RecipeDomainRepository(RecipeProtocolRepository: baseRepository)
 /// ```
-final class DefaultRecipeRepository: RecipeProtocolRepository {
+final class RecipeDomainRepository: RecipeProtocolRepository {
     /// The underlying repository implementation being wrapped
     private let recipeRepository: RecipeProtocolRepository
 
