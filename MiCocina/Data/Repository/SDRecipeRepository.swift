@@ -30,12 +30,17 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
 
     /// Retrieves all recipes from the database.
     ///
-    /// - Returns: An array of `Recipe` domain objects. Returns an empty array if no recipes
-    ///   are found or if an error occurs during the fetch operation.
+    /// - Returns: An array of `Recipe` domain objects. Returns empty array if fetch fails.
     func getAll() -> [Recipe] {
         let descriptor = FetchDescriptor<SDRecipe>()
-        guard let sdRecipes = try? context.fetch(descriptor) else { return [] }
-        return sdRecipes.map { DomainMapper.toDomain(recipe: $0) }
+        do {
+            let sdRecipes = try context.fetch(descriptor)
+            return sdRecipes.map { DomainMapper.toDomain(recipe: $0) }
+        } catch {
+            // Log the error for debugging but return empty array to match protocol
+            print("RepositoryError.fetchFailed(operation: \"getAll\", underlyingError: \(error))")
+            return []
+        }
     }
 
     /// Retrieves a recipe by its unique identifier.
@@ -47,8 +52,14 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
         let descriptor = FetchDescriptor<SDRecipe>(
             predicate: #Predicate { $0.id == recipeUUID }
         )
-        guard let sdRecipe = try? context.fetch(descriptor).first else { return nil }
-        return DomainMapper.toDomain(recipe: sdRecipe)
+        do {
+            let sdRecipe = try context.fetch(descriptor).first
+            return sdRecipe.map { DomainMapper.toDomain(recipe: $0) }
+        } catch {
+            // Log the error for debugging but return nil to match protocol
+            print("RepositoryError.fetchFailed(operation: \"getByID(\(id))\", underlyingError: \(error))")
+            return nil
+        }
     }
     
     /// Retrieves a recipe by its name.
@@ -61,34 +72,50 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
         let descriptor = FetchDescriptor<SDRecipe>(
             predicate: #Predicate { $0.name == name }
         )
-        guard let sdRecipe = try? context.fetch(descriptor).last else { return nil }
-        return DomainMapper.toDomain(recipe: sdRecipe)
+        do {
+            let sdRecipe = try context.fetch(descriptor).last
+            return sdRecipe.map { DomainMapper.toDomain(recipe: $0) }
+        } catch {
+            // Log the error for debugging but return nil to match protocol
+            print("RepositoryError.fetchFailed(operation: \"getByName(\(name))\", underlyingError: \(error))")
+            return nil
+        }
     }
     
     /// Retrieves all recipes that match a specific meal type.
     ///
     /// - Parameter mealType: The `MealType` to filter recipes by.
     /// - Returns: An array of `Recipe` domain objects that match the specified meal type.
-    ///   Returns an empty array if no matching recipes are found or if an error occurs.
     func getByMealType(_ mealType: MealType) -> [Recipe] {
         let mealTypeString: String = mealType.rawValue
         let descriptor = FetchDescriptor<SDRecipe>(
             predicate: #Predicate { $0.mealType == mealTypeString }
         )
-        guard let sdRecipes = try? context.fetch(descriptor) else { return [] }
-        return sdRecipes.map { DomainMapper.toDomain(recipe: $0) }
+        do {
+            let sdRecipes = try context.fetch(descriptor)
+            return sdRecipes.map { DomainMapper.toDomain(recipe: $0) }
+        } catch {
+            // Log the error for debugging but return empty array to match protocol
+            print("RepositoryError.fetchFailed(operation: \"getByMealType(\(mealType))\", underlyingError: \(error))")
+            return []
+        }
     }
     
     /// Retrieves all recipes marked as favorites.
     ///
     /// - Returns: An array of `Recipe` domain objects that are marked as favorites.
-    ///   Returns an empty array if no favorite recipes exist or if an error occurs.
     func getFavorites() -> [Recipe] {
         let descriptor = FetchDescriptor<SDRecipe>(
             predicate: #Predicate { $0.isFavorite }
         )
-        guard let sdRecipes = try? context.fetch(descriptor) else { return [] }
-        return sdRecipes.map { DomainMapper.toDomain(recipe: $0) }
+        do {
+            let sdRecipes = try context.fetch(descriptor)
+            return sdRecipes.map { DomainMapper.toDomain(recipe: $0) }
+        } catch {
+            // Log the error for debugging but return empty array to match protocol
+            print("RepositoryError.fetchFailed(operation: \"getFavorites\", underlyingError: \(error))")
+            return []
+        }
     }
     
     /// Saves a recipe to the database.
@@ -97,18 +124,28 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
     /// recipe instead of creating a new one.
     ///
     /// - Parameter recipe: The `Recipe` domain object to save.
-    /// - Throws: An error if the save operation fails or if the update operation fails.
+    /// - Throws: `RepositoryError` if the operation fails.
     func save(_ recipe: Recipe) throws {
         let recipeUUID: UUID = recipe.id
         let descriptor = FetchDescriptor<SDRecipe>(
             predicate: #Predicate { $0.id == recipeUUID }
         )
-        if let _ = try? context.fetch(descriptor).first {
-            try update(recipe)
-            return
+        
+        do {
+            if let _ = try context.fetch(descriptor).first {
+                try update(recipe)
+                return
+            }
+        } catch {
+            throw RepositoryError.fetchFailed(operation: "save - checking existing recipe", underlyingError: error)
         }
+        
         let sdRecipe = StorageMapper.toStorage(recipe: recipe, context: context)
-        try context.save()
+        do {
+            try context.save()
+        } catch {
+            throw RepositoryError.saveFailed(operation: "save new recipe", underlyingError: error)
+        }
     }
     
     /// Deletes a recipe from the database.
@@ -117,15 +154,26 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
     /// If no recipe with the specified ID exists, the method completes without error.
     ///
     /// - Parameter recipe: The `Recipe` domain object to delete. Only the ID is used for identification.
-    /// - Throws: An error if the delete operation fails or if saving the context fails.
+    /// - Throws: `RepositoryError` if the operation fails.
     func delete(_ recipe: Recipe) throws {
         let recipeUUID: UUID = recipe.id
         let descriptor = FetchDescriptor<SDRecipe>(
             predicate: #Predicate { $0.id == recipeUUID }
         )
-        if let sdRecipe = try? context.fetch(descriptor).first {
-            context.delete(sdRecipe)
-            try context.save()
+        
+        do {
+            if let sdRecipe = try context.fetch(descriptor).first {
+                context.delete(sdRecipe)
+                try context.save()
+            }
+        } catch let error where error is NSError {
+            if (error as NSError).domain.contains("delete") || (error as NSError).localizedDescription.lowercased().contains("delete") {
+                throw RepositoryError.deleteFailed(operation: "delete recipe \(recipe.id)", underlyingError: error)
+            } else {
+                throw RepositoryError.fetchFailed(operation: "delete - finding recipe to delete", underlyingError: error)
+            }
+        } catch {
+            throw RepositoryError.fetchFailed(operation: "delete - finding recipe to delete", underlyingError: error)
         }
     }
 
@@ -135,8 +183,7 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
     /// All existing ingredients are removed and replaced with the new ones from the domain object.
     ///
     /// - Parameter recipe: The `Recipe` domain object containing the updated data.
-    /// - Throws: An `NSError` with code 404 if the recipe is not found in the database,
-    ///   or any other error that occurs during the fetch or save operations.
+    /// - Throws: `RepositoryError` if the operation fails.
     /// - Important: This method completely replaces the ingredients collection. Any existing
     ///   ingredient relationships will be deleted and recreated.
     func update(_ recipe: Recipe) throws {
@@ -144,11 +191,19 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
         let descriptor = FetchDescriptor<SDRecipe>(
             predicate: #Predicate { $0.id == recipeUUID }
         )
-        guard let sdRecipe = try context.fetch(descriptor).first else {
-            throw NSError(domain: "RecipeProtocolRepository", code: 404, userInfo: [
-                NSLocalizedDescriptionKey: "Recipe not found"
-            ])
+        
+        let sdRecipe: SDRecipe
+        do {
+            guard let foundRecipe = try context.fetch(descriptor).first else {
+                throw RepositoryError.entityNotFound(entityType: "Recipe", identifier: recipe.id.uuidString)
+            }
+            sdRecipe = foundRecipe
+        } catch let error as RepositoryError {
+            throw error
+        } catch {
+            throw RepositoryError.fetchFailed(operation: "update - finding recipe to update", underlyingError: error)
         }
+        
         sdRecipe.name = recipe.name
         sdRecipe.mealType = recipe.mealType.rawValue
         sdRecipe.isFavorite = recipe.isFavorite
@@ -169,6 +224,11 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
             )
             sdRecipe.ingredients.append(sdRecipeIngredient)
         }
-        try context.save()
+        
+        do {
+            try context.save()
+        } catch {
+            throw RepositoryError.updateFailed(operation: "update recipe \(recipe.id)", underlyingError: error)
+        }
     }
 }

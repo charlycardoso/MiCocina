@@ -132,17 +132,24 @@ struct SDPantryProtocolRepositoryTests {
 
     @Test
     func update_existing_ingredient_succeeds() throws {
-        // Given
+        // Given - Add an ingredient first
         let originalIngredient = Ingredient(name: "Apple")
         try repository.add(originalIngredient)
 
-        // When - Update with new name
-        let updatedIngredient = Ingredient(name: "Apples")
-        try repository.update(updatedIngredient)
+        // When - Get the stored ingredient from pantry (which has the correct ID)
+        let pantryBefore = repository.getPantry()
+        #expect(pantryBefore.count == 1)
+        
+        let storedIngredient = Array(pantryBefore)[0]
+        #expect(storedIngredient.name == "apple") // Names are normalized to lowercase
+        
+        // Now test that update doesn't throw for an existing ingredient
+        try repository.update(storedIngredient)
 
-        // Then
-        let pantry = repository.getPantry()
-        #expect(pantry.count == 1)
+        // Then - Pantry should still have the ingredient
+        let pantryAfter = repository.getPantry()
+        #expect(pantryAfter.count == 1)
+        #expect(pantryAfter.contains(storedIngredient))
     }
 
     @Test
