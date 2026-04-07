@@ -75,7 +75,7 @@ struct RecipeUseCasesTests {
 }
 
 extension RecipeUseCasesTests {
-    struct FakeRecipeRepository: RecipeRepository {
+    struct FakeRecipeProtocolRepository: RecipeProtocolRepository {
         private let recipes: [Recipe]
 
         init(recipes: [Recipe]) {
@@ -112,7 +112,7 @@ extension RecipeUseCasesTests {
         }
     }
     
-    struct FakePantryRepository: PantryRepository {
+    struct FakePantryProtocolRepository: PantryProtocolRepository {
         private let pantry: Set<Ingredient>
 
         init(pantry: Set<Ingredient>) {
@@ -145,8 +145,8 @@ extension RecipeUseCasesTests {
         pantry: Set<Ingredient> = []
     ) -> RecipeUseCases {
         RecipeUseCasesImpl(
-            recipeRepository: FakeRecipeRepository(recipes: recipes),
-            pantryRepository: FakePantryRepository(pantry: pantry),
+            RecipeProtocolRepository: FakeRecipeProtocolRepository(recipes: recipes),
+            PantryProtocolRepository: FakePantryProtocolRepository(pantry: pantry),
             matcher: RecipeMatcher()
         )
     }

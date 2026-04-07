@@ -5,16 +5,16 @@ import Foundation
 @testable import MiCocina
 
 @Suite
-struct SDPantryRepositoryTests {
+struct SDPantryProtocolRepositoryTests {
     private var container: ModelContainer
     private var context: ModelContext
-    private var repository: SDPantryRepository
+    private var repository: SDPantryProtocolRepository
 
     init() throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         container = try ModelContainer(for: SDIngredient.self, configurations: config)
         context = ModelContext(container)
-        repository = SDPantryRepository(context: context)
+        repository = SDPantryProtocolRepository(context: context)
     }
 
     @Test

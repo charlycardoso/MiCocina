@@ -5,10 +5,10 @@ import Foundation
 @testable import MiCocina
 
 @Suite
-struct SDRecipeRepositoryTests {
+struct SDRecipeProtocolRepositoryTests {
     private var container: ModelContainer
     private var context: ModelContext
-    private var repository: SDRecipeRepository
+    private var repository: SDRecipeProtocolRepository
 
     init() throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
@@ -17,7 +17,7 @@ struct SDRecipeRepositoryTests {
             configurations: config
         )
         context = ModelContext(container)
-        repository = SDRecipeRepository(context: context)
+        repository = SDRecipeProtocolRepository(context: context)
     }
 
     private func createTestRecipe(

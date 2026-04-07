@@ -1,5 +1,5 @@
 //
-//  SDPantryRepository.swift
+//  SDPantryProtocolRepository.swift
 //  MiCocina
 //
 //  Created by Carlos Cardoso on 03/04/26.
@@ -8,7 +8,7 @@
 import SwiftData
 import Foundation
 
-final class SDPantryRepository: PantryRepository {
+final class SDPantryProtocolRepository: PantryProtocolRepository {
     let context: ModelContext
 
     init(context: ModelContext) {

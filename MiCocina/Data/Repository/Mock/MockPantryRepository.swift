@@ -1,25 +1,11 @@
 //
-//  PantryRepository.swift
+//  MockPantryProtocolRepository.swift
 //  MiCocina
 //
 //  Created by Carlos Cardoso on 19/03/26.
 //
 
-protocol PantryRepository {
-    func getPantry() -> Set<Ingredient>
-
-    func add(_ ingredient: Ingredient) throws
-
-    func remove(_ ingredient: Ingredient) throws
-
-    func update(_ ingredient: Ingredient) throws
-
-    func clear() throws
-
-    func exists(_ ingredient: Ingredient) -> Bool
-}
-
-final class MockPantryRepository: PantryRepository {
+final class MockPantryProtocolRepository: PantryProtocolRepository {
     private var pantry: Set<Ingredient>
 
     init(pantry: Set<Ingredient> = []) {

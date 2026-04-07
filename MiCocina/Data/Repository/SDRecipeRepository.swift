@@ -1,5 +1,5 @@
 //
-//  SDRecipeRepository.swift
+//  SDRecipeProtocolRepository.swift
 //  MiCocina
 //
 //  Created by Carlos Cardoso on 03/04/26.
@@ -8,7 +8,7 @@
 import SwiftData
 import Foundation
 
-final class SDRecipeRepository: RecipeRepository {
+final class SDRecipeProtocolRepository: RecipeProtocolRepository {
     let context: ModelContext
 
     init(context: ModelContext) {
@@ -85,7 +85,7 @@ final class SDRecipeRepository: RecipeRepository {
             predicate: #Predicate { $0.id == recipeUUID }
         )
         guard let sdRecipe = try context.fetch(descriptor).first else {
-            throw NSError(domain: "RecipeRepository", code: 404, userInfo: [
+            throw NSError(domain: "RecipeProtocolRepository", code: 404, userInfo: [
                 NSLocalizedDescriptionKey: "Recipe not found"
             ])
         }

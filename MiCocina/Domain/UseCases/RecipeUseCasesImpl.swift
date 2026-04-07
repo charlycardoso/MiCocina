@@ -30,27 +30,27 @@ struct RecipeGrouper {
 }
 
 final class RecipeUseCasesImpl: RecipeUseCases {
-    private let recipeRepository: RecipeRepository
-    private let pantryRepository: PantryRepository
+    private let RecipeProtocolRepository: RecipeProtocolRepository
+    private let PantryProtocolRepository: PantryProtocolRepository
     private let matcher: RecipeMatcher
     private let mapper = RecipeMapper()
 
-    init(recipeRepository: RecipeRepository, pantryRepository: PantryRepository, matcher: RecipeMatcher) {
-        self.recipeRepository = recipeRepository
-        self.pantryRepository = pantryRepository
+    init(RecipeProtocolRepository: RecipeProtocolRepository, PantryProtocolRepository: PantryProtocolRepository, matcher: RecipeMatcher) {
+        self.RecipeProtocolRepository = RecipeProtocolRepository
+        self.PantryProtocolRepository = PantryProtocolRepository
         self.matcher = matcher
     }
 
     func getAllRecipes() -> [RecipeGroup] {
-        let recipes = recipeRepository.getAll()
-        let pantry = pantryRepository.getPantry()
+        let recipes = RecipeProtocolRepository.getAll()
+        let pantry = PantryProtocolRepository.getPantry()
         let mapped = recipes.map { mapper.map($0, pantry: pantry, matcher: matcher) }
         return RecipeGrouper.group(mapped)
     }
 
     func getPossibleRecipes() -> [RecipeGroup] {
-        let recipes = recipeRepository.getAll()
-        let pantry = pantryRepository.getPantry()
+        let recipes = RecipeProtocolRepository.getAll()
+        let pantry = PantryProtocolRepository.getPantry()
         let possible = matcher.possibleRecipes(from: recipes, pantry: pantry)
         let mapped = possible.map { mapper.map($0, pantry: pantry, matcher: matcher) }
         return RecipeGrouper.group(mapped)
