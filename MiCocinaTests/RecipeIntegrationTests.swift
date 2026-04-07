@@ -8,9 +8,18 @@
 import Testing
 @testable import MiCocina
 
+/// Integration test suite validating the entire recipe pipeline.
+///
+/// `RecipeIntegrationTests` validates the complete flow from matching recipes,
+/// through mapping to view data, and finally grouping by meal type. These tests
+/// ensure all components work together correctly in real-world scenarios.
 @MainActor
 struct RecipeIntegrationTests {
 
+    /// Tests the complete pipeline from recipe matching to final grouped output.
+    ///
+    /// Verifies that the matcher, mapper, and grouper components work together
+    /// to produce correctly organized and sorted recipe groups.
     @Test
     func full_pipeline_matcher_mapper_grouper_produces_correct_output() {
         // Given - Complete scenario with multiple recipes and ingredients

@@ -9,9 +9,16 @@ import Testing
 import SwiftData
 @testable import MiCocina
 
+/// Test suite for `StorageMapper` domain model to persistence model conversion.
+///
+/// `StorageMapperTests` validates the mapping of domain models to storage layer models.
+/// Tests ensure proper persistence of data and correct handling of relationships and deduplication.
 @MainActor
 struct StorageMapperTests {
     
+    /// Tests that domain ingredients are correctly converted to storage ingredients.
+    ///
+    /// Verifies that the ingredient name is preserved (normalized) during storage mapping.
     @Test
     func toStorage_ingredient_maps_correctly() async {
         // Given
@@ -27,6 +34,12 @@ struct StorageMapperTests {
         #expect(sdIngredient.name == "tomato")
     }
     
+    /// Tests that new storage ingredients are created when not yet present.
+    ///
+    /// Verifies proper insertion of new ingredients into the database.
+    /// Tests that new storage ingredients are created when not yet present.
+    ///
+    /// Verifies proper insertion of new ingredients into the database.
     @Test
     func toStorage_ingredient_creates_new_when_not_exists() async {
         // Given
@@ -43,6 +56,9 @@ struct StorageMapperTests {
         #expect(!sdIngredient.name.isEmpty)
     }
     
+    /// Tests that existing ingredients are returned instead of creating duplicates.
+    ///
+    /// Verifies deduplication by ID when an ingredient already exists.
     @Test
     func toStorage_ingredient_returns_existing_when_present() async {
         // Given
@@ -60,6 +76,9 @@ struct StorageMapperTests {
         #expect(sdIngredient1.name == "garlic")
     }
     
+    /// Tests that recipe ingredients are correctly converted to storage recipe ingredients.
+    ///
+    /// Verifies proper mapping of the relationship and the isRequired flag.
     @Test
     func toStorage_recipeIngredient_maps_correctly() async {
         // Given

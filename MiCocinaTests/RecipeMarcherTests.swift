@@ -8,9 +8,20 @@
 import Testing
 @testable import MiCocina
 
+/// Test suite for `RecipeMatcher` service.
+///
+/// `RecipeMarcherTests` validates the recipe matching algorithm that determines
+/// whether recipes can be cooked with available pantry items. Tests cover:
+/// - Basic matching with exact ingredients
+/// - Matching with missing ingredients (up to 3)
+/// - Filtering multiple recipes at once
+/// - Edge cases like empty recipes and empty pantries
 @MainActor
 struct RecipeMarcherTests {
 
+    /// Tests that a recipe is cookable when all ingredients are available.
+    ///
+    /// Verifies the basic happy path where all required ingredients exist in the pantry.
     @Test
     func recipe_is_possible_when_all_ingredients_exists() {
         // My Ingredients
@@ -26,6 +37,10 @@ struct RecipeMarcherTests {
         #expect(result == true)
     }
 
+    /// Tests that a recipe is cookable when some ingredients are missing.
+    ///
+    /// Verifies that optional ingredients don't count against the tolerance threshold.
+    /// A recipe with all required ingredients is cookable even without optional ones.
     @Test
     func recipe_is_possible_when_all_ingredients_do_not_exists() {
         // My ingredients
@@ -46,6 +61,10 @@ struct RecipeMarcherTests {
         #expect(result == true)
     }
 
+    /// Tests that `possibleRecipes()` correctly filters recipes.
+    ///
+    /// Verifies that the matcher can filter multiple recipes and return only
+    /// those that are cookable based on the tolerance threshold.
     @Test
     func filters_only_possible_recipes() {
         // Ingredients
@@ -86,6 +105,10 @@ struct RecipeMarcherTests {
         #expect(result.map(\.name).contains("carlotta de limón"))
     }
 
+    /// Tests that a recipe cannot be cooked when pantry is empty.
+    ///
+    /// Verifies that a recipe with 3 or more missing ingredients cannot be cooked,
+    /// applying the tolerance threshold correctly.
     @Test
     func can_cook_when_there_are_no_ingredients() {
         let pantry: Set<Ingredient> = []

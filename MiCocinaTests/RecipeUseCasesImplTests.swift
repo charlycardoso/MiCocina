@@ -8,9 +8,25 @@
 import Testing
 @testable import MiCocina
 
+/// Test suite for `RecipeUseCasesImpl` use case implementation.
+///
+/// `RecipeUseCasesImplTests` validates the complete workflow of recipe discovery,
+/// including fetching recipes from repositories, applying recipe matching, mapping
+/// to view data, and grouping by meal type.
+///
+/// Tests cover:
+/// - Fetching all recipes with proper grouping and sorting
+/// - Correct mapping of recipe properties to view data
+/// - Filtering to show only cookable recipes
+/// - Proper handling of missing ingredient counts
+/// - Recipe sorting within groups (favorites first, then cookable, etc.)
 @MainActor
 struct RecipeUseCasesImplTests {
 
+    /// Tests that all recipes are returned grouped by meal type.
+    ///
+    /// Verifies that `getAllRecipes()` returns recipe groups for each meal type
+    /// found in the repository.
     @Test
     func getAllRecipes_returns_all_recipes_grouped_by_meal_type() {
         // Given
@@ -44,6 +60,10 @@ struct RecipeUseCasesImplTests {
         #expect(groups.contains { $0.mealType == .lunch })
     }
 
+    /// Tests that recipes are correctly mapped to view data.
+    ///
+    /// Verifies that `getAllRecipes()` correctly transforms domain recipes to
+    /// view data, preserving all properties and computing derived fields.
     @Test
     func getAllRecipes_maps_recipes_correctly() {
         // Given
@@ -73,6 +93,13 @@ struct RecipeUseCasesImplTests {
         #expect(mappedRecipe.missingCount == 0)
     }
 
+    /// Tests that recipes are properly sorted within each group.
+    ///
+    /// Verifies that within a meal type group, recipes are sorted by:
+    /// 1. Favorite status (favorites first)
+    /// 2. Cookability (can cook before can't cook)
+    /// 3. Missing ingredient count (fewer missing first)
+    /// 4. Alphabetically (as tiebreaker)
     @Test
     func getAllRecipes_sorts_recipes_within_groups() {
         // Given
@@ -106,6 +133,10 @@ struct RecipeUseCasesImplTests {
         #expect(groups[0].recipes[1].isFavorite == false)
     }
 
+    /// Tests that `getPossibleRecipes()` filters recipes by cookability.
+    ///
+    /// Verifies that only recipes with 3 or fewer missing ingredients are returned.
+    /// The tolerance of 3 missing ingredients allows practical meal planning.
     @Test
     func getPossibleRecipes_filters_only_cookable_recipes() {
         // Given

@@ -9,9 +9,17 @@ import Testing
 import Foundation
 @testable import MiCocina
 
+/// Test suite for `RecipeGrouper` utility.
+///
+/// `RecipeGrouperTests` validates the recipe grouping and sorting functionality
+/// that organizes recipes by meal type and applies intelligent sorting within each group.
 @MainActor
 struct RecipeGrouperTests {
 
+    /// Tests that recipes are grouped by meal type.
+    ///
+    /// Verifies that `RecipeGrouper.group()` creates separate groups for each
+    /// meal type represented in the input.
     @Test
     func grouper_groups_recipes_by_meal_type() {
         // Given
@@ -52,6 +60,14 @@ struct RecipeGrouperTests {
         #expect(groups.contains { $0.mealType == .dinner })
     }
 
+    /// Tests that groups are sorted by meal type raw value.
+    ///
+    /// Verifies that the returned groups are sorted alphabetically by
+    /// their meal type string representation for consistent display order.
+    /// Tests that groups are sorted by meal type raw value.
+    ///
+    /// Verifies that the returned groups are sorted alphabetically by
+    /// their meal type string representation for consistent display order.
     @Test
     func grouper_sorts_groups_by_meal_type_raw_value() {
         // Given
@@ -90,6 +106,9 @@ struct RecipeGrouperTests {
         #expect(mealTypes == [.breakFast, .dinner, .lunch])
     }
 
+    /// Tests that favorite recipes appear first within a group.
+    ///
+    /// Verifies the first sorting criterion: favorite recipes are sorted before non-favorites.
     @Test
     func grouper_sorts_recipes_within_group_favorites_first() {
         // Given

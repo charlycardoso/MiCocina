@@ -8,8 +8,16 @@
 import Testing
 @testable import MiCocina
 
+/// Test suite for `DomainMapper` persistence model to domain model conversion.
+///
+/// `DomainMapperTests` validates the mapping of storage layer models (`SD*` classes)
+/// to domain models. Tests ensure proper transformation of data including normalization
+/// of ingredient names and preservation of relationships.
 struct DomainMapperTests {
 
+    /// Tests that storage ingredients are correctly converted to domain ingredients.
+    ///
+    /// Verifies that the ingredient name is normalized (lowercase) during conversion.
     @Test
     func toDomain_ingredient_maps_correctly() {
         // Given
@@ -22,6 +30,9 @@ struct DomainMapperTests {
         #expect(ingredient.name == "tomato")
     }
 
+    /// Tests that ingredient names are preserved (not empty) after conversion.
+    ///
+    /// Verifies that the mapping handles various ingredient name formats correctly.
     @Test
     func toDomain_ingredient_preserves_name() {
         // Given
@@ -35,6 +46,9 @@ struct DomainMapperTests {
         }
     }
 
+    /// Tests that recipe ingredients are correctly converted from storage to domain.
+    ///
+    /// Verifies that both the ingredient and the isRequired flag are preserved during conversion.
     @Test
     func toDomain_recipeIngredient_maps_correctly() {
         // Given
@@ -53,6 +67,9 @@ struct DomainMapperTests {
         #expect(recipeIngredient.isRequired == true)
     }
 
+    /// Tests that optional recipe ingredients are handled correctly.
+    ///
+    /// Verifies that the isRequired flag is properly preserved when false.
     @Test
     func toDomain_recipeIngredient_respects_isRequired_false() {
         // Given
@@ -70,6 +87,9 @@ struct DomainMapperTests {
         #expect(recipeIngredient.isRequired == false)
     }
 
+    /// Tests that storage recipes are correctly converted to domain recipes.
+    ///
+    /// Verifies that recipe properties and ingredients are properly mapped.
     @Test
     func toDomain_recipe_maps_correctly() {
         // Given
@@ -100,6 +120,9 @@ struct DomainMapperTests {
         #expect(recipe.ingredients.count == 2)
     }
 
+    /// Tests that all ingredients are correctly mapped from storage recipe to domain recipe.
+    ///
+    /// Verifies that multiple ingredients are all properly converted and included.
     @Test
     func toDomain_recipe_maps_all_ingredients() {
         // Given
@@ -129,6 +152,9 @@ struct DomainMapperTests {
         #expect(ingredientNames.contains("olive oil"))
     }
 
+    /// Tests that meal type strings are correctly converted to MealType enums.
+    ///
+    /// Verifies proper conversion of all meal type values.
     @Test
     func toDomain_recipe_respects_mealType() {
         // Given
@@ -147,6 +173,9 @@ struct DomainMapperTests {
         }
     }
 
+    /// Tests that the isFavorite flag is correctly preserved during conversion.
+    ///
+    /// Verifies that both true and false values are properly maintained.
     @Test
     func toDomain_recipe_respects_isFavorite_flag() {
         // Given
@@ -162,6 +191,9 @@ struct DomainMapperTests {
         #expect(domainNonFavorite.isFavorite == false)
     }
 
+    /// Tests that recipes with both required and optional ingredients are handled correctly.
+    ///
+    /// Verifies that the isRequired flag is properly preserved for multiple ingredients.
     @Test
     func toDomain_recipe_with_mixed_required_ingredients() {
         // Given
@@ -193,6 +225,10 @@ struct DomainMapperTests {
         #expect(optionalCount == 1)
     }
 
+    /// Tests that ingredient names with spaces are correctly normalized.
+    ///
+    /// Verifies that multi-word ingredient names (like "Olive Oil") preserve spacing
+    /// during normalization, distinguishing them from single-word variants.
     @Test
     func toDomain_ingredient_preserves_spaces() {
         // Given - Two ingredients with similar names but different spacing

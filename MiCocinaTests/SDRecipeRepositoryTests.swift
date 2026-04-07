@@ -4,6 +4,11 @@ import Foundation
 
 @testable import MiCocina
 
+/// Test suite for `SDRecipeProtocolRepository` SwiftData-based recipe persistence.
+///
+/// `SDRecipeProtocolRepositoryTests` validates all CRUD operations and query methods
+/// for recipes stored using SwiftData. Tests ensure data integrity, relationship
+/// management, and proper error handling.
 @Suite
 struct SDRecipeProtocolRepositoryTests {
     private var container: ModelContainer
@@ -39,12 +44,14 @@ struct SDRecipeProtocolRepositoryTests {
 
     // MARK: - getAll Tests
 
+    /// Tests that getAll returns empty list when no recipes exist.
     @Test
     func getAll_empty_returns_empty_list() {
         let recipes = repository.getAll()
         #expect(recipes.isEmpty)
     }
 
+    /// Tests that getAll returns all stored recipes.
     @Test
     func getAll_with_recipes_returns_all() throws {
         // Given
@@ -61,6 +68,8 @@ struct SDRecipeProtocolRepositoryTests {
         #expect(recipes.count == 2)
     }
 
+    /// Tests that getAll correctly preserves all recipe properties including relationships.
+    /// Tests that getAll correctly preserves all recipe properties including relationships.
     @Test
     func getAll_preserves_recipe_properties() throws {
         // Given
@@ -91,6 +100,7 @@ struct SDRecipeProtocolRepositoryTests {
 
     // MARK: - getByID Tests
 
+    /// Tests that getByID returns the correct recipe when it exists.
     @Test
     func getByID_existing_recipe_returns_recipe() throws {
         // Given

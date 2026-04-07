@@ -4,6 +4,11 @@ import Foundation
 
 @testable import MiCocina
 
+/// Test suite for `SDPantryProtocolRepository` SwiftData-based pantry persistence.
+///
+/// `SDPantryProtocolRepositoryTests` validates all CRUD operations for pantry ingredients
+/// stored using SwiftData. Tests ensure proper ingredient management, deduplication,
+/// and collection operations.
 @Suite
 struct SDPantryProtocolRepositoryTests {
     private var container: ModelContainer
@@ -17,12 +22,14 @@ struct SDPantryProtocolRepositoryTests {
         repository = SDPantryProtocolRepository(context: context)
     }
 
+    /// Tests that getPantry returns empty set when pantry is empty.
     @Test
     func getPantry_empty_returns_empty_set() {
         let pantry = repository.getPantry()
         #expect(pantry.isEmpty)
     }
 
+    /// Tests that getPantry returns all stored ingredients.
     @Test
     func getPantry_with_ingredients_returns_all() throws {
         // Given
@@ -41,6 +48,7 @@ struct SDPantryProtocolRepositoryTests {
         #expect(pantry.contains(ingredient2))
     }
 
+    /// Tests that a single ingredient can be added successfully.
     @Test
     func add_single_ingredient_succeeds() throws {
         // Given

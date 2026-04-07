@@ -9,9 +9,21 @@ import Testing
 import Foundation
 @testable import MiCocina
 
+/// Test suite for `RecipeUseCases` protocol behavior.
+///
+/// `RecipeUseCasesTests` validates the core functionality of the recipe use case interface
+/// using fake repository implementations. Tests focus on high-level behavior such as
+/// grouping, filtering, and data mapping.
+///
+/// This test suite uses local fake implementations of the repositories to isolate
+/// testing of the use case logic from specific repository implementations.
 @MainActor
 struct RecipeUseCasesTests {
 
+    /// Tests that recipes are grouped by meal type.
+    ///
+    /// Verifies that `getAllRecipes()` correctly organizes recipes into groups
+    /// based on their meal type classification.
     @Test
     func groups_recipes_by_meal_type() {
         // ingredients
@@ -42,6 +54,9 @@ struct RecipeUseCasesTests {
         #expect(groups.first(where: { $0.mealType == .lunch })?.recipes.map(\.name) == ["Limonada"])
     }
     
+    /// Tests that an empty array is returned when no recipes exist.
+    ///
+    /// Verifies proper handling of the empty state.
     @Test
     func returns_empty_array_when_no_recipes() {
         // given
@@ -54,6 +69,10 @@ struct RecipeUseCasesTests {
         #expect(recipeGroups.isEmpty)
     }
     
+    /// Tests that missing ingredient counts are computed correctly.
+    ///
+    /// Verifies that the `missingCount` property correctly reflects the number
+    /// of ingredients not available in the pantry.
     @Test
     func all_recipes_have_correct_missing_count() {
         // given
@@ -75,6 +94,10 @@ struct RecipeUseCasesTests {
 }
 
 extension RecipeUseCasesTests {
+    /// A fake recipe repository for testing purposes.
+    ///
+    /// Provides a minimal in-memory implementation of `RecipeProtocolRepository`
+    /// that stores recipes and returns them without any persistence layer.
     struct FakeRecipeProtocolRepository: RecipeProtocolRepository {
         private let recipes: [Recipe]
 
@@ -112,6 +135,10 @@ extension RecipeUseCasesTests {
         }
     }
     
+    /// A fake pantry repository for testing purposes.
+    ///
+    /// Provides a minimal in-memory implementation of `PantryProtocolRepository`
+    /// that stores ingredients in a set without any persistence layer.
     struct FakePantryProtocolRepository: PantryProtocolRepository {
         private let pantry: Set<Ingredient>
 
@@ -140,6 +167,15 @@ extension RecipeUseCasesTests {
         }
     }
     
+    /// Creates a subject under test (SUT) with configurable fake repositories.
+    ///
+    /// This helper method simplifies test setup by providing a pre-configured
+    /// `RecipeUseCasesImpl` with fake repositories.
+    ///
+    /// - Parameters:
+    ///   - recipes: The recipes to populate in the fake recipe repository
+    ///   - pantry: The ingredients to populate in the fake pantry repository
+    /// - Returns: A configured `RecipeUseCases` instance ready for testing
     func makeSUT(
         recipes: [Recipe] = [],
         pantry: Set<Ingredient> = []

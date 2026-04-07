@@ -8,9 +8,16 @@
 import Testing
 @testable import MiCocina
 
+/// Test suite for `RecipeMapper` domain model to view data conversion.
+///
+/// `RecipeMapperTests` validates the transformation of recipes into view-optimized
+/// data objects, including computation of cookability and missing ingredient counts.
 @MainActor
 struct RecipeMapperTests {
 
+    /// Tests that missing ingredient counts are computed correctly.
+    ///
+    /// Verifies that the mapper correctly counts ingredients not present in the pantry.
     @Test
     func mapper_computes_correct_missing_count() {
         // Given
@@ -40,6 +47,10 @@ struct RecipeMapperTests {
         #expect(result.missingCount == 2)
     }
 
+    /// Tests that both required and optional missing ingredients are counted.
+    ///
+    /// Verifies that the missing count includes both required and optional ingredients
+    /// not present in the pantry.
     @Test
     func mapper_counts_missing_ingredients_regardless_of_required_status() {
         // Given
@@ -69,6 +80,9 @@ struct RecipeMapperTests {
         #expect(result.missingCount == 2)
     }
 
+    /// Tests that canCook flag is based on the recipe matcher result.
+    ///
+    /// Verifies that the mapper correctly delegates cookability determination to the matcher.
     @Test
     func mapper_sets_canCook_based_on_matcher() {
         // Given

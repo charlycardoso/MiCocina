@@ -7,8 +7,33 @@
 
 import Foundation
 
+/// Converts persistence models to domain models.
+///
+/// `DomainMapper` is responsible for transforming storage layer models (`SD*` classes)
+/// into domain layer models. This mapper enables the application to maintain a clear
+/// separation between persistence implementation details and business logic.
+///
+/// All mappings are static methods for convenience and to emphasize the stateless
+/// nature of the mapping operations.
+///
+/// - Example:
+/// ```swift
+/// let sdRecipe = sdRecipeFromDatabase
+/// let domainRecipe = DomainMapper.toDomain(recipe: sdRecipe)
+/// ```
 final class DomainMapper {
-    // MARK: Recipe
+    
+    // MARK: - Recipe Mapping
+    
+    /// Converts a storage recipe model to a domain recipe model.
+    ///
+    /// Transforms a `SDRecipe` persistence model into a `Recipe` domain model by:
+    /// 1. Converting the meal type string to a `MealType` enum
+    /// 2. Recursively converting all storage ingredients to domain ingredients
+    /// 3. Preserving all recipe properties and relationships
+    ///
+    /// - Parameter recipe: The storage recipe model to convert
+    /// - Returns: A domain `Recipe` model with all ingredients converted
     static func toDomain(recipe: SDRecipe) -> Recipe {
         var recipeIngredients: Set<RecipeIngredient> = .init()
         recipe.ingredients.forEach { recipe in
@@ -24,12 +49,22 @@ final class DomainMapper {
         )
     }
 
-    // MARK: Ingredient
+    // MARK: - Ingredient Mapping
+    
+    /// Converts a storage ingredient model to a domain ingredient model.
+    ///
+    /// - Parameter ingredient: The storage ingredient model to convert
+    /// - Returns: A domain `Ingredient` model
     static func toDomain(ingredient: SDIngredient) -> Ingredient {
         return .init(id: ingredient.id, name: ingredient.name)
     }
 
-    // MARK: RecipeIngredient
+    // MARK: - RecipeIngredient Mapping
+    
+    /// Converts a storage recipe-ingredient association to a domain recipe-ingredient.
+    ///
+    /// - Parameter recipeIngredient: The storage recipe-ingredient model to convert
+    /// - Returns: A domain `RecipeIngredient` model with the ingredient converted
     static func toDomain(recipeIngredient: SDRecipeIngredient) -> RecipeIngredient {
         let ingredient = DomainMapper.toDomain(ingredient: recipeIngredient.ingredient)
         return .init(ingredient: ingredient, isRequired: recipeIngredient.isRequired)
