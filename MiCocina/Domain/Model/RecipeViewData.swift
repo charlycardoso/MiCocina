@@ -30,7 +30,7 @@ import Foundation
 ///     missingCount: 0
 /// )
 /// ```
-struct RecipeViewData: Equatable {
+struct RecipeViewData: Identifiable, Equatable {
     /// Unique identifier for the recipe
     let id: UUID
     
