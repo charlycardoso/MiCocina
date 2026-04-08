@@ -1,0 +1,49 @@
+/* Meal types */
+"mealType.breakfast" = "Breakfast";
+"mealType.lunch" = "Lunch";
+"mealType.dinner" = "Dinner";
+"mealType.other" = "Other";
+
+/* Common */
+"common.cancel" = "Cancel";
+"common.save" = "Save";
+"common.ok" = "OK";
+"common.information" = "Information";
+"common.ingredients" = "Ingredients";
+"common.basicInfo" = "Basic Information";
+"common.recipeName" = "Recipe name";
+"common.recipeNamePlaceholder" = "Ex: Pasta Carbonara";
+"common.mealTypeLabel" = "Meal type";
+"common.markAsFavorite" = "Mark as favorite";
+"common.addIngredientPlaceholder" = "Add ingredient";
+"common.add" = "Add";
+"common.noIngredientsAdded" = "No ingredients added";
+"common.duplicateIngredient" = "This ingredient has already been added";
+"common.saveRecipeError" = "Error saving the recipe: %@";
+
+/* HomeContent */
+"homeContent.emptyState" = "You have no recipes available. \nSearch for one or create a new one.";
+"homeContent.navigationTitle" = "My recipes";
+"homeContent.searchPrompt" = "Search recipes";
+"homeContent.canCook" = "Cookable";
+"homeContent.cannotCook" = "Not cookable";
+
+/* NewRecipeView */
+"newRecipe.navigationTitle" = "New Recipe";
+
+/* RecipeDetailView */
+"recipeDetail.edit" = "Edit";
+"recipeDetail.delete" = "Delete";
+"recipeDetail.deleteAlertTitle" = "Delete Recipe";
+"recipeDetail.deleteConfirmMessage" = "Are you sure you want to delete the recipe \"%@\"? This action cannot be undone.";
+"recipeDetail.loadingIngredients" = "Loading ingredients...";
+"recipeDetail.recipeStatus" = "Recipe status";
+"recipeDetail.canCookStatus" = "You can cook this recipe!";
+"recipeDetail.cannotCookStatus" = "You're missing some ingredients";
+"recipeDetail.missingIngredients.singular" = "You're missing %d ingredient";
+"recipeDetail.missingIngredients.plural" = "You're missing %d ingredients";
+"recipeDetail.startCooking" = "Start cooking";
+"recipeDetail.optional" = "Optional";
+
+/* EditRecipeView */
+"editRecipe.navigationTitle" = "Edit Recipe";

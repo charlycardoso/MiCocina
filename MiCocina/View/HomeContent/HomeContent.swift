@@ -22,7 +22,7 @@ struct HomeContent: View {
         NavigationStack {
             Group {
                 if viewModel.recipes.isEmpty || viewModel.possibleRecipes.isEmpty {
-                    Text("No tienes recetas disponibles. \nBusca alguna receta o crea una nueva.")
+                    Text("homeContent.emptyState")
                         .padding()
                         .multilineTextAlignment(.center)
                         .font(.callout)
@@ -57,8 +57,8 @@ struct HomeContent: View {
                     .foregroundColor(.blue)
                 }
             })
-            .navigationTitle("Mis recetas")
-            .searchable(text: $searchRecipe, prompt: .init("Buscar recetas"))
+            .navigationTitle("homeContent.navigationTitle")
+            .searchable(text: $searchRecipe, prompt: "homeContent.searchPrompt")
             .onAppear {
                 viewModel.getAllRecipes()
             }
@@ -100,7 +100,7 @@ struct HomeContent: View {
                 }
             }
 
-            Text(recipe.canCook ? "Cocinable" : "No cocinable")
+            Text(recipe.canCook ? "homeContent.canCook" : "homeContent.cannotCook")
                 .foregroundStyle(recipe.canCook ? Color.green : Color.orange)
                 .font(.footnote)
                 .fontWeight(.medium)
@@ -123,13 +123,13 @@ struct HomeContent: View {
     private func mealTypeName(for mealType: MealType) -> String {
         switch mealType {
         case .breakFast:
-            return "Desayuno"
+            return NSLocalizedString("mealType.breakfast", comment: "")
         case .lunch:
-            return "Comida"
+            return NSLocalizedString("mealType.lunch", comment: "")
         case .dinner:
-            return "Cena"
+            return NSLocalizedString("mealType.dinner", comment: "")
         case .other:
-            return "Otros"
+            return NSLocalizedString("mealType.other", comment: "")
         }
     }
 }

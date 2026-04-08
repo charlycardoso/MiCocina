@@ -1,0 +1,49 @@
+/* Meal types */
+"mealType.breakfast" = "Desayuno";
+"mealType.lunch" = "Comida";
+"mealType.dinner" = "Cena";
+"mealType.other" = "Otros";
+
+/* Common */
+"common.cancel" = "Cancelar";
+"common.save" = "Guardar";
+"common.ok" = "OK";
+"common.information" = "Información";
+"common.ingredients" = "Ingredientes";
+"common.basicInfo" = "Información Básica";
+"common.recipeName" = "Nombre de la receta";
+"common.recipeNamePlaceholder" = "Ej: Pasta Carbonara";
+"common.mealTypeLabel" = "Tipo de comida";
+"common.markAsFavorite" = "Marcar como favorito";
+"common.addIngredientPlaceholder" = "Agregar ingrediente";
+"common.add" = "Agregar";
+"common.noIngredientsAdded" = "No hay ingredientes agregados";
+"common.duplicateIngredient" = "Este ingrediente ya fue agregado";
+"common.saveRecipeError" = "Error al guardar la receta: %@";
+
+/* HomeContent */
+"homeContent.emptyState" = "No tienes recetas disponibles. \nBusca alguna receta o crea una nueva.";
+"homeContent.navigationTitle" = "Mis recetas";
+"homeContent.searchPrompt" = "Buscar recetas";
+"homeContent.canCook" = "Cocinable";
+"homeContent.cannotCook" = "No cocinable";
+
+/* NewRecipeView */
+"newRecipe.navigationTitle" = "Nueva Receta";
+
+/* RecipeDetailView */
+"recipeDetail.edit" = "Editar";
+"recipeDetail.delete" = "Eliminar";
+"recipeDetail.deleteAlertTitle" = "Eliminar Receta";
+"recipeDetail.deleteConfirmMessage" = "¿Estás seguro de que deseas eliminar la receta \"%@\"? Esta acción no se puede deshacer.";
+"recipeDetail.loadingIngredients" = "Cargando ingredientes...";
+"recipeDetail.recipeStatus" = "Estado de la receta";
+"recipeDetail.canCookStatus" = "¡Puedes cocinar esta receta!";
+"recipeDetail.cannotCookStatus" = "Te faltan algunos ingredientes";
+"recipeDetail.missingIngredients.singular" = "Te falta %d ingrediente";
+"recipeDetail.missingIngredients.plural" = "Te faltan %d ingredientes";
+"recipeDetail.startCooking" = "Empezar a cocinar";
+"recipeDetail.optional" = "Opcional";
+
+/* EditRecipeView */
+"editRecipe.navigationTitle" = "Editar Receta";

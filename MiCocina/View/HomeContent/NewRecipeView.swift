@@ -11,7 +11,7 @@ import SwiftData
 struct NewRecipeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var recipeName: String = ""
     @State private var selectedMealType: MealType = .other
     @State private var isFavorite: Bool = false
@@ -19,13 +19,13 @@ struct NewRecipeView: View {
     @State private var ingredients: [String] = []
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
-    
+
     private var homeContentViewModel: HomeContentViewModel
-    
+
     init(viewModel: HomeContentViewModel) {
         self.homeContentViewModel = viewModel
     }
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -35,61 +35,61 @@ struct NewRecipeView: View {
                 }
                 .padding()
             }
-            .navigationTitle("Nueva Receta")
+            .navigationTitle("newRecipe.navigationTitle")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancelar") {
+                    Button("common.cancel") {
                         dismiss()
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Guardar") {
+                    Button("common.save") {
                         saveRecipe()
                     }
                     .disabled(recipeName.isEmpty || ingredients.isEmpty)
                 }
             }
-            .alert("Información", isPresented: $showAlert) {
-                Button("OK") { }
+            .alert("common.information", isPresented: $showAlert) {
+                Button("common.ok") { }
             } message: {
                 Text(alertMessage)
             }
         }
     }
-    
+
     @ViewBuilder
     private var recipeBasicInfo: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Información Básica")
+            Text("common.basicInfo")
                 .font(.headline)
                 .foregroundStyle(.primary)
-            
+
             VStack(alignment: .leading, spacing: 8) {
-                Text("Nombre de la receta")
+                Text("common.recipeName")
                     .font(.subheadline)
                     .fontWeight(.medium)
-                
-                TextField("Ej: Pasta Carbonara", text: $recipeName)
+
+                TextField("common.recipeNamePlaceholder", text: $recipeName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
             }
-            
+
             VStack(alignment: .leading, spacing: 8) {
-                Text("Tipo de comida")
+                Text("common.mealTypeLabel")
                     .font(.subheadline)
                     .fontWeight(.medium)
-                
-                Picker("Tipo de comida", selection: $selectedMealType) {
-                    Text("Desayuno").tag(MealType.breakFast)
-                    Text("Comida").tag(MealType.lunch)
-                    Text("Cena").tag(MealType.dinner)
-                    Text("Otros").tag(MealType.other)
+
+                Picker("common.mealTypeLabel", selection: $selectedMealType) {
+                    Text("mealType.breakfast").tag(MealType.breakFast)
+                    Text("mealType.lunch").tag(MealType.lunch)
+                    Text("mealType.dinner").tag(MealType.dinner)
+                    Text("mealType.other").tag(MealType.other)
                 }
                 .pickerStyle(SegmentedPickerStyle())
             }
-            
-            Toggle("Marcar como favorito", isOn: $isFavorite)
+
+            Toggle("common.markAsFavorite", isOn: $isFavorite)
                 .toggleStyle(SwitchToggleStyle())
         }
         .padding()
@@ -99,30 +99,30 @@ struct NewRecipeView: View {
                 .background(Color(.systemBackground))
         }
     }
-    
+
     @ViewBuilder
     private var ingredientsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Ingredientes")
+            Text("common.ingredients")
                 .font(.headline)
                 .foregroundStyle(.primary)
-            
+
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    TextField("Agregar ingrediente", text: $ingredientText)
+                    TextField("common.addIngredientPlaceholder", text: $ingredientText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .onSubmit {
                             addIngredient()
                         }
-                    
-                    Button("Agregar") {
+
+                    Button("common.add") {
                         addIngredient()
                     }
                     .disabled(ingredientText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
-                
+
                 if ingredients.isEmpty {
-                    Text("No hay ingredientes agregados")
+                    Text("common.noIngredientsAdded")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .italic()
@@ -133,12 +133,12 @@ struct NewRecipeView: View {
                                 Image(systemName: "circle.fill")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
-                                
+
                                 Text(ingredient)
                                     .font(.body)
-                                
+
                                 Spacer()
-                                
+
                                 Button {
                                     removeIngredient(at: index)
                                 } label: {
@@ -159,35 +159,35 @@ struct NewRecipeView: View {
                 .background(Color(.systemBackground))
         }
     }
-    
+
     private func addIngredient() {
         let trimmedIngredient = ingredientText.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         guard !trimmedIngredient.isEmpty else { return }
         guard !ingredients.contains(where: { $0.lowercased() == trimmedIngredient.lowercased() }) else {
-            alertMessage = "Este ingrediente ya fue agregado"
+            alertMessage = NSLocalizedString("common.duplicateIngredient", comment: "")
             showAlert = true
             return
         }
-        
+
         ingredients.append(trimmedIngredient)
         ingredientText = ""
     }
-    
+
     private func removeIngredient(at index: Int) {
         ingredients.remove(at: index)
     }
-    
+
     private func saveRecipe() {
         guard !recipeName.isEmpty && !ingredients.isEmpty else { return }
-        
+
         do {
             // Create domain ingredients
             let recipeIngredients = Set(ingredients.map { ingredientName in
                 let ingredient = Ingredient(name: ingredientName)
                 return RecipeIngredient(ingredient: ingredient, isRequired: true)
             })
-            
+
             // Create the recipe
             let recipe = Recipe(
                 name: recipeName,
@@ -195,17 +195,17 @@ struct NewRecipeView: View {
                 mealType: selectedMealType,
                 isFavorite: isFavorite
             )
-            
+
             // Save using the view model
             try homeContentViewModel.save(recipe)
-            
+
             // Refresh the recipes list
             homeContentViewModel.getAllRecipes()
-            
+
             dismiss()
-            
+
         } catch {
-            alertMessage = "Error al guardar la receta: \(error.localizedDescription)"
+            alertMessage = String(format: NSLocalizedString("common.saveRecipeError", comment: ""), error.localizedDescription)
             showAlert = true
         }
     }
@@ -220,9 +220,9 @@ struct NewRecipeView: View {
     ])
     let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: schema, configurations: [config])
-    
+
     let mockVM = HomeContentViewModel.mockForPreview(context: container.mainContext)
-    
+
     return NewRecipeView(viewModel: mockVM)
         .modelContainer(container)
 }
