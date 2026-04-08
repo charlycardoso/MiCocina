@@ -1,0 +1,114 @@
+# .github/workflows/ci.yml
+#
+# CI workflow for MiCocina
+# Runs unit tests on every pull request targeting main.
+#
+# XCODE 26 NOTE: GitHub-hosted runners do not yet include Xcode 26 (pre-release
+# as of April 2026). You have two options:
+#
+#   Option A — self-hosted runner (recommended now):
+#     Register a macOS machine with Xcode 26 installed as a GitHub Actions
+#     self-hosted runner, then change `runs-on` to: [self-hosted, macOS, xcode-26]
+#     and remove the "Check Xcode availability" step entirely.
+#
+#   Option B — current default (macos-15 hosted runner):
+#     The preflight step detects whether Xcode 26 is present. If not, it emits a
+#     visible warning and skips the test run instead of failing with a cryptic error.
+#     Tests will begin running automatically once GitHub ships Xcode 26 on their
+#     hosted runner images — no workflow changes needed at that point.
+
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+# Cancel any in-progress run for the same PR when new commits are pushed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  XCODE_VERSION: "26.0"
+  SCHEME: "MiCocina"
+  PROJECT: "MiCocina.xcodeproj"
+  # Adjust device name if the simulator lineup changes with iOS 26.
+  # Verify available simulators with: xcrun simctl list devices available
+  DESTINATION: "platform=iOS Simulator,name=iPhone 16,OS=latest"
+
+jobs:
+  unit-tests:
+    name: Unit Tests (MiCocinaTests)
+    # Change to [self-hosted, macOS, xcode-26] when using a self-hosted runner.
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # Preflight: verify Xcode 26 is available on this runner.
+      # Remove this step once Xcode 26 is part of the hosted runner image.
+      # -----------------------------------------------------------------------
+      - name: Check Xcode availability
+        id: xcode_check
+        run: |
+          AVAILABLE=$(ls /Applications/ | grep -E "Xcode_?${XCODE_VERSION}" || true)
+          if [ -z "$AVAILABLE" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Xcode ${XCODE_VERSION} not found::Xcode ${XCODE_VERSION} is not installed on this runner. Test run skipped. See workflow comments for setup instructions."
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        if: steps.xcode_check.outputs.available == 'true'
+        run: |
+          XCODE_PATH=$(find /Applications -maxdepth 1 -name "Xcode*.app" | \
+            xargs -I{} sh -c 'plutil -extract CFBundleShortVersionString raw "{}/Contents/Info.plist" 2>/dev/null | grep -q "^${XCODE_VERSION}" && echo "{}"' | head -1)
+          sudo xcode-select --switch "$XCODE_PATH/Contents/Developer"
+          xcodebuild -version
+
+      - name: Show build environment
+        if: steps.xcode_check.outputs.available == 'true'
+        run: |
+          echo "Xcode: $(xcodebuild -version | head -1)"
+          echo "Swift: $(swift --version | head -1)"
+          echo "macOS: $(sw_vers -productVersion)"
+
+      # -----------------------------------------------------------------------
+      # Build and test
+      # -only-testing:MiCocinaTests  — unit tests only; UITests target has no
+      #   sources yet and is already skipped="YES" in the scheme, but being
+      #   explicit here guards against accidental scheme changes.
+      # CODE_SIGNING_ALLOWED=NO      — simulator runs don't need a signing identity.
+      # tee xcodebuild.log           — writes output to both the console (live in
+      #   the Actions UI) and a file uploaded as an artifact below.
+      # Note: xcpretty is intentionally NOT used. The tests use Swift Testing
+      #   (import Testing), not XCTest. xcpretty does not parse Swift Testing
+      #   output and would suppress test names and failure messages.
+      # -----------------------------------------------------------------------
+      - name: Build and run unit tests
+        if: steps.xcode_check.outputs.available == 'true'
+        run: |
+          xcodebuild test \
+            -project "$PROJECT" \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -only-testing:MiCocinaTests \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee xcodebuild.log
+
+      # Upload the .xcresult bundle (open in Xcode's Report Navigator for
+      # per-test details) and the plain-text log as a fallback.
+      - name: Upload test results
+        if: steps.xcode_check.outputs.available == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_number }}
+          path: |
+            TestResults.xcresult
+            xcodebuild.log
+          retention-days: 14
