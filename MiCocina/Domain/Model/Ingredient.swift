@@ -32,8 +32,8 @@ struct Ingredient: Identifiable, Equatable, Hashable {
     /// Human-readable name of the ingredient (automatically normalized)
     let name: String
     
-    /// Quantity of the ingredient (reserved for future use)
-    let quantity: Int = 0
+    /// Quantity of the ingredient
+    let quantity: Int
 
     /// Initializes a new `Ingredient` instance.
     ///
@@ -46,8 +46,10 @@ struct Ingredient: Identifiable, Equatable, Hashable {
     /// - Parameters:
     ///   - id: A unique identifier for the ingredient. Defaults to a newly generated UUID.
     ///   - name: The name of the ingredient. Will be normalized automatically.
-    init(id: UUID = .init(), name: String) {
+    ///   - quantity: The quantity you have of the ingredient.
+    init(id: UUID = .init(), name: String, quantity: Int = 0) {
         self.id = id
         self.name = name.normalize()
+        self.quantity = quantity
     }
 }

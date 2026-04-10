@@ -47,3 +47,58 @@
 
 /* EditRecipeView */
 "editRecipe.navigationTitle" = "Editar Receta";
+
+/* Common (extended) */
+"common.error" = "Error";
+"common.delete" = "Eliminar";
+"common.edit" = "Editar";
+"common.close" = "Cerrar";
+"common.quantity" = "Cantidad:";
+"common.name" = "Nombre:";
+"common.details" = "Detalles";
+"common.actions" = "Acciones";
+"common.ingredient.namePlaceholder" = "Nombre del ingrediente";
+"common.ingredient.emptyNameError" = "El nombre del ingrediente no puede estar vacío.";
+"common.ingredient.duplicateTitle" = "Ingrediente Duplicado";
+
+/* MyPantryView */
+"myPantry.navigationTitle" = "Mis ingredientes";
+"myPantry.emptyState" = "No tienes ingredientes agregados";
+"myPantry.noSearchResults" = "No se encontraron ingredientes con ese nombre";
+"myPantry.swipe.buy" = "Comprar";
+"myPantry.swipe.delete" = "Eliminar";
+"myPantry.deleteAlert.title" = "Eliminar ingrediente";
+"myPantry.deleteAlert.message" = "¿Estás seguro de que quieres eliminar %@?";
+"myPantry.deleteAlert.error" = "No se pudo eliminar el ingrediente";
+
+/* AddIngredientView */
+"addIngredient.navigationTitle" = "Nuevo Ingrediente";
+"addIngredient.scanBarcode" = "Escanear código de barras";
+"addIngredient.searchingProduct" = "Buscando producto...";
+"addIngredient.footer" = "Ingresa el nombre y la cantidad del ingrediente que deseas agregar a tu despensa.";
+"addIngredient.success.title" = "¡Éxito!";
+"addIngredient.success.message" = "El ingrediente se ha agregado correctamente a tu despensa.";
+"addIngredient.productNotFound.title" = "Producto no encontrado";
+"addIngredient.productNotFound.message" = "No se encontró información para este código de barras. Puedes ingresar el nombre manualmente.";
+"addIngredient.fetchError" = "No se pudo obtener información del producto.";
+"addIngredient.duplicate.message" = "Este ingrediente ya existe en tu despensa. Puedes editarlo desde la lista principal.";
+"addIngredient.saveError" = "No se pudo guardar el ingrediente. Inténtalo de nuevo.";
+
+/* IngredientDetailView */
+"ingredientDetail.navigationTitle.view" = "Detalles";
+"ingredientDetail.navigationTitle.edit" = "Editar Ingrediente";
+"ingredientDetail.sectionHeader" = "Detalles del ingrediente";
+"ingredientDetail.editingFooter" = "Modifica los detalles del ingrediente según sea necesario.";
+"ingredientDetail.viewFooter" = "Toca 'Editar' para modificar este ingrediente.";
+"ingredientDetail.addToShoppingList" = "Agregar a lista de compras";
+"ingredientDetail.deleteButton" = "Eliminar ingrediente";
+"ingredientDetail.actionsHeader" = "Acciones";
+"ingredientDetail.close" = "Cerrar";
+"ingredientDetail.edit" = "Editar";
+"ingredientDetail.saved.title" = "¡Guardado!";
+"ingredientDetail.saved.message" = "Los cambios se han guardado correctamente.";
+"ingredientDetail.deleteConfirm.title" = "¿Eliminar ingrediente?";
+"ingredientDetail.deleteConfirm.message" = "Esta acción no se puede deshacer. El ingrediente será eliminado permanentemente de tu despensa.";
+"ingredientDetail.duplicate.message" = "Ya existe un ingrediente con ese nombre en tu despensa.";
+"ingredientDetail.saveError" = "No se pudieron guardar los cambios. Inténtalo de nuevo.";
+"ingredientDetail.deleteError" = "No se pudo eliminar el ingrediente. Inténtalo de nuevo.";
