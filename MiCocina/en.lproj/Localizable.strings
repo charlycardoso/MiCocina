@@ -47,3 +47,58 @@
 
 /* EditRecipeView */
 "editRecipe.navigationTitle" = "Edit Recipe";
+
+/* Common (extended) */
+"common.error" = "Error";
+"common.delete" = "Delete";
+"common.edit" = "Edit";
+"common.close" = "Close";
+"common.quantity" = "Quantity:";
+"common.name" = "Name:";
+"common.details" = "Details";
+"common.actions" = "Actions";
+"common.ingredient.namePlaceholder" = "Ingredient name";
+"common.ingredient.emptyNameError" = "The ingredient name cannot be empty.";
+"common.ingredient.duplicateTitle" = "Duplicate Ingredient";
+
+/* MyPantryView */
+"myPantry.navigationTitle" = "My Ingredients";
+"myPantry.emptyState" = "You have no ingredients added";
+"myPantry.noSearchResults" = "No ingredients found with that name";
+"myPantry.swipe.buy" = "Buy";
+"myPantry.swipe.delete" = "Delete";
+"myPantry.deleteAlert.title" = "Delete ingredient";
+"myPantry.deleteAlert.message" = "Are you sure you want to delete %@?";
+"myPantry.deleteAlert.error" = "Could not delete the ingredient";
+
+/* AddIngredientView */
+"addIngredient.navigationTitle" = "New Ingredient";
+"addIngredient.scanBarcode" = "Scan barcode";
+"addIngredient.searchingProduct" = "Searching product...";
+"addIngredient.footer" = "Enter the name and quantity of the ingredient you want to add to your pantry.";
+"addIngredient.success.title" = "Success!";
+"addIngredient.success.message" = "The ingredient has been added correctly to your pantry.";
+"addIngredient.productNotFound.title" = "Product not found";
+"addIngredient.productNotFound.message" = "No information was found for this barcode. You can enter the name manually.";
+"addIngredient.fetchError" = "Could not get product information.";
+"addIngredient.duplicate.message" = "This ingredient already exists in your pantry. You can edit it from the main list.";
+"addIngredient.saveError" = "Could not save the ingredient. Try again.";
+
+/* IngredientDetailView */
+"ingredientDetail.navigationTitle.view" = "Details";
+"ingredientDetail.navigationTitle.edit" = "Edit Ingredient";
+"ingredientDetail.sectionHeader" = "Ingredient details";
+"ingredientDetail.editingFooter" = "Modify the ingredient details as needed.";
+"ingredientDetail.viewFooter" = "Tap 'Edit' to modify this ingredient.";
+"ingredientDetail.addToShoppingList" = "Add to shopping list";
+"ingredientDetail.deleteButton" = "Delete ingredient";
+"ingredientDetail.actionsHeader" = "Actions";
+"ingredientDetail.close" = "Close";
+"ingredientDetail.edit" = "Edit";
+"ingredientDetail.saved.title" = "Saved!";
+"ingredientDetail.saved.message" = "Changes have been saved correctly.";
+"ingredientDetail.deleteConfirm.title" = "Delete ingredient?";
+"ingredientDetail.deleteConfirm.message" = "This action cannot be undone. The ingredient will be permanently deleted from your pantry.";
+"ingredientDetail.duplicate.message" = "An ingredient with that name already exists in your pantry.";
+"ingredientDetail.saveError" = "Could not save the changes. Try again.";
+"ingredientDetail.deleteError" = "Could not delete the ingredient. Try again.";
