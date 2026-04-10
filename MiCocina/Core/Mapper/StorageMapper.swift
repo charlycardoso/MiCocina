@@ -149,4 +149,24 @@ final class StorageMapper {
         context.insert(new)
         return new
     }
+
+    static func toStorage(
+        planner: PlannerData,
+        context: ModelContext
+    ) -> SDPlannerData {
+
+        let sdRecipes = planner.recipes.map {
+            toStorage(recipe: $0, context: context)
+        }
+
+        let sdPlanner = SDPlannerData(
+            id: planner.id,
+            day: planner.day,
+            recipes: sdRecipes
+        )
+
+        context.insert(sdPlanner)
+
+        return sdPlanner
+    }
 }

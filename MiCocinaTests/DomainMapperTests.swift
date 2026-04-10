@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import MiCocina
 
 /// Test suite for `DomainMapper` persistence model to domain model conversion.
@@ -243,5 +244,50 @@ struct DomainMapperTests {
         #expect(oliveOil.name == "olive oil")
         #expect(oliveOilNoSpace.name == "oliveoil")
         #expect(oliveOil.name != oliveOilNoSpace.name)
+    }
+
+    // MARK: - Planner Mapping
+
+    @Test
+    func toDomain_planner_maps_id_and_day() {
+        // Given
+        let id = UUID()
+        let day = Date()
+        let sdPlanner = SDPlannerData(id: id, day: day, recipes: [])
+
+        // When
+        let planner = DomainMapper.toDomain(planner: sdPlanner)
+
+        // Then
+        #expect(planner.id == id)
+        #expect(planner.day == day)
+    }
+
+    @Test
+    func toDomain_planner_with_no_recipes_returns_empty_list() {
+        // Given
+        let sdPlanner = SDPlannerData(day: Date(), recipes: [])
+
+        // When
+        let planner = DomainMapper.toDomain(planner: sdPlanner)
+
+        // Then
+        #expect(planner.recipes.isEmpty)
+    }
+
+    @Test
+    func toDomain_planner_maps_all_recipes() {
+        // Given
+        let recipe1 = SDRecipe(name: "Pasta", mealType: "lunch", isFavorite: false)
+        let recipe2 = SDRecipe(name: "Pizza", mealType: "dinner", isFavorite: true)
+        let sdPlanner = SDPlannerData(day: Date(), recipes: [recipe1, recipe2])
+
+        // When
+        let planner = DomainMapper.toDomain(planner: sdPlanner)
+
+        // Then
+        #expect(planner.recipes.count == 2)
+        #expect(planner.recipes.contains { $0.name == "Pasta" })
+        #expect(planner.recipes.contains { $0.name == "Pizza" })
     }
 }

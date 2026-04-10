@@ -69,4 +69,14 @@ final class DomainMapper {
         let ingredient = DomainMapper.toDomain(ingredient: recipeIngredient.ingredient)
         return .init(ingredient: ingredient, isRequired: recipeIngredient.isRequired)
     }
+
+    static func toDomain(planner: SDPlannerData) -> PlannerData {
+        let recipes = planner.recipes.map { toDomain(recipe: $0) }
+
+        return PlannerData(
+            id: planner.id,
+            day: planner.day,
+            recipes: recipes
+        )
+    }
 }

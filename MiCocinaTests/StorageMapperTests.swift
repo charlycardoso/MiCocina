@@ -7,6 +7,7 @@
 
 import Testing
 import SwiftData
+import Foundation
 @testable import MiCocina
 
 /// Test suite for `StorageMapper` domain model to persistence model conversion.
@@ -268,5 +269,68 @@ struct StorageMapperTests {
         let optionalCount = sdRecipe.ingredients.filter { !$0.isRequired }.count
         #expect(requiredCount == 1)
         #expect(optionalCount == 1)
+    }
+
+    // MARK: - Planner Mapping
+
+    @Test
+    func toStorage_planner_maps_id_and_day() async {
+        // Given
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try! ModelContainer(
+            for: SDRecipe.self, SDIngredient.self, SDRecipeIngredient.self, SDPlannerData.self,
+            configurations: config
+        )
+        let context = container.mainContext
+        let id = UUID()
+        let day = Date()
+        let planner = PlannerData(id: id, day: day, recipes: [])
+
+        // When
+        let sdPlanner = StorageMapper.toStorage(planner: planner, context: context)
+
+        // Then
+        #expect(sdPlanner.id == id)
+        #expect(sdPlanner.day == day)
+    }
+
+    @Test
+    func toStorage_planner_with_no_recipes_maps_empty_list() async {
+        // Given
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try! ModelContainer(
+            for: SDRecipe.self, SDIngredient.self, SDRecipeIngredient.self, SDPlannerData.self,
+            configurations: config
+        )
+        let context = container.mainContext
+        let planner = PlannerData(day: Date(), recipes: [])
+
+        // When
+        let sdPlanner = StorageMapper.toStorage(planner: planner, context: context)
+
+        // Then
+        #expect(sdPlanner.recipes.isEmpty)
+    }
+
+    @Test
+    func toStorage_planner_maps_all_recipes() async {
+        // Given
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try! ModelContainer(
+            for: SDRecipe.self, SDIngredient.self, SDRecipeIngredient.self, SDPlannerData.self,
+            configurations: config
+        )
+        let context = container.mainContext
+        let recipe1 = Recipe(name: "Pasta", ingredients: [], mealType: .lunch, isFavorite: false)
+        let recipe2 = Recipe(name: "Pizza", ingredients: [], mealType: .dinner, isFavorite: false)
+        let planner = PlannerData(day: Date(), recipes: [recipe1, recipe2])
+
+        // When
+        let sdPlanner = StorageMapper.toStorage(planner: planner, context: context)
+
+        // Then
+        #expect(sdPlanner.recipes.count == 2)
+        #expect(sdPlanner.recipes.contains { $0.name == "Pasta" })
+        #expect(sdPlanner.recipes.contains { $0.name == "Pizza" })
     }
 }
