@@ -11,7 +11,6 @@ struct HomeContentViewModelTests {
     
     private func createInMemoryModelContainer() -> ModelContainer {
         let schema = Schema([
-            Item.self,
             SDRecipe.self,
             SDIngredient.self,
             SDRecipeIngredient.self,
@@ -332,7 +331,6 @@ struct HomeContentViewModelPublishedPropertiesTests {
     
     private func createInMemoryModelContainer() -> ModelContainer {
         let schema = Schema([
-            Item.self,
             SDRecipe.self,
             SDIngredient.self,
             SDRecipeIngredient.self,

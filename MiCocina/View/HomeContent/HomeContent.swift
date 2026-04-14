@@ -136,7 +136,6 @@ struct HomeContent: View {
 
 #Preview {
     let schema = Schema([
-        Item.self,
         SDRecipe.self,
         SDIngredient.self,
         SDRecipeIngredient.self,

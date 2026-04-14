@@ -79,4 +79,20 @@ final class DomainMapper {
             recipes: recipes
         )
     }
+
+    // MARK: - ShoppingListItem Mapping
+    
+    /// Converts a persistence shopping list item to a domain shopping list item.
+    ///
+    /// - Parameter shoppingListItem: The storage shopping list item to convert
+    /// - Returns: A domain `ShoppingListItem` model
+    static func toDomain(shoppingListItem: SDShoppingListItem) -> ShoppingListItem {
+        let ingredient = toDomain(ingredient: shoppingListItem.ingredient)
+        
+        return ShoppingListItem(
+            id: shoppingListItem.id,
+            ingredient: ingredient,
+            isBought: shoppingListItem.isBought
+        )
+    }
 }

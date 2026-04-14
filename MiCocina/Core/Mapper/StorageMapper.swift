@@ -169,4 +169,32 @@ final class StorageMapper {
 
         return sdPlanner
     }
+    
+    // MARK: - SDShoppingListItem Mapping
+    
+    /// Converts a domain shopping list item to a persistence shopping list item.
+    ///
+    /// Creates a new shopping list item in storage, ensuring the ingredient is properly
+    /// stored or reused if it already exists.
+    ///
+    /// - Parameters:
+    ///   - item: The domain shopping list item to convert
+    ///   - context: The SwiftData model context for database operations
+    ///
+    /// - Returns: A persistence `SDShoppingListItem` model
+    static func toStorage(
+        shoppingListItem item: ShoppingListItem,
+        context: ModelContext
+    ) -> SDShoppingListItem {
+        let sdIngredient = toStorage(with: item.ingredient, context: context)
+        
+        let sdItem = SDShoppingListItem(
+            id: item.id,
+            ingredient: sdIngredient,
+            isBought: item.isBought
+        )
+        
+        context.insert(sdItem)
+        return sdItem
+    }
 }

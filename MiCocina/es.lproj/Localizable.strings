@@ -137,3 +137,50 @@
 "planner.moveRecipe.newDate" = "Nueva fecha";
 "planner.moveRecipe.moveButton" = "Mover Receta";
 "planner.moveRecipe.navigationTitle" = "Mover Receta";
+
+// MARK: - Shopping List View
+
+"shoppingList.title" = "Lista de Compras";
+"shoppingList.searchPrompt" = "Buscar ingredientes";
+
+// MARK: - Empty State
+
+"shoppingList.emptyState.title" = "Sin Elementos";
+"shoppingList.emptyState.description" = "Tu lista de compras está vacía.\nAgrega ingredientes usando el botón + o desde las recetas.";
+"shoppingList.emptyState.addButton" = "Agregar Ingrediente";
+
+// MARK: - Item Counter
+
+"shoppingList.counter.item" = "elemento";
+"shoppingList.counter.items" = "elementos";
+"shoppingList.counter.inList" = "en la lista";
+"shoppingList.counter.toBuy" = "por comprar";
+
+// MARK: - Sections
+
+"shoppingList.section.toBuy" = "Por Comprar";
+"shoppingList.section.bought" = "Comprado";
+
+// MARK: - Toolbar
+
+"shoppingList.toolbar.addIngredient" = "Agregar Ingrediente";
+"shoppingList.toolbar.clearList" = "Vaciar Lista";
+
+// MARK: - Clear Confirmation
+
+"shoppingList.clear.title" = "Vaciar Lista de Compras";
+"shoppingList.clear.message" = "¿Estás seguro de que deseas eliminar todos los elementos de tu lista de compras?";
+"shoppingList.clear.confirm" = "Vaciar Todos los Elementos";
+"shoppingList.clear.cancel" = "Cancelar";
+
+// MARK: - Add Ingredient Sheet
+
+"shoppingList.add.title" = "Agregar Ingrediente";
+"shoppingList.add.placeholder" = "Nombre del ingrediente";
+"shoppingList.add.cancel" = "Cancelar";
+"shoppingList.add.add" = "Agregar";
+
+// MARK: - Search
+
+"shoppingList.search.noResults" = "Sin Resultados";
+"shoppingList.search.noMatch" = "No hay ingredientes que coincidan con '%@'";

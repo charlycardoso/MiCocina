@@ -12,7 +12,6 @@ import SwiftData
 struct MiCocinaApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
             SDRecipe.self,
             SDIngredient.self,
             SDRecipeIngredient.self,
