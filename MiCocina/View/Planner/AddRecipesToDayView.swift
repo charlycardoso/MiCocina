@@ -51,11 +51,6 @@ struct AddRecipesToDayView: View {
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     
-    /// View model for accessing the user's recipe collection
-    private var homeViewModel: HomeContentViewModel {
-        HomeContentViewModel(context: modelContext)
-    }
-    
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -138,19 +133,12 @@ struct AddRecipesToDayView: View {
             }
         }
     }
-    
+
     /// Loads available recipes filtered by the selected meal type.
     private func loadRecipes() {
-        homeViewModel.getAllRecipes()
-        
-        // Filter recipes by selected meal type
-        let recipesForMealType = homeViewModel.recipes
-            .first(where: { $0.mealType == selectedMealType })?
-            .recipes ?? []
-        
-        availableRecipes = recipesForMealType
+        availableRecipes = viewModel.getRecipes(by: selectedMealType)
     }
-    
+
     /// Toggles the selection state of a recipe.
     ///
     /// - Parameter id: The unique identifier of the recipe to toggle
@@ -164,32 +152,52 @@ struct AddRecipesToDayView: View {
     
     /// Saves the selected recipes to the specified day.
     ///
-    /// This method retrieves full recipe objects from the repository using the selected
-    /// recipe IDs, adds them to any existing recipes for the day, and saves the updated
-    /// planner data. If an error occurs, an alert is shown to the user.
+    /// This method retrieves existing SDRecipe storage objects and updates the planner
+    /// by directly working with SwiftData relationships. This avoids creating duplicate
+    /// recipe entries in the database.
     private func saveRecipesToDay() {
-        let selectedRecipeViewData = availableRecipes.filter { selectedRecipes.contains($0.id) }
+        let selectedRecipeIDs = Array(selectedRecipes)
         
-        guard !selectedRecipeViewData.isEmpty else { return }
+        guard !selectedRecipeIDs.isEmpty else { return }
         
         do {
-            // Get existing planner data or create new one
-            var existingRecipes: [Recipe] = []
+            let calendar = Calendar.current
+            let normalizedDay = calendar.startOfDay(for: selectedDate)
             
-            if let plannerData = viewModel.get(by: selectedDate) {
-                existingRecipes = plannerData.recipes
+            // Fetch existing planner for this day
+            let plannerDescriptor = FetchDescriptor<SDPlannerData>(
+                predicate: #Predicate<SDPlannerData> { $0.day == normalizedDay }
+            )
+            
+            let existingPlanner = try modelContext.fetch(plannerDescriptor).first
+            
+            // Fetch the SDRecipe objects for the selected recipe IDs
+            let recipeDescriptor = FetchDescriptor<SDRecipe>(
+                predicate: #Predicate<SDRecipe> { recipe in
+                    selectedRecipeIDs.contains(recipe.id)
+                }
+            )
+            
+            let selectedSDRecipes = try modelContext.fetch(recipeDescriptor)
+            
+            // Update or create planner
+            if let planner = existingPlanner {
+                // Add new recipes, avoiding duplicates
+                for sdRecipe in selectedSDRecipes {
+                    if !planner.recipes.contains(where: { $0.id == sdRecipe.id }) {
+                        planner.recipes.append(sdRecipe)
+                    }
+                }
+            } else {
+                // Create new planner with selected recipes
+                let newPlanner = SDPlannerData(
+                    day: normalizedDay,
+                    recipes: selectedSDRecipes
+                )
+                modelContext.insert(newPlanner)
             }
             
-            // Convert RecipeViewData IDs to Recipe objects from the repository
-            for recipeViewData in selectedRecipeViewData {
-//                if let recipe = viewModel.get(by: recipeViewData) {
-//                    existingRecipes.append(recipe)
-//                }
-            }
-            
-            // Create updated planner data
-            let updatedPlannerData = PlannerData(day: selectedDate, recipes: existingRecipes)
-            try viewModel.save(updatedPlannerData)
+            try modelContext.save()
             
             onSave()
             dismiss()

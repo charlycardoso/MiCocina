@@ -34,6 +34,17 @@ final class PlannerViewModel: ObservableObject {
         }
         recipeGroups = plannerData.groupedRecipes
     }
+
+    func getRecipes(by mealType: MealType) -> [RecipeViewData] {
+        let recipeProtocol = SDRecipeProtocolRepository(context: context)
+        let pantryProtocol = SDPantryProtocolRepository(context: context)
+        let matcher = RecipeUseCasesImpl(RecipeProtocolRepository: recipeProtocol, PantryProtocolRepository: pantryProtocol, matcher: .init())
+        let recipes = matcher.getAllRecipes()
+        let recipesForMealType = recipes
+            .first(where: { $0.mealType == mealType })?
+            .recipes ?? []
+        return recipesForMealType
+    }
 }
 
 extension PlannerViewModel: PlannerProtocolRepository {
