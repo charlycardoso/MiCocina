@@ -102,3 +102,38 @@
 "ingredientDetail.duplicate.message" = "Ya existe un ingrediente con ese nombre en tu despensa.";
 "ingredientDetail.saveError" = "No se pudieron guardar los cambios. Inténtalo de nuevo.";
 "ingredientDetail.deleteError" = "No se pudo eliminar el ingrediente. Inténtalo de nuevo.";
+
+// MARK: - Planner View
+
+"planner.title" = "Planner";
+"planner.emptyState.title" = "No tienes recetas programadas";
+"planner.emptyState.message" = "Toca el botón + para agregar recetas a este día";
+"planner.addRecipes" = "Agregar Recetas";
+"planner.error.deleteRecipe" = "Error al eliminar la receta: %@";
+"planner.error.moveRecipe" = "Error al mover la receta: %@";
+"planner.error.saveRecipes" = "Error al guardar recetas: %@";
+
+// MARK: - Recipe Row
+
+"planner.recipe.canCook" = "Puedes cocinar";
+"planner.recipe.missingIngredients" = "%d faltantes";
+"planner.recipe.missingIngredientsLong" = "%d ingredientes faltantes";
+"planner.recipe.moveToAnotherDay" = "Mover a otro día";
+"planner.recipe.delete" = "Eliminar";
+
+// MARK: - Add Recipes View
+
+"planner.addRecipes.header" = "Agregar recetas para";
+"planner.addRecipes.mealTypeLabel" = "Tipo de comida";
+"planner.addRecipes.noRecipesAvailable" = "No hay recetas disponibles";
+"planner.addRecipes.title" = "Seleccionar Recetas";
+"planner.addRecipes.addButton" = "Agregar";
+
+// MARK: - Move Recipe View
+
+"planner.moveRecipe.title" = "Mover receta";
+"planner.moveRecipe.from" = "Desde: %@";
+"planner.moveRecipe.selectNewDay" = "Selecciona el nuevo día";
+"planner.moveRecipe.newDate" = "Nueva fecha";
+"planner.moveRecipe.moveButton" = "Mover Receta";
+"planner.moveRecipe.navigationTitle" = "Mover Receta";
