@@ -140,7 +140,7 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
             throw RepositoryError.fetchFailed(operation: "save - checking existing recipe", underlyingError: error)
         }
         
-        let sdRecipe = StorageMapper.toStorage(recipe: recipe, context: context)
+        _ = StorageMapper.toStorage(recipe: recipe, context: context)
         do {
             try context.save()
         } catch {
@@ -182,6 +182,8 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
     /// This method updates all properties of the recipe, including its ingredients.
     /// All existing ingredients are removed and replaced with the new ones from the domain object.
     ///
+    /// **Architecture**: Recipe ingredients are stored as names only, no SDIngredient references.
+    ///
     /// - Parameter recipe: The `Recipe` domain object containing the updated data.
     /// - Throws: `RepositoryError` if the operation fails.
     /// - Important: This method completely replaces the ingredients collection. Any existing
@@ -204,24 +206,26 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
             throw RepositoryError.fetchFailed(operation: "update - finding recipe to update", underlyingError: error)
         }
         
+        // Update basic recipe properties
         sdRecipe.name = recipe.name
         sdRecipe.mealType = recipe.mealType.rawValue
         sdRecipe.isFavorite = recipe.isFavorite
+        
+        // Remove all old ingredients
         for old in sdRecipe.ingredients {
             context.delete(old)
         }
         sdRecipe.ingredients.removeAll()
-        for ingredient in recipe.ingredients {
-            let sdIngredient = StorageMapper.toStorage(
-                with: ingredient.ingredient,
-                context: context
-            )
+        
+        // Add new ingredients (storing just the names, no SDIngredient references)
+        for recipeIngredient in recipe.ingredients {
             let sdRecipeIngredient = SDRecipeIngredient(
                 recipe: sdRecipe,
-                ingredient: sdIngredient,
+                ingredientName: recipeIngredient.ingredientName,
                 quantity: nil,
-                isRequired: ingredient.isRequired
+                isRequired: recipeIngredient.isRequired
             )
+            context.insert(sdRecipeIngredient)
             sdRecipe.ingredients.append(sdRecipeIngredient)
         }
         

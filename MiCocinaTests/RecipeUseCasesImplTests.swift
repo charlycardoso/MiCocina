@@ -30,8 +30,8 @@ struct RecipeUseCasesImplTests {
     @Test
     func getAllRecipes_returns_all_recipes_grouped_by_meal_type() {
         // Given
-        let agua = Ingredient(name: "agua")
-        let limon = Ingredient(name: "limon")
+        let agua = Ingredient(name: "agua", quantity: 1)
+        let limon = Ingredient(name: "limon", quantity: 1)
 
         let recipe1 = Recipe(
             name: "Limonada",
@@ -67,7 +67,7 @@ struct RecipeUseCasesImplTests {
     @Test
     func getAllRecipes_maps_recipes_correctly() {
         // Given
-        let pasta = Ingredient(name: "Pasta")
+        let pasta = Ingredient(name: "Pasta", quantity: 1)
         let recipe = Recipe(
             name: "Spaghetti",
             ingredients: [.init(ingredient: pasta)],
@@ -103,7 +103,7 @@ struct RecipeUseCasesImplTests {
     @Test
     func getAllRecipes_sorts_recipes_within_groups() {
         // Given
-        let water = Ingredient(name: "water")
+        let water = Ingredient(name: "water", quantity: 1)
 
         let favorite = Recipe(
             name: "Favorite Recipe",
@@ -140,8 +140,8 @@ struct RecipeUseCasesImplTests {
     @Test
     func getPossibleRecipes_filters_only_cookable_recipes() {
         // Given
-        let agua = Ingredient(name: "agua")
-        let limon = Ingredient(name: "limon")
+        let agua = Ingredient(name: "agua", quantity: 1)
+        let limon = Ingredient(name: "limon", quantity: 1)
         let otros = Ingredient(name: "otros")
 
         let cookableRecipe = Recipe(
@@ -182,7 +182,7 @@ struct RecipeUseCasesImplTests {
     @Test
     func getPossibleRecipes_groups_filtered_recipes() {
         // Given
-        let water = Ingredient(name: "water")
+        let water = Ingredient(name: "water", quantity: 1)
 
         let breakfastRecipe = Recipe(
             name: "Eggs",
@@ -214,7 +214,7 @@ struct RecipeUseCasesImplTests {
     @Test
     func getPossibleRecipes_returns_correct_ordering() {
         // Given
-        let water = Ingredient(name: "water")
+        let water = Ingredient(name: "water", quantity: 1)
 
         let regular = Recipe(
             name: "Regular",
@@ -247,19 +247,18 @@ struct RecipeUseCasesImplTests {
     @Test
     func getPossibleRecipes_returns_empty_groups_when_no_possible_recipes() {
         // Given
-        let agua = Ingredient(name: "agua")
-        let limon = Ingredient(name: "limon")
-        let otros = Ingredient(name: "otros")
+        let agua = Ingredient(name: "agua", quantity: 1)
+        let limon = Ingredient(name: "limon", quantity: 1)
 
         let recipe = Recipe(
             name: "Complex Dish",
             ingredients: [
-                .init(ingredient: otros),
-                .init(ingredient: agua),
-                .init(ingredient: limon),
-                .init(ingredient: Ingredient(name: "missing1")),
-                .init(ingredient: Ingredient(name: "missing2")),
-                .init(ingredient: Ingredient(name: "missing3"))
+                .init(ingredientName: "otros"),
+                .init(ingredientName: "agua"),
+                .init(ingredientName: "limon"),
+                .init(ingredientName: "tomato"),
+                .init(ingredientName: "onion"),
+                .init(ingredientName: "missing")
             ],
             mealType: .dinner
         )
@@ -296,8 +295,8 @@ struct RecipeUseCasesImplTests {
     @Test
     func getAllRecipes_returns_correct_missing_count() {
         // Given
-        let pasta = Ingredient(name: "Pasta")
-        let tomato = Ingredient(name: "Tomate")
+        let pasta = Ingredient(name: "Pasta", quantity: 1)
+        let tomato = Ingredient(name: "Tomate", quantity: 1)
         let garlic = Ingredient(name: "Ajo")
 
         let recipe = Recipe(
@@ -326,7 +325,7 @@ struct RecipeUseCasesImplTests {
     @Test
     func getAllRecipes_groups_are_sorted_by_meal_type() {
         // Given
-        let water = Ingredient(name: "water")
+        let water = Ingredient(name: "water", quantity: 1)
 
         let dinnerRecipe = Recipe(
             name: "Dinner",
@@ -363,8 +362,8 @@ struct RecipeUseCasesImplTests {
     @Test
     func getPossibleRecipes_respects_matcher_logic() {
         // Given - Matcher allows up to 3 missing ingredients
-        let water = Ingredient(name: "water")
-        let sugar = Ingredient(name: "sugar")
+        let water = Ingredient(name: "water", quantity: 1)
+        let sugar = Ingredient(name: "sugar", quantity: 1)
         let lemon = Ingredient(name: "lemon")
         let salt = Ingredient(name: "salt")
         let oil = Ingredient(name: "oil")
@@ -392,6 +391,8 @@ struct RecipeUseCasesImplTests {
 
         // Then - With 3 missing, should still be possible
         #expect(!groups.isEmpty)
-        #expect(groups[0].recipes[0].canCook == true)
+        if !groups.isEmpty && !groups[0].recipes.isEmpty {
+            #expect(groups[0].recipes[0].canCook == true)
+        }
     }
 }

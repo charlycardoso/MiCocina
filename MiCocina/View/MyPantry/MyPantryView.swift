@@ -87,7 +87,11 @@ struct MyPantryView: View {
             })
         }
         .onAppear {
+            viewModel.refresh()
             ingredients = viewModel.pantry
+        }
+        .onChange(of: viewModel.pantry) { oldValue, newValue in
+            ingredients = newValue
         }
         .sheet(isPresented: $showAddIngredientView) {
             AddIngredientView(viewModel: viewModel)
@@ -126,7 +130,11 @@ struct MyPantryView: View {
     }
     
     private func refreshIngredients() {
-        ingredients = viewModel.getPantry()
+        // Force a small delay to ensure SwiftData has processed changes
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            ingredients = viewModel.getPantry()
+        }
     }
 
     @ViewBuilder

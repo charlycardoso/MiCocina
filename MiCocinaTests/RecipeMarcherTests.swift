@@ -171,11 +171,11 @@ struct RecipeMarcherTests {
         let mayonesa = Ingredient(name: "mayonesa")
         // Recipe Ingredients
         let recipeIngredients: Set<RecipeIngredient> = [
-            .init(ingredient: pan),
-            .init(ingredient: jamon),
-            .init(ingredient: lechuga),
-            .init(ingredient: jitomate),
-            .init(ingredient: mayonesa)
+            .init(ingredientName: "pan"),
+            .init(ingredientName: "jamon"),
+            .init(ingredientName: "lechuga"),
+            .init(ingredientName: "jitomate"),
+            .init(ingredientName: "mayonesa")
         ]
         // my ingredients
         let myPantry: Set<Ingredient> = [pan, jamon]

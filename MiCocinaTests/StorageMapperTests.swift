@@ -77,59 +77,69 @@ struct StorageMapperTests {
         #expect(sdIngredient1.name == "garlic")
     }
     
-    /// Tests that recipe ingredients are correctly converted to storage recipe ingredients.
+    /// Tests that recipe ingredients are correctly stored with just their names.
     ///
-    /// Verifies proper mapping of the relationship and the isRequired flag.
+    /// Verifies that RecipeIngredient stores ingredient names directly without SDIngredient references.
     @Test
-    func toStorage_recipeIngredient_maps_correctly() async {
+    func toStorage_recipe_stores_ingredient_names_not_references() async {
         // Given
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: SDRecipe.self, SDIngredient.self, SDRecipeIngredient.self, configurations: config)
         let context = container.mainContext
-        let sdRecipe = SDRecipe(name: "Pasta", mealType: "lunch", isFavorite: false)
-        let sdIngredient = SDIngredient(name: "Pasta")
-        let domainRecipeIngredient = RecipeIngredient(
-            ingredient: Ingredient(name: "Pasta"),
-            isRequired: true
+        
+        let recipe = Recipe(
+            name: "Pasta",
+            ingredients: [
+                RecipeIngredient(ingredientName: "Pasta", isRequired: true),
+                RecipeIngredient(ingredientName: "Tomato", isRequired: false)
+            ],
+            mealType: .lunch,
+            isFavorite: false
         )
         
         // When
-        let sdRecipeIngredient = StorageMapper.toStorage(
-            domainRecipeIngredient,
-            recipe: sdRecipe,
-            ingredient: sdIngredient,
-            context: context
-        )
+        let sdRecipe = StorageMapper.toStorage(recipe: recipe, context: context)
         
         // Then
-        #expect(sdRecipeIngredient.isRequired == true)
-        #expect(sdRecipeIngredient.recipe === sdRecipe)
-        #expect(sdRecipeIngredient.ingredient === sdIngredient)
+        #expect(sdRecipe.ingredients.count == 2)
+        
+        let pastaIngredient = sdRecipe.ingredients.first { $0.ingredientName == "pasta" }
+        let tomatoIngredient = sdRecipe.ingredients.first { $0.ingredientName == "tomato" }
+        
+        #expect(pastaIngredient != nil)
+        #expect(pastaIngredient?.isRequired == true)
+        
+        #expect(tomatoIngredient != nil)
+        #expect(tomatoIngredient?.isRequired == false)
     }
     
+    /// Tests that recipe ingredients with isRequired=false are properly stored.
+    ///
+    /// Verifies that optional ingredients are marked correctly in storage.
     @Test
-    func toStorage_recipeIngredient_respects_isRequired_false() async {
+    func toStorage_recipe_respects_optional_ingredients() async {
         // Given
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: SDRecipe.self, SDIngredient.self, SDRecipeIngredient.self, configurations: config)
         let context = container.mainContext
-        let sdRecipe = SDRecipe(name: "Pizza", mealType: "lunch", isFavorite: false)
-        let sdIngredient = SDIngredient(name: "Oregano")
-        let domainRecipeIngredient = RecipeIngredient(
-            ingredient: Ingredient(name: "Oregano"),
-            isRequired: false
+        
+        let recipe = Recipe(
+            name: "Pizza",
+            ingredients: [
+                RecipeIngredient(ingredientName: "Dough", isRequired: true),
+                RecipeIngredient(ingredientName: "Oregano", isRequired: false)
+            ],
+            mealType: .lunch,
+            isFavorite: false
         )
         
         // When
-        let sdRecipeIngredient = StorageMapper.toStorage(
-            domainRecipeIngredient,
-            recipe: sdRecipe,
-            ingredient: sdIngredient,
-            context: context
-        )
+        let sdRecipe = StorageMapper.toStorage(recipe: recipe, context: context)
         
         // Then
-        #expect(sdRecipeIngredient.isRequired == false)
+        let oreganoIngredient = sdRecipe.ingredients.first { $0.ingredientName == "oregano" }
+        #expect(oreganoIngredient != nil)
+        #expect(oreganoIngredient?.isRequired == false)
     }
     
     @Test
@@ -138,14 +148,12 @@ struct StorageMapperTests {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: SDRecipe.self, SDIngredient.self, SDRecipeIngredient.self, configurations: config)
         let context = container.mainContext
-        let pasta = Ingredient(name: "Pasta")
-        let eggs = Ingredient(name: "Eggs")
         
         let recipe = Recipe(
             name: "Pasta Carbonara",
             ingredients: [
-                RecipeIngredient(ingredient: pasta, isRequired: true),
-                RecipeIngredient(ingredient: eggs, isRequired: true)
+                RecipeIngredient(ingredientName: "Pasta", isRequired: true),
+                RecipeIngredient(ingredientName: "Eggs", isRequired: true)
             ],
             mealType: .lunch,
             isFavorite: true
@@ -167,15 +175,14 @@ struct StorageMapperTests {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: SDRecipe.self, SDIngredient.self, SDRecipeIngredient.self, configurations: config)
         let context = container.mainContext
-        let ingredients = [
-            Ingredient(name: "Lettuce"),
-            Ingredient(name: "Tomato"),
-            Ingredient(name: "Cucumber")
-        ]
         
         let recipe = Recipe(
             name: "Salad",
-            ingredients: Set(ingredients.map { RecipeIngredient(ingredient: $0, isRequired: true) }),
+            ingredients: [
+                RecipeIngredient(ingredientName: "Lettuce", isRequired: true),
+                RecipeIngredient(ingredientName: "Tomato", isRequired: true),
+                RecipeIngredient(ingredientName: "Cucumber", isRequired: true)
+            ],
             mealType: .lunch,
             isFavorite: false
         )
@@ -247,14 +254,12 @@ struct StorageMapperTests {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: SDRecipe.self, SDIngredient.self, SDRecipeIngredient.self, configurations: config)
         let context = container.mainContext
-        let requiredIng = Ingredient(name: "Rice")
-        let optionalIng = Ingredient(name: "Pepper")
         
         let recipe = Recipe(
             name: "Flexible Recipe",
             ingredients: [
-                RecipeIngredient(ingredient: requiredIng, isRequired: true),
-                RecipeIngredient(ingredient: optionalIng, isRequired: false)
+                RecipeIngredient(ingredientName: "Rice", isRequired: true),
+                RecipeIngredient(ingredientName: "Pepper", isRequired: false)
             ],
             mealType: .dinner,
             isFavorite: false

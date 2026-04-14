@@ -38,8 +38,7 @@ struct SDRecipeProtocolRepositoryTests {
         name: String = "Ingredient",
         isRequired: Bool = true
     ) -> RecipeIngredient {
-        let ingredient = Ingredient(id: .init(), name: name)
-        return RecipeIngredient(id: .init(), ingredient: ingredient, isRequired: isRequired)
+        return RecipeIngredient(ingredientName: name)
     }
 
     // MARK: - getAll Tests
@@ -69,13 +68,12 @@ struct SDRecipeProtocolRepositoryTests {
     }
 
     /// Tests that getAll correctly preserves all recipe properties including relationships.
-    /// Tests that getAll correctly preserves all recipe properties including relationships.
     @Test
     func getAll_preserves_recipe_properties() throws {
         // Given
         let ingredients: Set<RecipeIngredient> = [
-            RecipeIngredient(ingredient: Ingredient(name: "Flour"), isRequired: true),
-            RecipeIngredient(ingredient: Ingredient(name: "Water"), isRequired: true)
+            RecipeIngredient(ingredientName: "Flour", isRequired: true),
+            RecipeIngredient(ingredientName: "Water", isRequired: true)
         ]
         let recipe = Recipe(
             name: "Bread",
@@ -455,18 +453,15 @@ struct SDRecipeProtocolRepositoryTests {
         }
         sdRecipe.ingredients.removeAll()
         
-        // Add new ingredients
-        for ingredient in newIngredients {
-            let sdIngredient = StorageMapper.toStorage(
-                with: ingredient.ingredient,
-                context: context
-            )
+        // Add new ingredients (using ingredient names directly, no SDIngredient references)
+        for recipeIngredient in newIngredients {
             let sdRecipeIngredient = SDRecipeIngredient(
                 recipe: sdRecipe,
-                ingredient: sdIngredient,
+                ingredientName: recipeIngredient.ingredientName,
                 quantity: nil,
-                isRequired: ingredient.isRequired
+                isRequired: recipeIngredient.isRequired
             )
+            context.insert(sdRecipeIngredient)
             sdRecipe.ingredients.append(sdRecipeIngredient)
         }
         try context.save()

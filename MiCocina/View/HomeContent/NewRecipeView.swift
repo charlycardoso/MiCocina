@@ -182,10 +182,9 @@ struct NewRecipeView: View {
         guard !recipeName.isEmpty && !ingredients.isEmpty else { return }
 
         do {
-            // Create domain ingredients
+            // Create recipe ingredients with just the names
             let recipeIngredients = Set(ingredients.map { ingredientName in
-                let ingredient = Ingredient(name: ingredientName)
-                return RecipeIngredient(ingredient: ingredient, isRequired: true)
+                RecipeIngredient(ingredientName: ingredientName, isRequired: true)
             })
 
             // Create the recipe

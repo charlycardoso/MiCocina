@@ -21,6 +21,7 @@ MiCocina's MVP includes four main modules:
 #### 🥗 My Pantry
 - Manage your ingredient inventory
 - Add ingredients with quantity tracking
+- **Barcode scanning** for quick ingredient lookup using device camera
 - Visual quantity indicators (red for low stock ≤3, green for adequate stock)
 - Search ingredients in your pantry
 - Swipe actions for quick management:
@@ -46,6 +47,40 @@ MiCocina's MVP includes four main modules:
 - Visual grouping of checked/unchecked items
 - Search functionality for quick item lookup
 - Empty state guidance
+
+## ⚙️ Requirements
+
+- **iOS 17.0+**
+- **Camera access** for barcode scanning (Info.plist permission required)
+- **SwiftData** for persistence
+- **VisionKit** for barcode scanning
+
+### Info.plist Configuration
+
+Add the following key to your Info.plist for camera access:
+
+```xml
+<key>NSCameraUsageDescription</key>
+<string>MiCocina necesita acceso a la cámara para escanear códigos de barras de productos</string>
+```
+
+## 🏗️ Architecture
+
+MiCocina follows Clean Architecture principles with **strict separation between recipe ingredients and pantry items**.
+
+### ⚠️ Critical Architectural Distinction
+
+**Recipe Ingredients** and **Pantry Ingredients** are **completely separate** concepts:
+
+- **RecipeIngredient**: What a recipe **needs** (stores only ingredient name)
+- **Ingredient** (Pantry): What you **actually have** (stores name + quantity)
+
+This separation ensures that:
+- ✅ Adding recipes does NOT add ingredients to your pantry
+- ✅ Recipes and pantry data are independent
+- ✅ Recipe matching compares ingredient names correctly
+
+**For detailed explanation, see:** [ARCHITECTURE_GUIDE.md](./ARCHITECTURE_GUIDE.md)
 
 ## 🏗️ Architecture
 

@@ -47,6 +47,7 @@ final class StorageMapper {
     ) -> SDIngredient {
         let name = ingredient.name
         let id = ingredient.id
+        let quantity = ingredient.quantity
         let descriptor = FetchDescriptor<SDIngredient>(
             predicate: #Predicate { $0.id == id }
         )
@@ -55,25 +56,30 @@ final class StorageMapper {
             return existing
         }
 
-        // Create new if it doesn't exist
-        let new = SDIngredient(id: ingredient.id, name: name)
+        // Create new if it doesn't exist - preserve the original ID and quantity
+        let new = SDIngredient(id: id, name: name, quantity: quantity)
         context.insert(new)
         return new
     }
 
     // MARK: - SDRecipe Mapping
     
-    /// Converts a domain recipe to a persistence recipe with all ingredients.
+    /// Converts a domain recipe to a persistence recipe with ingredient names.
     ///
-    /// Creates a new storage recipe and automatically converts and saves all associated
-    /// recipe-ingredient relationships. Uses deduplication to avoid creating duplicate
-    /// ingredient entries.
+    /// Creates a new storage recipe and stores ingredient names directly in SDRecipeIngredient.
+    /// **Important**: This does NOT create SDIngredient entries or affect the pantry.
+    /// Recipe ingredients are stored as simple name strings.
+    ///
+    /// **Architecture**: Recipe ingredients are completely separate from pantry ingredients.
+    /// - Recipes store: ingredient names
+    /// - Pantry stores: ingredient names + quantities
+    /// - RecipeMatcher: compares names between recipes and pantry
     ///
     /// - Parameters:
     ///   - domain: The domain recipe to convert
     ///   - context: The SwiftData model context for database operations
     ///
-    /// - Returns: A persistence `SDRecipe` model with ingredients
+    /// - Returns: A persistence `SDRecipe` model with ingredient names
     static func toStorage(
         recipe domain: Recipe,
         context: ModelContext
@@ -87,15 +93,12 @@ final class StorageMapper {
 
         context.insert(sdRecipe)
 
+        // Create recipe-ingredient entries with just the ingredient names
+        // NO SDIngredient objects are created or referenced
         domain.ingredients.forEach { recipeIngredient in
-            let sdIngredient = StorageMapper.toStorage(
-                with: recipeIngredient.ingredient,
-                context: context
-            )
-
             let sdRecipeIngredient = SDRecipeIngredient(
                 recipe: sdRecipe,
-                ingredient: sdIngredient,
+                ingredientName: recipeIngredient.ingredientName,
                 quantity: nil,
                 isRequired: recipeIngredient.isRequired
             )
@@ -107,49 +110,8 @@ final class StorageMapper {
         return sdRecipe
     }
 
-    // MARK: - SDRecipeIngredient Mapping
+    // MARK: - SDPlannerData Mapping
     
-    /// Converts a domain recipe-ingredient to a persistence recipe-ingredient.
-    ///
-    /// Creates a new association between a recipe and an ingredient, ensuring both
-    /// are properly inserted into the context before creating the relationship.
-    ///
-    /// - Parameters:
-    ///   - domain: The domain recipe-ingredient to convert
-    ///   - recipe: The persistence recipe entity
-    ///   - ingredient: The persistence ingredient entity
-    ///   - context: The SwiftData model context for database operations
-    ///
-    /// - Returns: A persistence `SDRecipeIngredient` model
-    static func toStorage(
-        _ domain: RecipeIngredient,
-        recipe: SDRecipe,
-        ingredient: SDIngredient,
-        context: ModelContext
-    ) -> SDRecipeIngredient {
-
-        // Ensure the SDIngredient exists in the context
-        if ingredient.persistentModelID.storeIdentifier == nil {
-            context.insert(ingredient)
-        }
-
-        // Ensure the SDRecipe is inserted
-        if recipe.persistentModelID.storeIdentifier == nil {
-            context.insert(recipe)
-        }
-
-        // Now create the RecipeIngredient
-        let new = SDRecipeIngredient(
-            recipe: recipe,
-            ingredient: ingredient,
-            quantity: nil,
-            isRequired: domain.isRequired
-        )
-
-        context.insert(new)
-        return new
-    }
-
     static func toStorage(
         planner: PlannerData,
         context: ModelContext

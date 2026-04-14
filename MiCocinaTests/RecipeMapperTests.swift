@@ -22,17 +22,15 @@ struct RecipeMapperTests {
     func mapper_computes_correct_missing_count() {
         // Given
         let pasta = Ingredient(name: "Pasta")
-        let tomato = Ingredient(name: "Tomate")
-        let garlic = Ingredient(name: "Ajo")
-        let olive = Ingredient(name: "Oliva")
+        let tomato = Ingredient(name: "Tomato")
 
         let recipe = Recipe(
-            name: "Pasta",
+            name: "Pasta Alfredo",
             ingredients: [
-                RecipeIngredient(ingredient: pasta),
-                RecipeIngredient(ingredient: tomato),
-                RecipeIngredient(ingredient: garlic),
-                RecipeIngredient(ingredient: olive)
+                RecipeIngredient(ingredientName: "pasta"),
+                RecipeIngredient(ingredientName: "tomato"),
+                RecipeIngredient(ingredientName: "garlic"),
+                RecipeIngredient(ingredientName: "olive")
             ]
         )
 

@@ -21,7 +21,7 @@ struct HomeContent: View {
     var body: some View {
         NavigationStack {
             Group {
-                if viewModel.recipes.isEmpty || viewModel.possibleRecipes.isEmpty {
+                if viewModel.recipes.isEmpty {
                     Text("homeContent.emptyState")
                         .padding()
                         .multilineTextAlignment(.center)

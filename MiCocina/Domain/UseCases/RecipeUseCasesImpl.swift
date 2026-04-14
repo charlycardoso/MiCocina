@@ -27,18 +27,34 @@ struct RecipeMapper {
     ///
     /// Transforms a domain `Recipe` into a `RecipeViewData` object by:
     /// 1. Using the recipe matcher to determine if the recipe is cookable
-    /// 2. Counting the number of missing ingredients
+    /// 2. Counting the number of missing **required** ingredients
     /// 3. Extracting relevant fields into the view data structure
+    ///
+    /// **Architecture**: Compares recipe ingredient names against pantry ingredient names.
     ///
     /// - Parameters:
     ///   - recipe: The recipe to transform
-    ///   - pantry: The set of available ingredients
+    ///   - pantry: The set of available ingredients (with quantities)
     ///   - matcher: The recipe matcher service used to evaluate feasibility
     ///
     /// - Returns: A `RecipeViewData` object containing all information needed for UI display
     func map(_ recipe: Recipe, pantry: Set<Ingredient>, matcher: RecipeMatcher) -> RecipeViewData {
         let canCook = matcher.canCook(recipe: recipe, with: pantry)
-        let missing = recipe.ingredients.filter { !pantry.contains($0.ingredient) }.count
+        
+        // Get required ingredient names from recipe
+        let requiredIngredientNames = Set(
+            recipe.ingredients
+                .map { $0.ingredientName.normalize() }
+        )
+        
+        // Get available ingredient names from pantry
+        let pantryNames = Set(
+            pantry
+                .map { $0.name.normalize() }
+        )
+        
+        let missing = requiredIngredientNames.subtracting(pantryNames).count
+        
         return RecipeViewData(
             id: recipe.id,
             name: recipe.name,

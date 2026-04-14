@@ -117,15 +117,17 @@ struct RecipeDetailView: View {
                 .foregroundStyle(.primary)
 
             if let fullRecipe = fullRecipe {
+                let sortedIngredients = Array(fullRecipe.ingredients).sorted(by: { $0.ingredientName < $1.ingredientName })
+                
                 LazyVStack(alignment: .leading, spacing: 12) {
-                    ForEach(Array(fullRecipe.ingredients.sorted(by: { $0.ingredient.name < $1.ingredient.name })), id: \.ingredient.id) { recipeIngredient in
+                    ForEach(sortedIngredients) { recipeIngredient in
                         HStack(alignment: .center, spacing: 12) {
                             Image(systemName: recipeIngredient.isRequired ? "circle.fill" : "circle")
                                 .font(.caption)
                                 .foregroundStyle(recipeIngredient.isRequired ? .green : .orange)
 
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(recipeIngredient.ingredient.name.capitalized)
+                                Text(recipeIngredient.ingredientName.capitalized)
                                     .font(.body)
                                     .fontWeight(.medium)
 
@@ -139,7 +141,7 @@ struct RecipeDetailView: View {
                             Spacer()
 
                             // Show if ingredient is available in pantry
-                            if homeContentViewModel.exists(recipeIngredient.ingredient) {
+                            if homeContentViewModel.exists(Ingredient(name: recipeIngredient.ingredientName)) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .font(.body)
                                     .foregroundStyle(.green)
@@ -306,7 +308,7 @@ struct EditRecipeView: View {
         self._recipeName = State(initialValue: recipe.name)
         self._selectedMealType = State(initialValue: recipe.mealType)
         self._isFavorite = State(initialValue: recipe.isFavorite)
-        self._ingredients = State(initialValue: recipe.ingredients.map { $0.ingredient.name }.sorted())
+        self._ingredients = State(initialValue: recipe.ingredients.map { $0.ingredientName }.sorted())
     }
 
     var body: some View {

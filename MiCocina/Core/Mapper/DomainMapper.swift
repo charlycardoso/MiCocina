@@ -54,20 +54,25 @@ final class DomainMapper {
     /// Converts a storage ingredient model to a domain ingredient model.
     ///
     /// - Parameter ingredient: The storage ingredient model to convert
-    /// - Returns: A domain `Ingredient` model
+    /// - Returns: A domain `Ingredient` model with quantity
     static func toDomain(ingredient: SDIngredient) -> Ingredient {
-        return .init(id: ingredient.id, name: ingredient.name)
+        return .init(id: ingredient.id, name: ingredient.name, quantity: ingredient.quantity)
     }
 
     // MARK: - RecipeIngredient Mapping
     
-    /// Converts a storage recipe-ingredient association to a domain recipe-ingredient.
+    /// Converts a storage recipe-ingredient to a domain recipe-ingredient.
+    ///
+    /// **Architecture**: Recipe ingredients are stored as names only, not linked to pantry.
     ///
     /// - Parameter recipeIngredient: The storage recipe-ingredient model to convert
-    /// - Returns: A domain `RecipeIngredient` model with the ingredient converted
+    /// - Returns: A domain `RecipeIngredient` model with just the ingredient name
     static func toDomain(recipeIngredient: SDRecipeIngredient) -> RecipeIngredient {
-        let ingredient = DomainMapper.toDomain(ingredient: recipeIngredient.ingredient)
-        return .init(ingredient: ingredient, isRequired: recipeIngredient.isRequired)
+        return .init(
+            id: recipeIngredient.id,
+            ingredientName: recipeIngredient.ingredientName,
+            isRequired: recipeIngredient.isRequired
+        )
     }
 
     static func toDomain(planner: SDPlannerData) -> PlannerData {

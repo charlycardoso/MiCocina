@@ -34,14 +34,18 @@ struct RecipeMatcher {
     ///
     /// A recipe is considered cookable if:
     /// - It has at least one ingredient
-    /// - The number of missing ingredients is 3 or fewer
+    /// - The number of missing **required** ingredients is 3 or fewer
+    ///
+    /// **Architecture**: Compares recipe ingredient names against pantry ingredient names.
+    /// - Recipe ingredients: Just names (no quantity)
+    /// - Pantry ingredients: Names with quantities (quantity > 0 means you have it)
     ///
     /// This tolerance mechanism allows users to cook recipes even when they're missing
     /// a few items, promoting flexibility in meal planning.
     ///
     /// - Parameters:
     ///   - recipe: The recipe to evaluate
-    ///   - pantry: A set of ingredients available in the pantry
+    ///   - pantry: A set of ingredients available in the pantry (with quantities > 0)
     ///
     /// - Returns: `true` if the recipe can be cooked with the available ingredients,
     ///           `false` otherwise
@@ -50,8 +54,20 @@ struct RecipeMatcher {
     func canCook(recipe: Recipe, with pantry: Set<Ingredient>) -> Bool {
         guard !recipe.ingredients.isEmpty else { return false }
 
-        let allIngredients = recipe.ingredients.map { $0.ingredient }
-        let missingIngredients = Set(allIngredients).subtracting(pantry)
+        // Get required ingredient names from recipe
+        let requiredIngredientNames = Set(
+            recipe.ingredients
+                .filter { $0.isRequired }
+                .map { $0.ingredientName.normalize() }
+        )
+        
+        // Get available ingredient names from pantry (only items with quantity > 0)
+        let pantryNames = Set(
+            pantry
+                .map { $0.name.normalize() }
+        )
+
+        let missingIngredients = requiredIngredientNames.subtracting(pantryNames)
 
         return missingIngredients.count <= 3
     }

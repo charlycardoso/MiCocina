@@ -56,7 +56,7 @@ struct DomainMapperTests {
         let sdIngredient = SDIngredient(name: "Basil")
         let sdRecipeIngredient = SDRecipeIngredient(
             recipe: SDRecipe(name: "Pasta", mealType: "lunch", isFavorite: false),
-            ingredient: sdIngredient,
+            ingredientName: sdIngredient.name,
             isRequired: true
         )
 
@@ -64,7 +64,7 @@ struct DomainMapperTests {
         let recipeIngredient = DomainMapper.toDomain(recipeIngredient: sdRecipeIngredient)
 
         // Then
-        #expect(recipeIngredient.ingredient.name == "basil")
+        #expect(recipeIngredient.ingredientName == "basil")
         #expect(recipeIngredient.isRequired == true)
     }
 
@@ -77,7 +77,7 @@ struct DomainMapperTests {
         let sdIngredient = SDIngredient(name: "Oregano")
         let sdRecipeIngredient = SDRecipeIngredient(
             recipe: SDRecipe(name: "Pizza", mealType: "lunch", isFavorite: false),
-            ingredient: sdIngredient,
+            ingredientName: sdIngredient.name,
             isRequired: false
         )
 
@@ -100,12 +100,12 @@ struct DomainMapperTests {
         
         let sdRecipeIng1 = SDRecipeIngredient(
             recipe: sdRecipe,
-            ingredient: ingredient1,
+            ingredientName: ingredient1.name,
             isRequired: true
         )
         let sdRecipeIng2 = SDRecipeIngredient(
             recipe: sdRecipe,
-            ingredient: ingredient2,
+            ingredientName: ingredient2.name,
             isRequired: true
         )
         
@@ -136,7 +136,7 @@ struct DomainMapperTests {
         ]
         
         let recipeIngredients = ingredients.map { ing in
-            SDRecipeIngredient(recipe: sdRecipe, ingredient: ing, isRequired: true)
+            SDRecipeIngredient(recipe: sdRecipe, ingredientName: ing.name, isRequired: true)
         }
         
         sdRecipe.ingredients = recipeIngredients
@@ -146,7 +146,7 @@ struct DomainMapperTests {
 
         // Then
         #expect(recipe.ingredients.count == 4)
-        let ingredientNames = recipe.ingredients.map { $0.ingredient.name }
+        let ingredientNames = recipe.ingredients.map { $0.ingredientName }
         #expect(ingredientNames.contains("lettuce"))
         #expect(ingredientNames.contains("tomato"))
         #expect(ingredientNames.contains("cucumber"))
@@ -204,12 +204,12 @@ struct DomainMapperTests {
         
         let sdRecipeIng1 = SDRecipeIngredient(
             recipe: sdRecipe,
-            ingredient: requiredIng,
+            ingredientName: requiredIng.name,
             isRequired: true
         )
         let sdRecipeIng2 = SDRecipeIngredient(
             recipe: sdRecipe,
-            ingredient: optionalIng,
+            ingredientName: optionalIng.name,
             isRequired: false
         )
         

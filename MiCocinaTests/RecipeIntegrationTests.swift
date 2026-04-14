@@ -6,6 +6,7 @@
 //
 
 import Testing
+import SwiftData
 @testable import MiCocina
 
 /// Integration test suite validating the entire recipe pipeline.
@@ -15,6 +16,26 @@ import Testing
 /// ensure all components work together correctly in real-world scenarios.
 @MainActor
 struct RecipeIntegrationTests {
+    let container: ModelContainer
+    let context: ModelContext
+
+    init() throws {
+        // 1. Setup in-memory configuration
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let schema = Schema([
+            SDShoppingListItem.self,
+            SDPlannerData.self,
+            SDRecipe.self,
+            SDIngredient.self,
+            SDRecipeIngredient.self,
+        ])
+        
+        // 2. Create the container with your @Model types
+        container = try ModelContainer(for: schema, configurations: config)
+        
+        // 3. Get the main context
+        context = container.mainContext
+    }
 
     /// Tests the complete pipeline from recipe matching to final grouped output.
     ///
@@ -26,16 +47,14 @@ struct RecipeIntegrationTests {
         let agua = Ingredient(name: "agua")
         let limon = Ingredient(name: "limon")
         let fresas = Ingredient(name: "fresas")
-        let azucar = Ingredient(name: "azucar")
-        let otros = Ingredient(name: "otros")
 
         let recipes: [Recipe] = [
             Recipe(
                 name: "agua de limón",
                 ingredients: [
-                    .init(ingredient: limon),
-                    .init(ingredient: agua),
-                    .init(ingredient: azucar, isRequired: false)
+                    .init(ingredientName: "limon"),
+                    .init(ingredientName: "agua"),
+                    .init(ingredientName: "azucar", isRequired: false)
                 ],
                 mealType: .lunch,
                 isFavorite: true
@@ -43,8 +62,8 @@ struct RecipeIntegrationTests {
             Recipe(
                 name: "carlotta de limón",
                 ingredients: [
-                    .init(ingredient: limon),
-                    .init(ingredient: otros)
+                    .init(ingredientName: "limon"),
+                    .init(ingredientName: "otros")
                 ],
                 mealType: .lunch,
                 isFavorite: false
@@ -52,9 +71,9 @@ struct RecipeIntegrationTests {
             Recipe(
                 name: "agua de fresa",
                 ingredients: [
-                    .init(ingredient: fresas),
-                    .init(ingredient: agua),
-                    .init(ingredient: azucar, isRequired: false)
+                    .init(ingredientName: "fresas"),
+                    .init(ingredientName: "agua"),
+                    .init(ingredientName: "azucar", isRequired: false)
                 ],
                 mealType: .breakFast,
                 isFavorite: false
@@ -102,18 +121,16 @@ struct RecipeIntegrationTests {
     @Test
     func missing_count_and_canCook_propagate_correctly_through_pipeline() {
         // Given
-        let pasta = Ingredient(name: "Pasta")
-        let tomato = Ingredient(name: "Tomate")
-        let garlic = Ingredient(name: "Ajo")
-        let basil = Ingredient(name: "Basil")
+        let pasta = Ingredient(name: "Pasta", quantity: 1)
+        let tomato = Ingredient(name: "Tomate", quantity: 1)  // Not in pantry
 
         let recipe = Recipe(
             name: "Pasta",
             ingredients: [
-                .init(ingredient: pasta),
-                .init(ingredient: tomato),
-                .init(ingredient: garlic),
-                .init(ingredient: basil)
+                .init(ingredientName: "Pasta"),
+                .init(ingredientName: "Tomate"),
+                .init(ingredientName: "Ajo"),
+                .init(ingredientName: "Basil")
             ],
             mealType: .lunch
         )
@@ -138,16 +155,16 @@ struct RecipeIntegrationTests {
     @Test
     func getPossibleRecipes_filters_correctly_through_matcher_mapper_grouper_pipeline() {
         // Given
-        let water = Ingredient(name: "water")
-        let sugar = Ingredient(name: "sugar")
-        let salt = Ingredient(name: "salt")
-        let oil = Ingredient(name: "oil")
-        let vinegar = Ingredient(name: "vinegar")
+        let water = Ingredient(name: "water", quantity: 1)
+        let sugar = Ingredient(name: "sugar", quantity: 0)
+        let salt = Ingredient(name: "salt", quantity: 1)
+        let oil = Ingredient(name: "oil", quantity: 0)
+        let vinegar = Ingredient(name: "vinegar", quantity: 0)
 
         // Recipe 1: 0 missing (should be in possible)
         let recipe1 = Recipe(
             name: "Simple Water",
-            ingredients: [.init(ingredient: water)],
+            ingredients: [.init(ingredientName: "water")],
             mealType: .lunch,
             isFavorite: false
         )
@@ -156,10 +173,10 @@ struct RecipeIntegrationTests {
         let recipe2 = Recipe(
             name: "Salad",
             ingredients: [
-                .init(ingredient: water),
-                .init(ingredient: salt),
-                .init(ingredient: oil),
-                .init(ingredient: sugar)
+                .init(ingredientName: "water"),
+                .init(ingredientName: "salt"),
+                .init(ingredientName: "oil"),
+                .init(ingredientName: "sugar")
             ],
             mealType: .lunch,
             isFavorite: false
@@ -169,12 +186,12 @@ struct RecipeIntegrationTests {
         let recipe3 = Recipe(
             name: "Complex Dish",
             ingredients: [
-                .init(ingredient: water),
-                .init(ingredient: salt),
-                .init(ingredient: oil),
-                .init(ingredient: sugar),
-                .init(ingredient: vinegar),
-                .init(ingredient: Ingredient(name: "missing"))
+                .init(ingredientName: "water"),
+                .init(ingredientName: "salt"),
+                .init(ingredientName: "oil"),
+                .init(ingredientName: "sugar"),
+                .init(ingredientName: "vinegar"),
+                .init(ingredientName: "missing")
             ],
             mealType: .dinner,
             isFavorite: false
@@ -202,10 +219,10 @@ struct RecipeIntegrationTests {
     @Test
     func pipeline_preserves_recipe_ids_through_mapping() {
         // Given
-        let water = Ingredient(name: "water")
+        let water = Ingredient(name: "water", quantity: 1)
         let recipe = Recipe(
             name: "Water",
-            ingredients: [.init(ingredient: water)],
+            ingredients: [.init(ingredientName: "water")],
             mealType: .lunch
         )
 
@@ -225,30 +242,30 @@ struct RecipeIntegrationTests {
     @Test
     func pipeline_handles_multiple_meal_types_with_correct_grouping_and_sorting() {
         // Given
-        let water = Ingredient(name: "water")
+        let water = Ingredient(name: "water", quantity: 1)
 
         let recipes: [Recipe] = [
             Recipe(
                 name: "Other Dish",
-                ingredients: [.init(ingredient: water)],
+                ingredients: [.init(ingredientName: "water")],
                 mealType: .other,
                 isFavorite: false
             ),
             Recipe(
                 name: "Dinner",
-                ingredients: [.init(ingredient: water)],
+                ingredients: [.init(ingredientName: "water")],
                 mealType: .dinner,
                 isFavorite: true
             ),
             Recipe(
                 name: "Breakfast",
-                ingredients: [.init(ingredient: water)],
+                ingredients: [.init(ingredientName: "water")],
                 mealType: .breakFast,
                 isFavorite: false
             ),
             Recipe(
                 name: "Lunch",
-                ingredients: [.init(ingredient: water)],
+                ingredients: [.init(ingredientName: "water")],
                 mealType: .lunch,
                 isFavorite: false
             ),
@@ -271,16 +288,12 @@ struct RecipeIntegrationTests {
     @Test
     func pipeline_with_no_pantry_items_computes_missing_count_correctly() {
         // Given
-        let pasta = Ingredient(name: "Pasta")
-        let tomato = Ingredient(name: "Tomate")
-        let garlic = Ingredient(name: "Ajo")
-
         let recipe = Recipe(
             name: "Pasta",
             ingredients: [
-                .init(ingredient: pasta),
-                .init(ingredient: tomato),
-                .init(ingredient: garlic)
+                .init(ingredientName: "Pasta"),
+                .init(ingredientName: "Tomate"),
+                .init(ingredientName: "Ajo")
             ],
             mealType: .lunch
         )
@@ -302,40 +315,40 @@ struct RecipeIntegrationTests {
     @Test
     func pipeline_complex_scenario_with_favorites_and_cookability() {
         // Given
-        let water = Ingredient(name: "water")
+        let water = Ingredient(name: "water", quantity: 1)
 
         let recipes: [Recipe] = [
             Recipe(
                 name: "Z Non-Cookable Non-Favorite",
                 ingredients: [
-                    .init(ingredient: water),
-                    .init(ingredient: Ingredient(name: "missing1")),
-                    .init(ingredient: Ingredient(name: "missing2")),
-                    .init(ingredient: Ingredient(name: "missing3")),
-                    .init(ingredient: Ingredient(name: "missing4"))
+                    .init(ingredientName: "water"),
+                    .init(ingredientName: "missing1"),
+                    .init(ingredientName: "missing2"),
+                    .init(ingredientName: "missing3"),
+                    .init(ingredientName: "missing4")
                 ],
                 mealType: .lunch,
                 isFavorite: false
             ),
             Recipe(
                 name: "Favorite Cookable",
-                ingredients: [.init(ingredient: water)],
+                ingredients: [.init(ingredientName: "water")],
                 mealType: .lunch,
                 isFavorite: true
             ),
             Recipe(
                 name: "A Non-Cookable Favorite",
                 ingredients: [
-                    .init(ingredient: water),
-                    .init(ingredient: Ingredient(name: "missing1")),
-                    .init(ingredient: Ingredient(name: "missing2"))
+                    .init(ingredientName: "water"),
+                    .init(ingredientName: "missing1"),
+                    .init(ingredientName: "missing2")
                 ],
                 mealType: .lunch,
                 isFavorite: true
             ),
             Recipe(
                 name: "Non-Favorite Cookable",
-                ingredients: [.init(ingredient: water)],
+                ingredients: [.init(ingredientName: "water")],
                 mealType: .lunch,
                 isFavorite: false
             ),
@@ -360,5 +373,33 @@ struct RecipeIntegrationTests {
         ]
         let actualOrder = sortedRecipes.map { $0.name }
         #expect(actualOrder == expectedOrder)
+    }
+
+    @Test
+    func any_ingredient_is_saved_when_adding_a_new_recipe() throws {
+        // Given
+        let ingredients: Set<RecipeIngredient> = [
+            .init(ingredientName: "Agua"),
+            .init(ingredientName: "Limones"),
+            .init(ingredientName: "Azucar")
+        ]
+        let newRecipe = Recipe(name: "Agua de limón", ingredients: ingredients)
+        
+        let pantryRepository = SDPantryProtocolRepository(context: context)
+        let recipeRepository = SDRecipeProtocolRepository(context: context)
+        let sut = RecipeUseCasesImpl(
+            RecipeProtocolRepository: recipeRepository,
+            PantryProtocolRepository: pantryRepository,
+            matcher: .init()
+        )
+
+        // When
+        try recipeRepository.save(newRecipe)
+
+        // Then
+        /// Verify that any ingredient was added to my pantry
+        let pantry = pantryRepository.getPantry()
+        #expect(sut.getAllRecipes().count == 1)
+        #expect(pantry.isEmpty == true, "The pantry should be empty, but has: \(pantry.count) ingredients.")
     }
 }

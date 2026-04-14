@@ -131,6 +131,7 @@ struct SDPantryProtocolRepositoryTests {
     }
 
     @Test
+    @MainActor
     func update_existing_ingredient_succeeds() throws {
         // Given - Add an ingredient first
         let originalIngredient = Ingredient(name: "Apple")

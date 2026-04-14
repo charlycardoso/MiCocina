@@ -30,6 +30,11 @@ final class MyPantryModuleViewModel: ObservableObject {
         let ingredients = pantryRepo.getPantry()
         self.pantry = ingredients
     }
+    
+    /// Manually refresh the pantry from the repository
+    func refresh() {
+        fetchPantry()
+    }
 }
 
 // MARK: Pantry Repository methods
@@ -40,18 +45,22 @@ extension MyPantryModuleViewModel: PantryProtocolRepository {
 
     func add(_ ingredient: Ingredient) throws {
         try pantryRepo.add(ingredient)
+        fetchPantry() // Refresh after add
     }
 
     func remove(_ ingredient: Ingredient) throws {
         try pantryRepo.remove(ingredient)
+        fetchPantry() // Refresh after remove
     }
 
     func update(_ ingredient: Ingredient) throws {
         try pantryRepo.update(ingredient)
+        fetchPantry() // Refresh after update
     }
 
     func clear() throws {
         try pantryRepo.clear()
+        fetchPantry() // Refresh after clear
     }
 
     func exists(_ ingredient: Ingredient) -> Bool {

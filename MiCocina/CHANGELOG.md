@@ -5,6 +5,97 @@ All notable changes to the MiCocina project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-04-14 - Architecture Refactoring
+
+### 🎯 Major Breaking Changes
+
+#### Architectural Separation: Recipe Ingredients vs Pantry Ingredients
+
+**Critical Change:** Complete separation of recipe ingredients and pantry ingredients to prevent data leakage.
+
+**Before (v1.0):**
+- Recipe ingredients and pantry items shared the same `Ingredient` model
+- Adding recipes accidentally added ingredients to pantry
+- Tight coupling between recipes and pantry data
+
+**After (v2.0):**
+- `RecipeIngredient`: Stores only ingredient **name** (what recipes need)
+- `Ingredient`: Stores name + **quantity** (what you have in pantry)
+- Complete separation prevents data leakage
+
+### Changed
+
+#### Domain Models
+- **RecipeIngredient**: Now stores `ingredientName: String` instead of `Ingredient` object
+- **Ingredient**: Added `quantity: Int` property for pantry tracking
+- Removed shared reference between recipe and pantry ingredients
+
+#### Storage Models (SwiftData)
+- **SDRecipeIngredient**: Now stores `ingredientName: String` instead of `SDIngredient` reference
+- **SDIngredient**: Added `quantity: Int` property
+- No foreign key relationship between recipe ingredients and pantry items
+
+#### Repository Layer
+- **SDPantryRepository**: Filters queries by `quantity > 0` to return only pantry items
+- **SDRecipeRepository**: Stores ingredient names directly, no pantry references
+- **StorageMapper**: Updated to handle name-based ingredient storage for recipes
+
+#### Business Logic
+- **RecipeMatcher**: Compares ingredient **names** instead of objects
+- **RecipeMapper**: Uses name-based comparison for missing ingredient calculation
+- Recipe matching now filters pantry by `quantity > 0`
+
+#### UI Layer
+- **NewRecipeView**: Uses `RecipeIngredient(ingredientName:)` API
+- **RecipeDetailView**: Displays `ingredientName` instead of `ingredient.name`
+- **AddIngredientView**: Barcode scanning now correctly adds only to pantry
+
+### Added
+- **ARCHITECTURE_GUIDE.md**: Comprehensive guide explaining ingredient separation
+- Camera permission support for barcode scanning (`NSCameraUsageDescription`)
+- Barcode scanner integration using VisionKit's `DataScannerViewController`
+- Product lookup via Open Food Facts API for barcode scanning
+
+### Fixed
+- ✅ **Critical:** Adding recipes no longer adds ingredients to pantry
+- ✅ **Critical:** Recipe ingredients and pantry items are now independent
+- ✅ Data persistence issues with ModelContext autosave
+- ✅ ShoppingListView now receives proper modelContext injection
+- ✅ Camera permission crash when scanning barcodes
+- ✅ Recipe matching logic uses correct ingredient comparison
+- ✅ Pantry refresh after add/edit/delete operations
+
+### Migration Notes
+
+**⚠️ Breaking Database Schema Change**
+
+Users must **delete the app** and reinstall to migrate from v1.0 to v2.0:
+
+1. Delete MiCocina from device
+2. Rebuild and reinstall
+3. All previous data will be lost (schema incompatible)
+4. Add camera permission to Info.plist for barcode scanning
+
+**Required Info.plist Change:**
+```xml
+<key>NSCameraUsageDescription</key>
+<string>MiCocina necesita acceso a la cámara para escanear códigos de barras</string>
+```
+
+### Technical Improvements
+- Enabled ModelContext autosave for better data persistence
+- Added explicit `allowsSave: true` in ModelConfiguration
+- Improved ViewMod el refresh after data operations
+- Better state synchronization in views using `.onChange`
+
+### Testing
+- Updated all integration tests to use new `ingredientName` API
+- Updated all storage mapper tests for new architecture
+- Updated all repository tests for separated models
+- Added test coverage for no-leakage between recipes and pantry
+
+---
+
 ## [1.0.0] - 2026-04-13 - MVP Release
 
 ### Added

@@ -7,28 +7,31 @@
 
 import Foundation
 
-/// Represents the association between a recipe and an ingredient.
+/// Represents an ingredient needed for a recipe.
 ///
-/// `RecipeIngredient` is a domain model that connects a recipe to a specific ingredient,
-/// along with metadata about that ingredient's role in the recipe. This model enables
-/// recipes to include the same ingredient multiple times with different requirements.
+/// `RecipeIngredient` is a domain model that specifies what ingredients a recipe requires.
+/// It stores only the ingredient name and metadata about its role in the recipe.
 ///
-/// - Note: This model allows tracking whether an ingredient is required or optional
-///   in a recipe, which is useful for flexible recipe matching.
+/// **Architecture Note**: This is separate from `Ingredient` (pantry items).
+/// - `RecipeIngredient`: What a recipe **needs** (just names)
+/// - `Ingredient`: What you **have** (names + quantities in your pantry)
+///
+/// This separation ensures that adding recipes doesn't affect your pantry inventory.
 ///
 /// - Example:
 /// ```swift
-/// let water = Ingredient(name: "water")
-/// let sugar = Ingredient(name: "sugar")
-/// let requiredWater = RecipeIngredient(ingredient: water, isRequired: true)
-/// let optionalSugar = RecipeIngredient(ingredient: sugar, isRequired: false)
+/// let requiredWater = RecipeIngredient(ingredientName: "water", isRequired: true)
+/// let optionalSugar = RecipeIngredient(ingredientName: "sugar", isRequired: false)
 /// ```
 struct RecipeIngredient: Identifiable, Hashable {
     /// Unique identifier for this recipe-ingredient association
     let id: UUID
     
-    /// The ingredient associated with this recipe
-    let ingredient: Ingredient
+    /// The name of the ingredient needed for this recipe
+    ///
+    /// This is just a string reference, not tied to pantry inventory.
+    /// The name is normalized (lowercase, trimmed) for consistent matching.
+    let ingredientName: String
     
     /// Whether this ingredient is required for the recipe
     ///
@@ -40,11 +43,24 @@ struct RecipeIngredient: Identifiable, Hashable {
     ///
     /// - Parameters:
     ///   - id: A unique identifier for this association. Defaults to a newly generated UUID.
-    ///   - ingredient: The ingredient associated with the recipe.
+    ///   - ingredientName: The name of the ingredient needed.
     ///   - isRequired: Whether this ingredient is required. Defaults to `true`.
+    init(id: UUID = .init(), ingredientName: String, isRequired: Bool = true) {
+        self.id = id
+        self.ingredientName = ingredientName.normalize()
+        self.isRequired = isRequired
+    }
+    
+    /// Convenience initializer for backwards compatibility during migration.
+    ///
+    /// - Parameters:
+    ///   - id: A unique identifier for this association. Defaults to a newly generated UUID.
+    ///   - ingredient: The ingredient to extract the name from.
+    ///   - isRequired: Whether this ingredient is required. Defaults to `true`.
+    @available(*, deprecated, message: "Use init(ingredientName:isRequired:) instead")
     init(id: UUID = .init(), ingredient: Ingredient, isRequired: Bool = true) {
         self.id = id
-        self.ingredient = ingredient
+        self.ingredientName = ingredient.name
         self.isRequired = isRequired
     }
 }

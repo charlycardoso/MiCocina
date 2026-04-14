@@ -18,10 +18,17 @@ struct MiCocinaApp: App {
             SDIngredient.self,
             SDRecipeIngredient.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            allowsSave: true
+        )
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            // Enable autosave on the main context
+            container.mainContext.autosaveEnabled = true
+            return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
