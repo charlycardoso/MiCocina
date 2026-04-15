@@ -13,6 +13,15 @@ struct HomeContent: View {
     @ObservedObject private var viewModel: HomeContentViewModel
     @State private var searchRecipe: String = ""
     @State private var showSaveNewRecipeView: Bool = false
+    @State private var markRecipeAsFavorite: Bool = false
+    @State private var selectedRecipe: RecipeViewData?
+    private var alertViewMessage: String {
+        let action = (selectedRecipe?.isFavorite ?? false) 
+            ? String(localized: "homeContent.alert.removeFavorite") 
+            : String(localized: "homeContent.alert.addFavorite")
+        let recipeName = selectedRecipe?.name.lowercased() ?? ""
+        return String(localized: "homeContent.alert.message \(action) \(recipeName)")
+    }
 
     init(viewModel: HomeContentViewModel) {
         self.viewModel = viewModel
@@ -27,6 +36,7 @@ struct HomeContent: View {
                         .multilineTextAlignment(.center)
                         .font(.callout)
                         .foregroundStyle(.gray)
+                        .accessibilityIdentifier("homeContent.emptyState")
                 } else {
                     ScrollView {
                         ForEach(viewModel.recipes, id: \.mealType) { recipeGroup in
@@ -38,23 +48,46 @@ struct HomeContent: View {
                                         RecipeDetailView(recipe: recipe, viewModel: viewModel)
                                     } label: {
                                         RowContent(for: recipe)
-                                            .padding(.vertical, 2)
+                                            .glassEffect(.identity)
                                     }
-                                    .buttonStyle(PlainButtonStyle())
+                                    .accessibilityIdentifier("homeContent.recipeRow.\(recipe.id.uuidString)")
+                                    Divider()
                                 }
                             }
                         }
                     }
+                    .accessibilityIdentifier("homeContent.recipeList")
                 }
             }
+            .alert(alertViewMessage, isPresented: $markRecipeAsFavorite, actions: {
+                Button(String(localized: "common.confirm"), role: .confirm) {
+                    guard let recipe = selectedRecipe,
+                          var shownRecipe = viewModel.getByID(recipe.id) else { return
+                    }
+                    shownRecipe.isFavorite = !shownRecipe.isFavorite
+                    try? viewModel.update(shownRecipe)
+                    viewModel.getAllRecipes()
+                    markRecipeAsFavorite = false
+                    selectedRecipe = nil
+                }
+                .accessibilityIdentifier("homeContent.alert.confirmButton")
+
+                Button(String(localized: "common.cancel"), role: .cancel) {
+                    markRecipeAsFavorite = false
+                    selectedRecipe = nil
+                }
+                .accessibilityIdentifier("homeContent.alert.cancelButton")
+            })
             .toolbar(content: {
-                ToolbarItem(placement: .destructiveAction) {
+                ToolbarItem(placement: .primaryAction) {
                     Button {
                         showSaveNewRecipeView.toggle()
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .foregroundColor(.blue)
+                    .tint(.cPrimary)
+                    .accessibilityIdentifier("homeContent.addRecipeButton")
+                    .accessibilityLabel(String(localized: "homeContent.addRecipe.accessibilityLabel"))
                 }
             })
             .navigationTitle("homeContent.navigationTitle")
@@ -79,45 +112,37 @@ struct HomeContent: View {
 
     @ViewBuilder
     private func RowContent(for recipe: RecipeViewData) -> some View {
-        VStack(alignment: .leading) {
-            HStack(alignment: .center) {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(recipe.name)
-                    .fontWeight(.regular)
-                    .font(.body)
-
-                Spacer()
-
-                if recipe.isFavorite {
-                    Button {
-                        // display an alert before to update the recipe
-                    } label: {
-                        Image(systemName: "heart.fill")
-                            .padding(8)
-                            .foregroundStyle(.red)
-                            .background(Color.red.opacity(0.1))
-                            .clipShape(Circle())
-                    }
-                }
+                Text(recipe.canCook ? "homeContent.canCook" : "homeContent.cannotCook")
+                    .font(.caption)
+                    .padding(2)
+                    .padding(.horizontal, 2)
+                    .background(recipe.canCook ? .cSecondary : .gray)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
             }
 
-            Text(recipe.canCook ? "homeContent.canCook" : "homeContent.cannotCook")
-                .foregroundStyle(recipe.canCook ? Color.green : Color.orange)
-                .font(.footnote)
-                .fontWeight(.medium)
-                .font(.caption)
-                .padding(6)
-                .padding(.horizontal, 4)
-                .background {
-                    (recipe.canCook ? Color.green : Color.orange).opacity(0.1)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+            Spacer()
+
+            Button {
+                // display an alert before to update the recipe
+                selectedRecipe = recipe
+                markRecipeAsFavorite = true
+            } label: {
+                Image(systemName: recipe.isFavorite ? "heart.fill" : "heart")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 20, height: 20)
+                    .foregroundStyle(Color.cPrimary)
+            }
+            .accessibilityIdentifier("homeContent.favoriteButton.\(recipe.id.uuidString)")
+            .accessibilityLabel(recipe.isFavorite 
+                ? String(localized: "homeContent.removeFavorite.accessibilityLabel")
+                : String(localized: "homeContent.addFavorite.accessibilityLabel")
+            )
         }
         .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray, lineWidth: 1)
-        }
-        .padding(.horizontal)
     }
 
     private func mealTypeName(for mealType: MealType) -> String {

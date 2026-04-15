@@ -72,25 +72,30 @@ struct ContentView: View {
                     Navigate(to: .Home)
                 }
             }
+            .accessibilityIdentifier("contentView.homeTab")
             
             Tab(String(localized: "myPantry.navigationTitle"), systemImage: "refrigerator.fill", value: .MyPantry) {
                 NavigationStack {
                     Navigate(to: .MyPantry)
                 }
             }
+            .accessibilityIdentifier("contentView.pantryTab")
             
             Tab(String(localized: "planner.title"), systemImage: "calendar", value: .Planner) {
                 NavigationStack {
                     Navigate(to: .Planner)
                 }
             }
+            .accessibilityIdentifier("contentView.plannerTab")
             
             Tab(String(localized: "shoppingList.title"), systemImage: "cart.fill", value: .ShoppingList) {
                 NavigationStack {
                     Navigate(to: .ShoppingList)
                 }
             }
+            .accessibilityIdentifier("contentView.shoppingListTab")
         }
+        .accessibilityIdentifier("contentView.tabView")
     }
 
     @ViewBuilder

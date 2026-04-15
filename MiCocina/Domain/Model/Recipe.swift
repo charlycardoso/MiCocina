@@ -41,7 +41,7 @@ struct Recipe: Equatable {
     let mealType: MealType
     
     /// Boolean flag indicating if the recipe is marked as a favorite
-    let isFavorite: Bool
+    var isFavorite: Bool
 
     /// Initializes a new `Recipe` instance.
     ///

@@ -6,6 +6,7 @@
 
 /* Common */
 "common.cancel" = "Cancelar";
+"common.confirm" = "Confirmar";
 "common.save" = "Guardar";
 "common.ok" = "OK";
 "common.information" = "Información";
@@ -27,6 +28,12 @@
 "homeContent.searchPrompt" = "Buscar recetas";
 "homeContent.canCook" = "Cocinable";
 "homeContent.cannotCook" = "No cocinable";
+"homeContent.alert.removeFavorite" = "Quitar";
+"homeContent.alert.addFavorite" = "Guardar";
+"homeContent.alert.message %@ %@" = "¿%@ %@ como favorito?";
+"homeContent.addRecipe.accessibilityLabel" = "Añadir nueva receta";
+"homeContent.addFavorite.accessibilityLabel" = "Marcar como favorito";
+"homeContent.removeFavorite.accessibilityLabel" = "Quitar de favoritos";
 
 /* NewRecipeView */
 "newRecipe.navigationTitle" = "Nueva Receta";
