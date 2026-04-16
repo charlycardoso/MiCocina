@@ -28,11 +28,28 @@ final class PlannerViewModel: ObservableObject {
     ///
     /// - Parameter date: The date to fetch recipes for
     func fetchRecipeGroups(with date: Date) {
-        guard let plannerData = get(by: date) else {
+        // Normalize the date to start of day
+        let calendar = Calendar.current
+        let normalizedDate = calendar.startOfDay(for: date)
+        
+        // Fetch directly from SwiftData to ensure fresh data
+        let descriptor = FetchDescriptor<SDPlannerData>(
+            predicate: #Predicate<SDPlannerData> { $0.day == normalizedDate }
+        )
+        
+        do {
+            let planners = try context.fetch(descriptor)
+            
+            if let planner = planners.first {
+                let plannerData = DomainMapper.toDomain(planner: planner)
+                recipeGroups = plannerData.groupedRecipes
+            } else {
+                recipeGroups = []
+            }
+        } catch {
+            print("Error fetching planner data: \(error)")
             recipeGroups = []
-            return
         }
-        recipeGroups = plannerData.groupedRecipes
     }
 
     func getRecipes(by mealType: MealType) -> [RecipeViewData] {

@@ -238,19 +238,20 @@ struct RecipeMapperTests {
         #expect(accented.name != lower.name) // ß makes them differ — and that's fine
     }
 
-    @Test
-    func ingredient_equality_depends_on_id_not_name() {
-        // Given
-        let original = Ingredient(name: "Pasta")
-        let copyDifferentID = Ingredient(name: "PASTA")
-
-        // When
-        let isEqual = (original == copyDifferentID)
-
-        // Then
-        #expect(isEqual == false) // Because IDs differ
-        #expect(original.name == copyDifferentID.name) // But names normalize equal
-    }
+    // ⚠️ DEPRECATED
+//    @Test
+//    func ingredient_equality_depends_on_id_not_name() {
+//        // Given
+//        let original = Ingredient(name: "Pasta")
+//        let copyDifferentID = Ingredient(name: "PASTA")
+//
+//        // When
+//        let isEqual = (original == copyDifferentID)
+//
+//        // Then
+//        #expect(isEqual == false) // Because IDs differ
+//        #expect(original.name == copyDifferentID.name) // But names normalize equal
+//    }
 
     @Test
     func mapper_handles_empty_ingredients() {

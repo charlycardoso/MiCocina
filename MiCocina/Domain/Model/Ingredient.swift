@@ -52,4 +52,8 @@ struct Ingredient: Identifiable, Equatable, Hashable {
         self.name = name.normalize()
         self.quantity = quantity
     }
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.name == rhs.name
+    }
 }

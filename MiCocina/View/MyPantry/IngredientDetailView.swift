@@ -33,7 +33,7 @@ struct IngredientDetailView: View {
                 Section {
                     if isEditing {
                         TextField("common.ingredient.namePlaceholder", text: $name)
-                            .textFieldStyle(.roundedBorder)
+                            .textFieldStyle(.plain)
                     } else {
                         HStack {
                             Text("common.name")

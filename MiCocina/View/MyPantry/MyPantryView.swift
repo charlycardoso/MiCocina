@@ -44,33 +44,33 @@ struct MyPantryView: View {
                         .font(.callout)
                         .foregroundStyle(.gray)
                 } else {
-                    VStack {
-                        List(filteredIngredients, id: \.id) { ingredient in
-                            IngredientRow(for: ingredient)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    selectedIngredient = ingredient
+                    List(filteredIngredients, id: \.id) { ingredient in
+                        IngredientRow(for: ingredient)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                selectedIngredient = ingredient
+                            }
+                            .swipeActions(allowsFullSwipe: false) {
+                                Button(role: .confirm) {
+                                    // TODO: Add to shopping list functionality
+                                } label: {
+                                    Label("myPantry.swipe.buy", systemImage: "basket")
                                 }
-                                .swipeActions(allowsFullSwipe: false) {
-                                    Button(role: .confirm) {
-                                        // TODO: Add to shopping list functionality
-                                    } label: {
-                                        Label("myPantry.swipe.buy", systemImage: "basket")
-                                    }
-                                    .tint(Color.blue)
-                                    Button(role: .destructive) {
-                                        ingredientToDelete = ingredient
-                                        showAlert = (
-                                            true,
-                                            String(localized: "myPantry.deleteAlert.title"),
-                                            String(format: String(localized: "myPantry.deleteAlert.message"), ingredient.name)
-                                        )
-                                    } label: {
-                                        Label("myPantry.swipe.delete", systemImage: "trash")
-                                    }
+                                .tint(Color.blue)
+                                Button(role: .destructive) {
+                                    ingredientToDelete = ingredient
+                                    showAlert = (
+                                        true,
+                                        String(localized: "myPantry.deleteAlert.title"),
+                                        String(format: String(localized: "myPantry.deleteAlert.message"), ingredient.name)
+                                    )
+                                } label: {
+                                    Label("myPantry.swipe.delete", systemImage: "trash")
                                 }
-                        }
+                            }
                     }
+                    .listStyle(.plain)
+                    .padding(.top, 16)
                 }
             }
             .navigationTitle("myPantry.navigationTitle")
@@ -82,7 +82,6 @@ struct MyPantryView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .foregroundColor(.blue)
                 }
             })
         }
@@ -149,7 +148,7 @@ struct MyPantryView: View {
                 .foregroundStyle(.white)
                 .background {
                     Circle()
-                        .fill(ingredient.quantity <= 3 ? Color.red : Color.green)
+                        .fill(ingredient.quantity <= 3 ? Color.cPrimary : Color.cSecondary)
                 }
         }
     }
@@ -164,8 +163,7 @@ struct MyPantryView: View {
     let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: schema, configurations: [config])
 
-    let mockVM = MyPantryModuleViewModel.mockForPreview(context: container.mainContext)
-
+    let mockVM = MyPantryModuleViewModel(context: container.mainContext)
     return MyPantryView(viewModel: mockVM)
         .modelContainer(container)
 }

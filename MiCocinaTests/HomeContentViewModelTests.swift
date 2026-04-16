@@ -283,8 +283,8 @@ struct HomeContentViewModelTests {
         // Given
         let container = createInMemoryModelContainer()
         let viewModel = HomeContentViewModel(context: container.mainContext)
-        let ingredient1 = createTestIngredient(name: "Ingredient 1")
-        let ingredient2 = createTestIngredient(name: "Ingredient 2")
+        let ingredient1 = createTestIngredient(name: "Limón")
+        let ingredient2 = createTestIngredient(name: "Agua")
         
         // When
         try viewModel.add(ingredient1)

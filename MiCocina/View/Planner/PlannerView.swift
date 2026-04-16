@@ -55,6 +55,7 @@ struct PlannerView: View {
     @State private var showMoveRecipeSheet: Bool = false
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
+    @State private var currentWeekOffset: Int = 0
 
     /// Initializes the planner view with a view model.
     ///
@@ -66,10 +67,22 @@ struct PlannerView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                WeekPlannerView()
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    .padding(.bottom, 16)
+                // Scrollable Week Planner with Paging
+                ScrollViewReader { proxy in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 0) {
+                            ForEach(0...1, id: \.self) { weekOffset in
+                                WeekPlannerView(weekOffset: weekOffset)
+                                    .frame(width: UIScreen.main.bounds.width)
+                                    .id(weekOffset)
+                            }
+                        }
+                        .scrollTargetLayout()
+                    }
+                    .scrollTargetBehavior(.paging)
+                    .frame(height: 100)
+                    .background(Color(.systemBackground))
+                }
 
                 Divider()
 
@@ -80,6 +93,7 @@ struct PlannerView: View {
                 }
             }
             .navigationTitle(NSLocalizedString("planner.title", comment: "Navigation title for the planner view"))
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -87,10 +101,11 @@ struct PlannerView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .tint(.blue)
                 }
             }
             .sheet(isPresented: $showAddRecipesSheet) {
+                refreshRecipes()
+            } content: {
                 AddRecipesToDayView(
                     viewModel: viewModel,
                     selectedDate: selectedDate,
@@ -98,8 +113,11 @@ struct PlannerView: View {
                         refreshRecipes()
                     }
                 )
+                .presentationDetents([.medium, .large])
             }
             .sheet(isPresented: $showMoveRecipeSheet) {
+                refreshRecipes()
+            } content: {
                 if let recipe = selectedRecipeForMove {
                     MoveRecipeView(
                         viewModel: viewModel,
@@ -143,19 +161,7 @@ struct PlannerView: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
-            
-            Button {
-                showAddRecipesSheet = true
-            } label: {
-                Label(NSLocalizedString("planner.addRecipes", comment: "Add recipes button"), systemImage: "plus.circle.fill")
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(Color.accentColor)
-                    .foregroundStyle(.white)
-                    .cornerRadius(10)
-            }
-            .padding(.top, 8)
-            
+
             Spacer()
         }
     }
@@ -163,7 +169,7 @@ struct PlannerView: View {
     @ViewBuilder
     private var recipesListView: some View {
         ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+            LazyVStack(spacing: 12, pinnedViews: [.sectionHeaders]) {
                 ForEach(viewModel.recipeGroups, id: \.mealType) { group in
                     Section {
                         ForEach(group.recipes) { recipe in
@@ -184,7 +190,8 @@ struct PlannerView: View {
                                     }
                                 )
                             }
-                            .buttonStyle(.plain)
+                            .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets())
                         }
                     } header: {
                         HStack {
@@ -200,6 +207,8 @@ struct PlannerView: View {
                                 .foregroundStyle(.gray)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
+                                .background(Color(.systemGray6))
+                                .clipShape(Capsule())
                         }
                         .padding(.horizontal)
                         .padding(.vertical, 8)
@@ -209,11 +218,12 @@ struct PlannerView: View {
             }
             .padding(.top, 8)
         }
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     @ViewBuilder
-    private func WeekPlannerView() -> some View {
-        let weekPlanning = currentWeekDaysFormatted()
+    private func WeekPlannerView(weekOffset: Int) -> some View {
+        let weekPlanning = currentWeekDaysFormatted(weekOffset: weekOffset)
         HStack {
             ForEach(Array(weekPlanning), id: \.date) { day in
                 let isToday = Calendar.current.isDateInToday(day.date)
@@ -232,12 +242,12 @@ struct PlannerView: View {
                         .frame(width: 40, height: 40)
                         .background {
                             Circle()
-                                .fill(isDaySelected ? Color.blue : Color.blue.opacity(0.1))
+                                .fill(isDaySelected ? Color.cPrimary : Color.cPrimary.opacity(0.1))
                         }
                         .overlay {
                             if isToday && !isDaySelected {
                                 Circle()
-                                    .stroke(Color.blue, lineWidth: 2)
+                                    .stroke(Color.cPrimary, lineWidth: 2)
                             }
                         }
                         .onTapGesture {
@@ -250,6 +260,8 @@ struct PlannerView: View {
                 Spacer()
             }
         }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
     }
     
     // MARK: - Helper Methods
@@ -328,24 +340,26 @@ struct PlannerView: View {
     /// The week starts on Monday following ISO 8601 standard. Each day includes
     /// a single-letter initial, two-digit day number, and the full date.
     ///
-    /// - Returns: Array of `WeekDay` objects representing the current week
-    func currentWeekDaysFormatted() -> [WeekDay] {
+    /// - Parameter weekOffset: The number of weeks to offset from the current week (e.g., -1 for previous week, 0 for current, 1 for next)
+    /// - Returns: Array of `WeekDay` objects representing the specified week
+    func currentWeekDaysFormatted(weekOffset: Int = 0) -> [WeekDay] {
         let calendar = Calendar(identifier: .iso8601)
         let today = Date()
 
-        guard let startOfWeek = calendar.dateInterval(of: .weekOfYear, for: today)?.start else {
+        guard let startOfWeek = calendar.dateInterval(of: .weekOfYear, for: today)?.start,
+              let offsetWeekStart = calendar.date(byAdding: .weekOfYear, value: weekOffset, to: startOfWeek) else {
             return []
         }
 
         let formatterInitial = DateFormatter()
-        formatterInitial.locale = Locale(identifier: "es_MX")
+        formatterInitial.locale = Locale.current
         formatterInitial.dateFormat = "EEEEE" // inicial del día
 
         let formatterDay = DateFormatter()
         formatterDay.dateFormat = "dd"
 
         return (0..<7).compactMap { offset in
-            guard let date = calendar.date(byAdding: .day, value: offset, to: startOfWeek) else {
+            guard let date = calendar.date(byAdding: .day, value: offset, to: offsetWeekStart) else {
                 return nil
             }
 

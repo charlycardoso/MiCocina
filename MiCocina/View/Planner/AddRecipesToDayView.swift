@@ -213,7 +213,7 @@ struct AddRecipesToDayView: View {
     /// - Returns: Localized long-form date string
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "es_MX")
+        formatter.locale = Locale.current
         formatter.dateStyle = .long
         return formatter.string(from: date)
     }

@@ -30,7 +30,7 @@ final class SDPlannerData {
     var day: Date
 
     /// The recipes planned for this day.
-    @Relationship
+    @Relationship(deleteRule: .nullify)
     var recipes: [SDRecipe]
 
     /// Creates a new persistence planner entry.

@@ -37,6 +37,10 @@ final class SDRecipe {
     /// The ingredients in this recipe (with cascade delete on recipe deletion)
     @Relationship(deleteRule: .cascade, inverse: \SDRecipeIngredient.recipe)
     var ingredients: [SDRecipeIngredient] = []
+    
+    /// The planner days that include this recipe (many-to-many relationship)
+    @Relationship(inverse: \SDPlannerData.recipes)
+    var planners: [SDPlannerData]? = []
 
     /// Initializes a new storage recipe model.
     ///
