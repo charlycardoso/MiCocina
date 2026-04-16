@@ -11,6 +11,7 @@ struct MyPantryModuleViewModelTests {
 
     private func makeContainer() throws -> ModelContainer {
         let schema = Schema([
+            SDPantryItem.self,
             SDRecipe.self,
             SDIngredient.self,
             SDRecipeIngredient.self,

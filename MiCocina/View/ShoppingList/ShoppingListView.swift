@@ -198,6 +198,14 @@ struct ShoppingListView: View {
                             item: item,
                             onToggle: { viewModel.toggleBought(item) }
                         )
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button {
+                                addToPantry(item)
+                            } label: {
+                                Label("shoppingList.addToPantry", systemImage: "refrigerator.fill")
+                            }
+                            .tint(.green)
+                        }
                     }
                     .onDelete { indexSet in
                         let itemsToDelete = indexSet.map { filteredBoughtItems[$0] }
@@ -227,13 +235,6 @@ struct ShoppingListView: View {
             Label("shoppingList.emptyState.title", systemImage: "cart")
         } description: {
             Text("shoppingList.emptyState.description")
-        } actions: {
-            Button {
-                showAddIngredient = true
-            } label: {
-                Label("shoppingList.emptyState.addButton", systemImage: "plus")
-            }
-            .buttonStyle(.borderedProminent)
         }
     }
     
@@ -255,12 +256,34 @@ struct ShoppingListView: View {
             return
         }
         
-        let ingredient = Ingredient(name: newIngredientName)
-        viewModel?.addIngredient(ingredient)
+        // Create shopping list item WITHOUT adding to pantry
+        let item = ShoppingListItem(
+            ingredient: Ingredient(name: newIngredientName),
+            isBought: false
+        )
+        viewModel?.addItem(item)
         
         // Reset and dismiss
         newIngredientName = ""
         showAddIngredient = false
+    }
+    
+    /// Adds a bought item to the pantry
+    private func addToPantry(_ item: ShoppingListItem) {
+        // Create pantry repository and add the ingredient
+        let pantryRepo = SDPantryProtocolRepository(context: modelContext)
+        
+        do {
+            // Add ingredient to pantry with default quantity of 1
+            var ingredientWithQuantity = item.ingredient
+            ingredientWithQuantity.quantity = 1
+            try pantryRepo.add(ingredientWithQuantity)
+            
+            // Remove from shopping list
+            viewModel?.removeItem(item)
+        } catch {
+            print("Error adding to pantry: \(error)")
+        }
     }
 }
 

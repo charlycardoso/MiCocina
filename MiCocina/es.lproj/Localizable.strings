@@ -194,3 +194,7 @@
 
 "shoppingList.search.noResults" = "Sin Resultados";
 "shoppingList.search.noMatch" = "No hay ingredientes que coincidan con '%@'";
+// MARK: - Actions
+
+"shoppingList.addToPantry" = "Agregar a Despensa";
+

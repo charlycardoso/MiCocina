@@ -196,3 +196,7 @@
 
 "shoppingList.search.noResults" = "No Results";
 "shoppingList.search.noMatch" = "No ingredients match '%@'";
+// MARK: - Actions
+
+"shoppingList.addToPantry" = "Add to Pantry";
+

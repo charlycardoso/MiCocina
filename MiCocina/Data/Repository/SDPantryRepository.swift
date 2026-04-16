@@ -49,10 +49,10 @@ final class SDPantryProtocolRepository: PantryProtocolRepository {
     ///
     /// - Returns: A set of all ingredients in the pantry. Returns empty set if fetch fails.
     func getPantry() -> Set<Ingredient> {
-        let descriptor = FetchDescriptor<SDIngredient>()
+        let descriptor = FetchDescriptor<SDPantryItem>()
         do {
             let ingredients = try context.fetch(descriptor)
-            let retrievedIngredients = ingredients.map { DomainMapper.toDomain(ingredient: $0) }
+            let retrievedIngredients = ingredients.map { DomainMapper.toDomain(ingredient: $0.ingredient) }
             var pantry: Set<Ingredient> = []
             retrievedIngredients.forEach { pantry.insert($0) }
             return pantry
@@ -73,8 +73,8 @@ final class SDPantryProtocolRepository: PantryProtocolRepository {
     /// - Throws: `RepositoryError` if the operation fails
     func add(_ ingredient: Ingredient) throws {
         let ingredientUUID: UUID = ingredient.id
-        let descriptor = FetchDescriptor<SDIngredient>(
-            predicate: #Predicate { $0.id == ingredientUUID }
+        let descriptor = FetchDescriptor<SDPantryItem>(
+            predicate: #Predicate { $0.ingredient.id == ingredientUUID }
         )
         
         do {

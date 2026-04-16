@@ -33,7 +33,7 @@ struct Ingredient: Identifiable, Equatable, Hashable {
     let name: String
     
     /// Quantity of the ingredient
-    let quantity: Int
+    var quantity: Int
 
     /// Initializes a new `Ingredient` instance.
     ///

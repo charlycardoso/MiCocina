@@ -28,6 +28,12 @@ protocol ShoppingListRepository {
     /// - Throws: `RepositoryError` if the operation fails
     func add(_ ingredient: Ingredient) throws
     
+    /// Adds a shopping list item directly without creating pantry entry.
+    ///
+    /// - Parameter item: The shopping list item to add
+    /// - Throws: `RepositoryError` if the operation fails
+    func addItem(_ item: ShoppingListItem) throws
+    
     /// Removes an item from the shopping list.
     ///
     /// - Parameter item: The shopping list item to remove

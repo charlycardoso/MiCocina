@@ -106,6 +106,64 @@ final class SDShoppingListRepository: ShoppingListRepository {
             throw RepositoryError.saveFailed(operation: "add new shopping list item for \(ingredient.name)", underlyingError: error)
         }
     }
+    
+    /// Adds a shopping list item directly without creating a pantry entry.
+    ///
+    /// This allows adding items to the shopping list without automatically
+    /// adding them to the pantry.
+    ///
+    /// - Parameter item: The shopping list item to add
+    /// - Throws: `RepositoryError` if the operation fails
+    func addItem(_ item: ShoppingListItem) throws {
+        // Check if already exists
+        let itemName = item.ingredient.name
+        let shoppingListDescriptor = FetchDescriptor<SDShoppingListItem>(
+            predicate: #Predicate { $0.ingredient.name == itemName }
+        )
+        
+        do {
+            let existingItem = try context.fetch(shoppingListDescriptor).first
+            if existingItem != nil {
+                // Already in shopping list, do nothing
+                return
+            }
+        } catch {
+            throw RepositoryError.fetchFailed(operation: "addItem - checking existing", underlyingError: error)
+        }
+        
+        // Reuse existing ingredient if available, otherwise create it
+        let ingredientID = item.ingredient.id
+        let ingredientDescriptor = FetchDescriptor<SDIngredient>(
+            predicate: #Predicate { $0.id == ingredientID }
+        )
+
+        let sdIngredient: SDIngredient
+        if let existingIngredient = try context.fetch(ingredientDescriptor).first {
+            sdIngredient = existingIngredient
+        } else {
+            sdIngredient = SDIngredient(
+                id: item.ingredient.id,
+                name: item.ingredient.name,
+                quantity: item.ingredient.quantity
+            )
+            context.insert(sdIngredient)
+        }
+        
+        // Create the shopping list item
+        let newItem = SDShoppingListItem(
+            id: item.id,
+            ingredient: sdIngredient,
+            isBought: item.isBought
+        )
+        
+        context.insert(newItem)
+        
+        do {
+            try context.save()
+        } catch {
+            throw RepositoryError.saveFailed(operation: "addItem \(item.ingredient.name)", underlyingError: error)
+        }
+    }
 
     /// Removes an item from the shopping list.
     ///

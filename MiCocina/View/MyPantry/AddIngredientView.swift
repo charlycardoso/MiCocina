@@ -167,6 +167,7 @@ struct AddIngredientView: View {
 
 #Preview {
     let schema = Schema([
+        SDPantryItem.self,
         SDRecipe.self,
         SDIngredient.self,
         SDRecipeIngredient.self,

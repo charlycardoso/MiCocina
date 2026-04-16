@@ -18,6 +18,7 @@ struct ShoppingListMapperTests {
     
     private func makeContainer() throws -> ModelContainer {
         let schema = Schema([
+            SDPantryItem.self,
             SDShoppingListItem.self,
             SDIngredient.self,
         ])

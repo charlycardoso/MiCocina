@@ -249,6 +249,7 @@ struct RecipeDetailView: View {
 
 #Preview("Recipe Detail") {
     let schema = Schema([
+        SDPantryItem.self,
         SDRecipe.self,
         SDIngredient.self,
         SDRecipeIngredient.self,

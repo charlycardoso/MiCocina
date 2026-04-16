@@ -129,4 +129,16 @@ final class ShoppingListViewModel {
             print("Error adding ingredient to shopping list: \(error)")
         }
     }
+    
+    /// Adds a shopping list item directly without adding to pantry.
+    ///
+    /// - Parameter item: The shopping list item to add
+    func addItem(_ item: ShoppingListItem) {
+        do {
+            try repository.addItem(item)
+            loadShoppingList()
+        } catch {
+            print("Error adding item to shopping list: \(error)")
+        }
+    }
 }

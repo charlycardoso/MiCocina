@@ -23,6 +23,7 @@ struct RecipeIntegrationTests {
         // 1. Setup in-memory configuration
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let schema = Schema([
+            SDPantryItem.self,
             SDShoppingListItem.self,
             SDPlannerData.self,
             SDRecipe.self,
