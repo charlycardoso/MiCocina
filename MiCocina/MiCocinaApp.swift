@@ -37,6 +37,7 @@ struct MiCocinaApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .tint(.cPrimary)
         }
         .modelContainer(sharedModelContainer)
     }

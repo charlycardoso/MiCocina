@@ -15,6 +15,23 @@ struct HomeContent: View {
     @State private var showSaveNewRecipeView: Bool = false
     @State private var markRecipeAsFavorite: Bool = false
     @State private var selectedRecipe: RecipeViewData?
+    
+    private var filteredRecipes: [RecipeGroup] {
+        guard !searchRecipe.isEmpty else {
+            return viewModel.recipes
+        }
+        
+        return viewModel.recipes.compactMap { group in
+            let filteredRecipesInGroup = group.recipes.filter { recipe in
+                recipe.name.localizedCaseInsensitiveContains(searchRecipe)
+            }
+            
+            guard !filteredRecipesInGroup.isEmpty else { return nil }
+            
+            return RecipeGroup(mealType: group.mealType, recipes: filteredRecipesInGroup)
+        }
+    }
+    
     private var alertViewMessage: String {
         let action = (selectedRecipe?.isFavorite ?? false) 
             ? String(localized: "homeContent.alert.removeFavorite") 
@@ -30,16 +47,34 @@ struct HomeContent: View {
     var body: some View {
         NavigationStack {
             Group {
-                if viewModel.recipes.isEmpty {
-                    Text("homeContent.emptyState")
+                if filteredRecipes.isEmpty {
+                    if searchRecipe.isEmpty {
+                        Text("homeContent.emptyState")
+                            .padding()
+                            .multilineTextAlignment(.center)
+                            .font(.callout)
+                            .foregroundStyle(.gray)
+                            .accessibilityIdentifier("homeContent.emptyState")
+                    } else {
+                        VStack(spacing: 12) {
+                            Image(systemName: "magnifyingglass")
+                                .font(.system(size: 48))
+                                .foregroundStyle(.gray)
+                            
+                            Text("homeContent.noSearchResults")
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+                            
+                            Text(verbatim: String(format: NSLocalizedString("homeContent.noSearchResultsMessage", comment: ""), searchRecipe))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
                         .padding()
-                        .multilineTextAlignment(.center)
-                        .font(.callout)
-                        .foregroundStyle(.gray)
-                        .accessibilityIdentifier("homeContent.emptyState")
+                    }
                 } else {
                     ScrollView {
-                        ForEach(viewModel.recipes, id: \.mealType) { recipeGroup in
+                        ForEach(filteredRecipes, id: \.mealType) { recipeGroup in
                             Section(header:
                                 SeparatorText(mealTypeName(for: recipeGroup.mealType))
                             ) {
@@ -60,23 +95,21 @@ struct HomeContent: View {
                 }
             }
             .alert(alertViewMessage, isPresented: $markRecipeAsFavorite, actions: {
-                Button(String(localized: "common.confirm"), role: .confirm) {
+                Button(role: .confirm) {
                     guard let recipe = selectedRecipe,
                           var shownRecipe = viewModel.getByID(recipe.id) else { return
                     }
-                    shownRecipe.isFavorite = !shownRecipe.isFavorite
+                    shownRecipe.isFavorite = true
                     try? viewModel.update(shownRecipe)
                     viewModel.getAllRecipes()
                     markRecipeAsFavorite = false
                     selectedRecipe = nil
                 }
-                .accessibilityIdentifier("homeContent.alert.confirmButton")
 
-                Button(String(localized: "common.cancel"), role: .cancel) {
+                Button(role: .cancel) {
                     markRecipeAsFavorite = false
                     selectedRecipe = nil
                 }
-                .accessibilityIdentifier("homeContent.alert.cancelButton")
             })
             .toolbar(content: {
                 ToolbarItem(placement: .primaryAction) {
@@ -85,9 +118,6 @@ struct HomeContent: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .tint(.cPrimary)
-                    .accessibilityIdentifier("homeContent.addRecipeButton")
-                    .accessibilityLabel(String(localized: "homeContent.addRecipe.accessibilityLabel"))
                 }
             })
             .navigationTitle("homeContent.navigationTitle")
@@ -115,8 +145,10 @@ struct HomeContent: View {
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(recipe.name)
+                    .foregroundStyle(.accent)
                 Text(recipe.canCook ? "homeContent.canCook" : "homeContent.cannotCook")
                     .font(.caption)
+                    .foregroundStyle(.accent)
                     .padding(2)
                     .padding(.horizontal, 2)
                     .background(recipe.canCook ? .cSecondary : .gray)
@@ -136,11 +168,6 @@ struct HomeContent: View {
                     .frame(width: 20, height: 20)
                     .foregroundStyle(Color.cPrimary)
             }
-            .accessibilityIdentifier("homeContent.favoriteButton.\(recipe.id.uuidString)")
-            .accessibilityLabel(recipe.isFavorite 
-                ? String(localized: "homeContent.removeFavorite.accessibilityLabel")
-                : String(localized: "homeContent.addFavorite.accessibilityLabel")
-            )
         }
         .padding()
     }

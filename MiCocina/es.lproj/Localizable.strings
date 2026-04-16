@@ -67,6 +67,9 @@
 "common.ingredient.namePlaceholder" = "Nombre del ingrediente";
 "common.ingredient.emptyNameError" = "El nombre del ingrediente no puede estar vacío.";
 "common.ingredient.duplicateTitle" = "Ingrediente Duplicado";
+"common.ingredient.required" = "Requerido";
+"common.ingredient.requiredDescription" = "Marca este ingrediente como esencial";
+"common.recipe.favoriteDescription" = "Marca esta receta como favorita";
 
 /* MyPantryView */
 "myPantry.navigationTitle" = "Mis ingredientes";

@@ -17,7 +17,16 @@ struct RecipeDetailView: View {
 
     @State private var showDeleteAlert: Bool = false
     @State private var showEditView: Bool = false
+    @State private var markAsFavorite: Bool = false
     @State private var fullRecipe: Recipe?
+    @State private var helpMessage: (activate: Bool, message: String) = (false, "")
+    private var alertViewMessage: String {
+        let action = (fullRecipe?.isFavorite ?? false)
+            ? String(localized: "homeContent.alert.removeFavorite")
+            : String(localized: "homeContent.alert.addFavorite")
+        let recipeName = fullRecipe?.name.lowercased() ?? ""
+        return String(localized: "homeContent.alert.message \(action) \(recipeName)")
+    }
 
     init(recipe: RecipeViewData, viewModel: HomeContentViewModel) {
         self.recipe = recipe
@@ -27,21 +36,21 @@ struct RecipeDetailView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                headerSection
-                ingredientsSection
                 cookingStatusSection
+                ingredientsSection
             }
             .padding()
         }
         .navigationTitle(recipe.name)
+        .navigationSubtitle(recipe.mealType.rawValue)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
-                    toggleFavorite()
+                    markAsFavorite.toggle()
                 } label: {
                     Image(systemName: recipe.isFavorite ? "heart.fill" : "heart")
-                        .foregroundStyle(recipe.isFavorite ? .red : .gray)
+                        .foregroundStyle(Color.cPrimary)
                 }
 
                 Menu {
@@ -60,6 +69,20 @@ struct RecipeDetailView: View {
         .onAppear {
             loadFullRecipe()
         }
+        .alert(alertViewMessage, isPresented: $markAsFavorite, actions: {
+            Button(String(localized: "common.confirm"), role: .confirm) {
+                toggleFavorite()
+            }
+            .accessibilityIdentifier("recipeDetailView.alert.confirmButton")
+
+            Button(String(localized: "common.cancel"), role: .cancel) {
+                markAsFavorite = false
+            }
+            .accessibilityIdentifier("recipeDetailView.alert.cancelButton")
+        })
+        .alert(helpMessage.message, isPresented: $helpMessage.activate, actions: {
+            Button("common.close", role: .close) { }
+        })
         .alert("recipeDetail.deleteAlertTitle", isPresented: $showDeleteAlert) {
             Button("common.cancel", role: .cancel) { }
             Button("recipeDetail.delete", role: .destructive) {
@@ -70,42 +93,8 @@ struct RecipeDetailView: View {
         }
         .sheet(isPresented: $showEditView) {
             if let fullRecipe = fullRecipe {
-                EditRecipeView(recipe: fullRecipe, viewModel: homeContentViewModel)
+                NewRecipeView(viewModel: homeContentViewModel, recipe: fullRecipe)
             }
-        }
-    }
-
-    @ViewBuilder
-    private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(recipe.name)
-                        .font(.title2)
-                        .fontWeight(.bold)
-
-                    Text(mealTypeName(for: recipe.mealType))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 4)
-                        .background(Color.blue.opacity(0.1))
-                        .clipShape(Capsule())
-                }
-
-                Spacer()
-
-                if recipe.isFavorite {
-                    Image(systemName: "heart.fill")
-                        .font(.title2)
-                        .foregroundStyle(.red)
-                }
-            }
-        }
-        .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemGray6))
         }
     }
 
@@ -122,36 +111,43 @@ struct RecipeDetailView: View {
                 LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(sortedIngredients) { recipeIngredient in
                         HStack(alignment: .center, spacing: 12) {
-                            Image(systemName: recipeIngredient.isRequired ? "circle.fill" : "circle")
-                                .font(.caption)
-                                .foregroundStyle(recipeIngredient.isRequired ? .green : .orange)
-
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text(recipeIngredient.ingredientName.capitalized)
                                     .font(.body)
                                     .fontWeight(.medium)
-
-                                if !recipeIngredient.isRequired {
-                                    Text("recipeDetail.optional")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
+                                
+                                Text(recipeIngredient.isRequired ? "common.ingredient.required" : "recipeDetail.optional")
+                                    .font(.caption)
+                                    .foregroundStyle(.systemBackground)
+                                    .padding(2)
+                                    .padding(.horizontal, 2)
+                                    .background {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(recipeIngredient.isRequired ? Color.cAccent : Color.cSecondary)
+                                    }
                             }
-
+                            
                             Spacer()
-
+                            
                             // Show if ingredient is available in pantry
                             if homeContentViewModel.exists(Ingredient(name: recipeIngredient.ingredientName)) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .font(.body)
                                     .foregroundStyle(.green)
                             } else {
-                                Image(systemName: "exclamationmark.circle")
-                                    .font(.body)
-                                    .foregroundStyle(.orange)
+                                Button {
+                                    withAnimation(.bouncy) {
+                                        let toggle = !helpMessage.activate
+                                        helpMessage = (toggle, "No cuentas con este ingrediente. Puedes agregarlo desde la sección de ingredientes.")
+                                    }
+                                } label: {
+                                    Image(systemName: "exclamationmark.circle")
+                                        .font(.body)
+                                        .foregroundStyle(.orange)
+                                }
                             }
                         }
-                        .padding(.horizontal, 4)
+                        Divider()
                     }
                 }
             } else {
@@ -164,65 +160,38 @@ struct RecipeDetailView: View {
                 }
             }
         }
-        .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
-                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-        }
     }
 
     @ViewBuilder
     private var cookingStatusSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("recipeDetail.recipeStatus")
-                .font(.headline)
-                .foregroundStyle(.primary)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: recipe.canCook ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    .font(.title2)
+                    .foregroundStyle(recipe.canCook ? .green : .orange)
 
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Image(systemName: recipe.canCook ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                        .font(.title2)
-                        .foregroundStyle(recipe.canCook ? .green : .orange)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(recipe.canCook ? "recipeDetail.canCookStatus" : "recipeDetail.cannotCookStatus")
-                            .font(.body)
-                            .fontWeight(.medium)
-                            .foregroundStyle(recipe.canCook ? .green : .orange)
-
-                        if !recipe.canCook {
-                            let key = recipe.missingCount == 1
-                                ? "recipeDetail.missingIngredients.singular"
-                                : "recipeDetail.missingIngredients.plural"
-                            Text(verbatim: String(format: NSLocalizedString(key, comment: ""), recipe.missingCount))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-
-                    Spacer()
-                }
-
-                if recipe.canCook {
-                    Button {
-                        // Future: Add cooking mode or instructions
-                    } label: {
-                        HStack {
-                            Image(systemName: "flame.fill")
-                            Text("recipeDetail.startCooking")
-                        }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(recipe.canCook ? (recipe.missingCount == 0 ? "recipeDetail.canCookStatus" : "Puedes cocinar pero te faltan ingredientes") : "recipeDetail.cannotCookStatus")
                         .font(.body)
                         .fontWeight(.medium)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .foregroundStyle(recipe.canCook ? .green : .orange)
+
+                    if recipe.canCook && recipe.missingCount != 0 {
+                        Text("Necesitas \(recipe.missingCount) ingredientes más")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else if !recipe.canCook {
+                        let key = recipe.missingCount == 1
+                            ? "recipeDetail.missingIngredients.singular"
+                            : "recipeDetail.missingIngredients.plural"
+                        Text(verbatim: String(format: NSLocalizedString(key, comment: ""), recipe.missingCount))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 16)
@@ -252,20 +221,13 @@ struct RecipeDetailView: View {
         guard var fullRecipe = fullRecipe else { return }
 
         do {
-            let updatedRecipe = Recipe(
-                id: fullRecipe.id,
-                name: fullRecipe.name,
-                ingredients: fullRecipe.ingredients,
-                mealType: fullRecipe.mealType,
-                isFavorite: !fullRecipe.isFavorite
-            )
-
-            try homeContentViewModel.update(updatedRecipe)
+            fullRecipe.isFavorite = true
+            try homeContentViewModel.update(fullRecipe)
             homeContentViewModel.getAllRecipes()
 
             // Update local state
-            self.fullRecipe = updatedRecipe
-
+            self.fullRecipe = fullRecipe
+            self.markAsFavorite = false
         } catch {
             // Handle error
             print("Error updating favorite status: \(error)")
@@ -281,218 +243,6 @@ struct RecipeDetailView: View {
             dismiss()
         } catch {
             print("Error deleting recipe: \(error)")
-        }
-    }
-}
-
-// MARK: - EditRecipeView
-
-struct EditRecipeView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    private let originalRecipe: Recipe
-    private let homeContentViewModel: HomeContentViewModel
-
-    @State private var recipeName: String
-    @State private var selectedMealType: MealType
-    @State private var isFavorite: Bool
-    @State private var ingredientText: String = ""
-    @State private var ingredients: [String]
-    @State private var showAlert: Bool = false
-    @State private var alertMessage: String = ""
-
-    init(recipe: Recipe, viewModel: HomeContentViewModel) {
-        self.originalRecipe = recipe
-        self.homeContentViewModel = viewModel
-
-        self._recipeName = State(initialValue: recipe.name)
-        self._selectedMealType = State(initialValue: recipe.mealType)
-        self._isFavorite = State(initialValue: recipe.isFavorite)
-        self._ingredients = State(initialValue: recipe.ingredients.map { $0.ingredientName }.sorted())
-    }
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    recipeBasicInfo
-                    ingredientsSection
-                }
-                .padding()
-            }
-            .navigationTitle("editRecipe.navigationTitle")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("common.cancel") {
-                        dismiss()
-                    }
-                }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("common.save") {
-                        saveRecipe()
-                    }
-                    .disabled(recipeName.isEmpty || ingredients.isEmpty)
-                }
-            }
-            .alert("common.information", isPresented: $showAlert) {
-                Button("common.ok") { }
-            } message: {
-                Text(alertMessage)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var recipeBasicInfo: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("common.basicInfo")
-                .font(.headline)
-                .foregroundStyle(.primary)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("common.recipeName")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-
-                TextField("common.recipeNamePlaceholder", text: $recipeName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("common.mealTypeLabel")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-
-                Picker("common.mealTypeLabel", selection: $selectedMealType) {
-                    Text("mealType.breakfast").tag(MealType.breakFast)
-                    Text("mealType.lunch").tag(MealType.lunch)
-                    Text("mealType.dinner").tag(MealType.dinner)
-                    Text("mealType.other").tag(MealType.other)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-            }
-
-            Toggle("common.markAsFavorite", isOn: $isFavorite)
-                .toggleStyle(SwitchToggleStyle())
-        }
-        .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                .background(Color(.systemBackground))
-        }
-    }
-
-    @ViewBuilder
-    private var ingredientsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("common.ingredients")
-                .font(.headline)
-                .foregroundStyle(.primary)
-
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    TextField("common.addIngredientPlaceholder", text: $ingredientText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .onSubmit {
-                            addIngredient()
-                        }
-
-                    Button("common.add") {
-                        addIngredient()
-                    }
-                    .disabled(ingredientText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-
-                if ingredients.isEmpty {
-                    Text("common.noIngredientsAdded")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .italic()
-                } else {
-                    LazyVStack(alignment: .leading, spacing: 4) {
-                        ForEach(Array(ingredients.enumerated()), id: \.offset) { index, ingredient in
-                            HStack {
-                                Image(systemName: "circle.fill")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-
-                                Text(ingredient)
-                                    .font(.body)
-
-                                Spacer()
-
-                                Button {
-                                    removeIngredient(at: index)
-                                } label: {
-                                    Image(systemName: "minus.circle.fill")
-                                        .foregroundStyle(.red)
-                                }
-                            }
-                            .padding(.vertical, 4)
-                        }
-                    }
-                }
-            }
-        }
-        .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                .background(Color(.systemBackground))
-        }
-    }
-
-    private func addIngredient() {
-        let trimmedIngredient = ingredientText.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        guard !trimmedIngredient.isEmpty else { return }
-        guard !ingredients.contains(where: { $0.lowercased() == trimmedIngredient.lowercased() }) else {
-            alertMessage = NSLocalizedString("common.duplicateIngredient", comment: "")
-            showAlert = true
-            return
-        }
-
-        ingredients.append(trimmedIngredient)
-        ingredientText = ""
-    }
-
-    private func removeIngredient(at index: Int) {
-        ingredients.remove(at: index)
-    }
-
-    private func saveRecipe() {
-        guard !recipeName.isEmpty && !ingredients.isEmpty else { return }
-
-        do {
-            // Create domain ingredients
-            let recipeIngredients = Set(ingredients.map { ingredientName in
-                let ingredient = Ingredient(name: ingredientName)
-                return RecipeIngredient(ingredient: ingredient, isRequired: true)
-            })
-
-            // Create the updated recipe
-            let updatedRecipe = Recipe(
-                id: originalRecipe.id, // Keep the same ID
-                name: recipeName,
-                ingredients: recipeIngredients,
-                mealType: selectedMealType,
-                isFavorite: isFavorite
-            )
-
-            // Update using the view model
-            try homeContentViewModel.update(updatedRecipe)
-
-            // Refresh the recipes list
-            homeContentViewModel.getAllRecipes()
-
-            dismiss()
-
-        } catch {
-            alertMessage = String(format: NSLocalizedString("common.saveRecipeError", comment: ""), error.localizedDescription)
-            showAlert = true
         }
     }
 }

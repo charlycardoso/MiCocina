@@ -16,26 +16,77 @@ struct NewRecipeView: View {
     @State private var selectedMealType: MealType = .other
     @State private var isFavorite: Bool = false
     @State private var ingredientText: String = ""
-    @State private var ingredients: [String] = []
+    @State private var ingredients: [IngredientItem] = []
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
 
     private var homeContentViewModel: HomeContentViewModel
+    private var existingRecipe: Recipe?
+    
+    private var isEditMode: Bool {
+        existingRecipe != nil
+    }
+    
+    private var navigationTitle: String {
+        isEditMode ? String(localized: "editRecipe.navigationTitle") : String(localized: "newRecipe.navigationTitle")
+    }
+    
+    // Helper struct to track ingredient and its required status
+    struct IngredientItem: Identifiable, Hashable {
+        let id = UUID()
+        var name: String
+        var isRequired: Bool = true
+    }
 
-    init(viewModel: HomeContentViewModel) {
+    init(viewModel: HomeContentViewModel, recipe: Recipe? = nil) {
         self.homeContentViewModel = viewModel
+        self.existingRecipe = recipe
+        
+        // Pre-populate fields if editing
+        if let recipe = recipe {
+            _recipeName = State(initialValue: recipe.name)
+            _selectedMealType = State(initialValue: recipe.mealType)
+            _isFavorite = State(initialValue: recipe.isFavorite)
+            _ingredients = State(initialValue: recipe.ingredients.map { 
+                IngredientItem(name: $0.ingredientName, isRequired: $0.isRequired)
+            })
+        }
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    // Mark as Favorite Section
+                    HStack {
+                        Image(systemName: isFavorite ? "heart.fill" : "heart")
+                            .foregroundStyle(isFavorite ? .red : .gray)
+                            .font(.title3)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("common.markAsFavorite")
+                                .font(.body)
+                                .fontWeight(.medium)
+                            
+                            Text("common.recipe.favoriteDescription")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Toggle("", isOn: $isFavorite)
+                            .labelsHidden()
+                            .toggleStyle(SwitchToggleStyle())
+                    }
+                    .padding(8)
+
                     recipeBasicInfo
                     ingredientsSection
                 }
                 .padding()
             }
-            .navigationTitle("newRecipe.navigationTitle")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -86,18 +137,11 @@ struct NewRecipeView: View {
                     Text("mealType.dinner").tag(MealType.dinner)
                     Text("mealType.other").tag(MealType.other)
                 }
-                .pickerStyle(SegmentedPickerStyle())
+                .pickerStyle(.segmented)
+                .glassEffect()
             }
-
-            Toggle("common.markAsFavorite", isOn: $isFavorite)
-                .toggleStyle(SwitchToggleStyle())
         }
         .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                .background(Color(.systemBackground))
-        }
     }
 
     @ViewBuilder
@@ -118,6 +162,7 @@ struct NewRecipeView: View {
                     Button("common.add") {
                         addIngredient()
                     }
+                    .tint(.cSecondary)
                     .disabled(ingredientText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
 
@@ -127,76 +172,98 @@ struct NewRecipeView: View {
                         .foregroundStyle(.secondary)
                         .italic()
                 } else {
-                    LazyVStack(alignment: .leading, spacing: 4) {
-                        ForEach(Array(ingredients.enumerated()), id: \.offset) { index, ingredient in
-                            HStack {
-                                Image(systemName: "circle.fill")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        ForEach($ingredients) { $ingredient in
+                            VStack(spacing: 8) {
+                                HStack {
+                                    Image(systemName: "circle.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
 
-                                Text(ingredient)
-                                    .font(.body)
+                                    Text(ingredient.name)
+                                        .font(.body)
 
-                                Spacer()
+                                    Spacer()
 
-                                Button {
-                                    removeIngredient(at: index)
-                                } label: {
-                                    Image(systemName: "minus.circle.fill")
-                                        .foregroundStyle(.red)
+                                    Button {
+                                        removeIngredient(ingredient: ingredient)
+                                    } label: {
+                                        Image(systemName: "minus.circle.fill")
+                                            .foregroundStyle(.red)
+                                    }
                                 }
+                                
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("common.ingredient.required")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                        
+                                        Text("common.ingredient.requiredDescription")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Toggle("", isOn: $ingredient.isRequired)
+                                        .labelsHidden()
+                                        .toggleStyle(SwitchToggleStyle())
+                                }
+                                .padding(.leading, 20)
                             }
                             .padding(.vertical, 4)
+                            Divider()
                         }
                     }
                 }
             }
         }
         .padding()
-        .background {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                .background(Color(.systemBackground))
-        }
     }
 
     private func addIngredient() {
         let trimmedIngredient = ingredientText.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !trimmedIngredient.isEmpty else { return }
-        guard !ingredients.contains(where: { $0.lowercased() == trimmedIngredient.lowercased() }) else {
+        guard !ingredients.contains(where: { $0.name.lowercased() == trimmedIngredient.lowercased() }) else {
             alertMessage = NSLocalizedString("common.duplicateIngredient", comment: "")
             showAlert = true
             return
         }
 
-        ingredients.append(trimmedIngredient)
+        ingredients.append(IngredientItem(name: trimmedIngredient, isRequired: true))
         ingredientText = ""
     }
 
-    private func removeIngredient(at index: Int) {
-        ingredients.remove(at: index)
+    private func removeIngredient(ingredient: IngredientItem) {
+        ingredients.removeAll { $0.id == ingredient.id }
     }
 
     private func saveRecipe() {
         guard !recipeName.isEmpty && !ingredients.isEmpty else { return }
 
         do {
-            // Create recipe ingredients with just the names
-            let recipeIngredients = Set(ingredients.map { ingredientName in
-                RecipeIngredient(ingredientName: ingredientName, isRequired: true)
+            // Create recipe ingredients with names and required status
+            let recipeIngredients = Set(ingredients.map { ingredient in
+                RecipeIngredient(ingredientName: ingredient.name, isRequired: ingredient.isRequired)
             })
 
-            // Create the recipe
+            // Create or update the recipe
             let recipe = Recipe(
+                id: existingRecipe?.id ?? UUID(),
                 name: recipeName,
                 ingredients: recipeIngredients,
                 mealType: selectedMealType,
                 isFavorite: isFavorite
             )
 
-            // Save using the view model
-            try homeContentViewModel.save(recipe)
+            // Save or update using the view model
+            if isEditMode {
+                try homeContentViewModel.update(recipe)
+            } else {
+                try homeContentViewModel.save(recipe)
+            }
 
             // Refresh the recipes list
             homeContentViewModel.getAllRecipes()
