@@ -34,6 +34,7 @@ struct IngredientDetailView: View {
                     if isEditing {
                         TextField("common.ingredient.namePlaceholder", text: $name)
                             .textFieldStyle(.plain)
+                            .accessibilityIdentifier("ingredientDetail.nameField")
                     } else {
                         HStack {
                             Text("common.name")
@@ -52,6 +53,7 @@ struct IngredientDetailView: View {
                                     .foregroundColor(.secondary)
                             }
                         }
+                        .accessibilityIdentifier("ingredientDetail.quantityStepper")
                     } else {
                         HStack {
                             Text("common.quantity")
@@ -86,6 +88,7 @@ struct IngredientDetailView: View {
                             }
                         }
                         .foregroundColor(.blue)
+                        .accessibilityIdentifier("ingredientDetail.addToShoppingListButton")
                         
                         Button(action: {
                             showDeleteConfirmation = true
@@ -96,6 +99,7 @@ struct IngredientDetailView: View {
                             }
                         }
                         .foregroundColor(.red)
+                        .accessibilityIdentifier("ingredientDetail.deleteButton")
                     } header: {
                         Text("ingredientDetail.actionsHeader")
                     }
@@ -109,10 +113,12 @@ struct IngredientDetailView: View {
                         Button("common.cancel") {
                             cancelEditing()
                         }
+                        .accessibilityIdentifier("ingredientDetail.cancelButton")
                     } else {
                         Button("ingredientDetail.close") {
                             dismiss()
                         }
+                        .accessibilityIdentifier("ingredientDetail.closeButton")
                     }
                 }
                 
@@ -122,10 +128,12 @@ struct IngredientDetailView: View {
                             saveChanges()
                         }
                         .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .accessibilityIdentifier("ingredientDetail.saveButton")
                     } else {
                         Button("ingredientDetail.edit") {
                             isEditing = true
                         }
+                        .accessibilityIdentifier("ingredientDetail.editButton")
                     }
                 }
             }

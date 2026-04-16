@@ -37,16 +37,19 @@ struct MyPantryView: View {
                         .multilineTextAlignment(.center)
                         .font(.callout)
                         .foregroundStyle(.gray)
+                        .accessibilityIdentifier("myPantry.emptyState")
                 } else if filteredIngredients.isEmpty {
                     Text("myPantry.noSearchResults")
                         .padding()
                         .multilineTextAlignment(.center)
                         .font(.callout)
                         .foregroundStyle(.gray)
+                        .accessibilityIdentifier("myPantry.noSearchResults")
                 } else {
                     List(filteredIngredients, id: \.id) { ingredient in
                         IngredientRow(for: ingredient)
                             .contentShape(Rectangle())
+                            .accessibilityIdentifier("myPantry.ingredientRow.\(ingredient.id.uuidString)")
                             .onTapGesture {
                                 selectedIngredient = ingredient
                             }
@@ -71,6 +74,7 @@ struct MyPantryView: View {
                     }
                     .listStyle(.plain)
                     .padding(.top, 16)
+                    .accessibilityIdentifier("myPantry.ingredientList")
                 }
             }
             .navigationTitle("myPantry.navigationTitle")
@@ -82,6 +86,7 @@ struct MyPantryView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .accessibilityIdentifier("myPantry.addButton")
                 }
             })
         }

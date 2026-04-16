@@ -81,7 +81,6 @@ struct PlannerView: View {
                     }
                     .scrollTargetBehavior(.paging)
                     .frame(height: 100)
-                    .background(Color(.systemBackground))
                 }
 
                 Divider()
@@ -101,6 +100,7 @@ struct PlannerView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .accessibilityIdentifier("planner.addButton")
                 }
             }
             .sheet(isPresented: $showAddRecipesSheet) {
@@ -164,6 +164,7 @@ struct PlannerView: View {
 
             Spacer()
         }
+        .accessibilityIdentifier("planner.emptyState")
     }
     
     @ViewBuilder
@@ -189,7 +190,9 @@ struct PlannerView: View {
                                         deleteRecipe(recipe)
                                     }
                                 )
+                                .glassEffect(.identity)
                             }
+                            .accessibilityIdentifier("planner.recipeRow.\(recipe.id.uuidString)")
                             .listRowBackground(Color.clear)
                             .listRowInsets(EdgeInsets())
                         }
@@ -219,6 +222,7 @@ struct PlannerView: View {
             .padding(.top, 8)
         }
         .scrollBounceBehavior(.basedOnSize)
+        .accessibilityIdentifier("planner.recipesList")
     }
 
     @ViewBuilder
@@ -250,6 +254,7 @@ struct PlannerView: View {
                                     .stroke(Color.cPrimary, lineWidth: 2)
                             }
                         }
+                        .accessibilityIdentifier("planner.weekDay.\(day.dayNumber)")
                         .onTapGesture {
                             withAnimation(.interactiveSpring) {
                                 selectedDate = day.date

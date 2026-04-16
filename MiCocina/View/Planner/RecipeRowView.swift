@@ -50,6 +50,7 @@ struct RecipeRowView: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(recipe.name)
+                        .foregroundStyle(.accent)
                         .font(.body)
                         .fontWeight(.medium)
                     
@@ -100,5 +101,6 @@ struct RecipeRowView: View {
             }
         }
         .padding(.horizontal)
+        .accessibilityIdentifier("planner.recipeRowView.\(recipe.id.uuidString)")
     }
 }

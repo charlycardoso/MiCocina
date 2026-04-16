@@ -34,6 +34,7 @@ struct AddIngredientView: View {
                         Label("addIngredient.scanBarcode", systemImage: "barcode.viewfinder")
                     }
                     .disabled(!DataScannerViewController.isSupported || !DataScannerViewController.isAvailable)
+                    .accessibilityIdentifier("addIngredient.scanBarcodeButton")
                 }
 
                 if isLoadingProduct {
@@ -49,6 +50,7 @@ struct AddIngredientView: View {
                 Section {
                     TextField("common.ingredient.namePlaceholder", text: $name)
                         .textFieldStyle(.plain)
+                        .accessibilityIdentifier("addIngredient.nameField")
 
                     Stepper(value: $quantity, in: 1...999) {
                         HStack {
@@ -58,6 +60,7 @@ struct AddIngredientView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                    .accessibilityIdentifier("addIngredient.quantityStepper")
                 } header: {
                     Text("common.details")
                 } footer: {
@@ -71,6 +74,7 @@ struct AddIngredientView: View {
                     Button("common.cancel") {
                         dismiss()
                     }
+                    .accessibilityIdentifier("addIngredient.cancelButton")
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
@@ -78,6 +82,7 @@ struct AddIngredientView: View {
                         saveIngredient()
                     }
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .accessibilityIdentifier("addIngredient.saveButton")
                 }
             }
             .alert(

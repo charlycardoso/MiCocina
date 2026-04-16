@@ -144,7 +144,7 @@ final class SDShoppingListRepository: ShoppingListRepository {
             sdIngredient = SDIngredient(
                 id: item.ingredient.id,
                 name: item.ingredient.name,
-                quantity: item.ingredient.quantity
+                quantity: item.ingredient.quantity == 0 ? 1 : item.ingredient.quantity
             )
             context.insert(sdIngredient)
         }

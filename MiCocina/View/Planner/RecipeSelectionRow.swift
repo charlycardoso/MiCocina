@@ -82,6 +82,7 @@ struct RecipeSelectionRow: View {
             }
         }
         .contentShape(Rectangle())
+        .accessibilityIdentifier("addRecipes.selectionRow.\(recipe.id.uuidString)")
         .onTapGesture {
             onTap()
         }

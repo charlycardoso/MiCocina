@@ -52,6 +52,7 @@ struct RecipeDetailView: View {
                     Image(systemName: recipe.isFavorite ? "heart.fill" : "heart")
                         .foregroundStyle(Color.cPrimary)
                 }
+                .accessibilityIdentifier("recipeDetail.favoriteButton")
 
                 Menu {
                     Button("recipeDetail.edit") {
@@ -147,6 +148,7 @@ struct RecipeDetailView: View {
                                 }
                             }
                         }
+                        .accessibilityIdentifier("recipeDetail.ingredientRow.\(recipeIngredient.id.uuidString)")
                         Divider()
                     }
                 }
@@ -171,13 +173,13 @@ struct RecipeDetailView: View {
                     .foregroundStyle(recipe.canCook ? .green : .orange)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(recipe.canCook ? (recipe.missingCount == 0 ? "recipeDetail.canCookStatus" : "Puedes cocinar pero te faltan ingredientes") : "recipeDetail.cannotCookStatus")
+                    Text(recipe.canCook ? (recipe.missingCount == 0 ? "recipeDetail.canCookStatus" : "recipeDetail.canCookWithMissing") : "recipeDetail.cannotCookStatus")
                         .font(.body)
                         .fontWeight(.medium)
                         .foregroundStyle(recipe.canCook ? .green : .orange)
 
                     if recipe.canCook && recipe.missingCount != 0 {
-                        Text("Necesitas \(recipe.missingCount) ingredientes más")
+                        Text(verbatim: String(format: NSLocalizedString("recipeDetail.needMoreIngredients", comment: ""), recipe.missingCount))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     } else if !recipe.canCook {
@@ -198,6 +200,7 @@ struct RecipeDetailView: View {
                 .fill(recipe.canCook ? Color.green.opacity(0.05) : Color.orange.opacity(0.05))
                 .stroke((recipe.canCook ? Color.green : Color.orange).opacity(0.3), lineWidth: 1)
         }
+        .accessibilityIdentifier("recipeDetail.cookingStatusSection")
     }
 
     private func mealTypeName(for mealType: MealType) -> String {

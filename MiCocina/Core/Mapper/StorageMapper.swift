@@ -62,6 +62,21 @@ final class StorageMapper {
         return new
     }
 
+    // MARK: - SDPantryItem Mapping
+
+    /// Converts a domain ingredient to a pantry persistence item.
+    ///
+    /// Creates (or reuses) the underlying `SDIngredient` and wraps it in a new `SDPantryItem`.
+    static func toStorage(
+        pantryItem ingredient: Ingredient,
+        context: ModelContext
+    ) -> SDPantryItem {
+        let sdIngredient = toStorage(with: ingredient, context: context)
+        let sdPantryItem = SDPantryItem(ingredient: sdIngredient)
+        context.insert(sdPantryItem)
+        return sdPantryItem
+    }
+
     // MARK: - SDRecipe Mapping
     
     /// Converts a domain recipe to a persistence recipe with ingredient names.

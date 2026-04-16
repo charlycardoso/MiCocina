@@ -52,6 +52,8 @@
 "recipeDetail.missingIngredients.singular" = "You're missing %d ingredient";
 "recipeDetail.missingIngredients.plural" = "You're missing %d ingredients";
 "recipeDetail.startCooking" = "Start cooking";
+"recipeDetail.canCookWithMissing" = "You can cook but you're missing some ingredients";
+"recipeDetail.needMoreIngredients" = "You need %d more ingredients";
 "recipeDetail.optional" = "Optional";
 
 /* EditRecipeView */

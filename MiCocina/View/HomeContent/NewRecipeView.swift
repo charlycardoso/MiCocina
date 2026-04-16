@@ -78,6 +78,7 @@ struct NewRecipeView: View {
                         Toggle("", isOn: $isFavorite)
                             .labelsHidden()
                             .toggleStyle(SwitchToggleStyle())
+                            .accessibilityIdentifier("newRecipe.favoriteToggle")
                     }
                     .padding(8)
 
@@ -93,6 +94,7 @@ struct NewRecipeView: View {
                     Button("common.cancel") {
                         dismiss()
                     }
+                    .accessibilityIdentifier("newRecipe.cancelButton")
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -100,6 +102,7 @@ struct NewRecipeView: View {
                         saveRecipe()
                     }
                     .disabled(recipeName.isEmpty || ingredients.isEmpty)
+                    .accessibilityIdentifier("newRecipe.saveButton")
                 }
             }
             .alert("common.information", isPresented: $showAlert) {
@@ -124,6 +127,7 @@ struct NewRecipeView: View {
 
                 TextField("common.recipeNamePlaceholder", text: $recipeName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .accessibilityIdentifier("newRecipe.recipeNameField")
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -139,6 +143,7 @@ struct NewRecipeView: View {
                 }
                 .pickerStyle(.segmented)
                 .glassEffect()
+                .accessibilityIdentifier("newRecipe.mealTypePicker")
             }
         }
         .padding()
@@ -155,6 +160,7 @@ struct NewRecipeView: View {
                 HStack {
                     TextField("common.addIngredientPlaceholder", text: $ingredientText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .accessibilityIdentifier("newRecipe.ingredientTextField")
                         .onSubmit {
                             addIngredient()
                         }
@@ -164,6 +170,7 @@ struct NewRecipeView: View {
                     }
                     .tint(.cSecondary)
                     .disabled(ingredientText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .accessibilityIdentifier("newRecipe.addIngredientButton")
                 }
 
                 if ingredients.isEmpty {
@@ -191,6 +198,7 @@ struct NewRecipeView: View {
                                         Image(systemName: "minus.circle.fill")
                                             .foregroundStyle(.red)
                                     }
+                                    .accessibilityIdentifier("newRecipe.removeIngredient.\(ingredient.id)")
                                 }
                                 
                                 HStack {

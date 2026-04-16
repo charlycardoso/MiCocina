@@ -66,7 +66,6 @@ struct AddRecipesToDayView: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
-                .background(Color(.secondarySystemBackground))
                 
                 // Meal Type Picker
                 Picker(NSLocalizedString("planner.addRecipes.mealTypeLabel", comment: "Meal type picker label"), selection: $selectedMealType) {
@@ -77,6 +76,7 @@ struct AddRecipesToDayView: View {
                 }
                 .pickerStyle(.segmented)
                 .padding()
+                .accessibilityIdentifier("addRecipes.mealTypePicker")
                 
                 // Recipes List
                 if availableRecipes.isEmpty {
@@ -90,6 +90,7 @@ struct AddRecipesToDayView: View {
                             .foregroundStyle(.secondary)
                         Spacer()
                     }
+                    .accessibilityIdentifier("addRecipes.emptyState")
                 } else {
                     List {
                         ForEach(availableRecipes) { recipe in
@@ -99,9 +100,11 @@ struct AddRecipesToDayView: View {
                             ) {
                                 toggleRecipeSelection(recipe.id)
                             }
+                            .accessibilityIdentifier("addRecipes.recipeRow.\(recipe.id.uuidString)")
                         }
                     }
                     .listStyle(.plain)
+                    .accessibilityIdentifier("addRecipes.recipesList")
                 }
             }
             .navigationTitle(NSLocalizedString("planner.addRecipes.title", comment: "Select recipes navigation title"))
@@ -111,6 +114,7 @@ struct AddRecipesToDayView: View {
                     Button(NSLocalizedString("common.cancel", comment: "Cancel button")) {
                         dismiss()
                     }
+                    .accessibilityIdentifier("addRecipes.cancelButton")
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
@@ -118,6 +122,7 @@ struct AddRecipesToDayView: View {
                         saveRecipesToDay()
                     }
                     .disabled(selectedRecipes.isEmpty)
+                    .accessibilityIdentifier("addRecipes.addButton")
                 }
             }
             .alert(NSLocalizedString("common.information", comment: "Information alert title"), isPresented: $showAlert) {

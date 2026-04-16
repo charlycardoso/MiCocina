@@ -70,11 +70,15 @@ final class ShoppingListViewModel {
     ///
     /// - Parameter item: The item to toggle
     func toggleBought(_ item: ShoppingListItem) {
+        guard let index = items.firstIndex(where: { $0.id == item.id }) else { return }
+        let newBoughtState = !item.isBought
+        // Optimistic update: mutate in-place so SwiftUI sees a clean, minimal diff
+        items[index].isBought = newBoughtState
         do {
-            let newBoughtState = !item.isBought
             try repository.markAsBought(item, bought: newBoughtState)
-            loadShoppingList()
         } catch {
+            // Revert on failure
+            items[index].isBought = item.isBought
             print("Error toggling bought state: \(error)")
         }
     }

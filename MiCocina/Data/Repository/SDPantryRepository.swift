@@ -87,7 +87,7 @@ final class SDPantryProtocolRepository: PantryProtocolRepository {
             throw RepositoryError.fetchFailed(operation: "add - checking existing ingredient", underlyingError: error)
         }
 
-        _ = StorageMapper.toStorage(with: ingredient, context: context)
+        _ = StorageMapper.toStorage(pantryItem: ingredient, context: context)
         do {
             try context.save()
         } catch {
@@ -103,23 +103,16 @@ final class SDPantryProtocolRepository: PantryProtocolRepository {
     /// - Note: If the ingredient doesn't exist, the operation completes silently
     func remove(_ ingredient: Ingredient) throws {
         let ingredientUUID: UUID = ingredient.id
-        let descriptor = FetchDescriptor<SDIngredient>(
-            predicate: #Predicate { $0.id == ingredientUUID }
-        )
-        
+        let descriptor = FetchDescriptor<SDPantryItem>()
+
         do {
-            if let existing = try context.fetch(descriptor).first {
+            let all = try context.fetch(descriptor)
+            if let existing = all.first(where: { $0.ingredient.id == ingredientUUID }) {
                 context.delete(existing)
                 try context.save()
             }
-        } catch let error where error is NSError {
-            if (error as NSError).domain.contains("delete") || (error as NSError).localizedDescription.lowercased().contains("delete") {
-                throw RepositoryError.deleteFailed(operation: "remove ingredient \(ingredient.name)", underlyingError: error)
-            } else {
-                throw RepositoryError.fetchFailed(operation: "remove - finding ingredient to delete", underlyingError: error)
-            }
         } catch {
-            throw RepositoryError.fetchFailed(operation: "remove - finding ingredient to delete", underlyingError: error)
+            throw RepositoryError.deleteFailed(operation: "remove ingredient \(ingredient.name)", underlyingError: error)
         }
     }
 
@@ -132,23 +125,19 @@ final class SDPantryProtocolRepository: PantryProtocolRepository {
     ///         If the ingredient doesn't exist, the operation completes silently.
     func update(_ ingredient: Ingredient) throws {
         let ingredientUUID: UUID = ingredient.id
-        let descriptor = FetchDescriptor<SDIngredient>(
-            predicate: #Predicate { $0.id == ingredientUUID }
-        )
-        
-        let existing: SDIngredient?
+        let descriptor = FetchDescriptor<SDPantryItem>()
+
+        let existing: SDPantryItem?
         do {
-            existing = try context.fetch(descriptor).first
+            let all = try context.fetch(descriptor)
+            existing = all.first(where: { $0.ingredient.id == ingredientUUID })
         } catch {
             throw RepositoryError.fetchFailed(operation: "update - finding ingredient to update", underlyingError: error)
         }
-        
-        guard let existing = existing else {
-            // Silently succeed if ingredient doesn't exist (original behavior)
-            return
-        }
-        
-        existing.name = ingredient.name
+
+        guard let existing else { return }
+
+        existing.ingredient.name = ingredient.name
         do {
             try context.save()
         } catch {
@@ -164,15 +153,13 @@ final class SDPantryProtocolRepository: PantryProtocolRepository {
     ///
     /// - Warning: This operation is not easily reversible
     func clear() throws {
-        let descriptor = FetchDescriptor<SDIngredient>()
+        let descriptor = FetchDescriptor<SDPantryItem>()
         do {
-            let allIngredients = try context.fetch(descriptor)
-            allIngredients.forEach { context.delete($0) }
+            let all = try context.fetch(descriptor)
+            all.forEach { context.delete($0) }
             try context.save()
-        } catch let error where error is NSError && ((error as NSError).domain.contains("delete") || (error as NSError).localizedDescription.lowercased().contains("delete")) {
-            throw RepositoryError.deleteFailed(operation: "clear all ingredients from pantry", underlyingError: error)
         } catch {
-            throw RepositoryError.fetchFailed(operation: "clear - fetching ingredients to delete", underlyingError: error)
+            throw RepositoryError.deleteFailed(operation: "clear all ingredients from pantry", underlyingError: error)
         }
     }
 
@@ -182,14 +169,11 @@ final class SDPantryProtocolRepository: PantryProtocolRepository {
     /// - Returns: `true` if the ingredient exists, `false` otherwise
     func exists(_ ingredient: Ingredient) -> Bool {
         let ingredientUUID: UUID = ingredient.id
-        let descriptor = FetchDescriptor<SDIngredient>(
-            predicate: #Predicate { $0.id == ingredientUUID }
-        )
+        let descriptor = FetchDescriptor<SDPantryItem>()
         do {
-            let existing = try context.fetch(descriptor).first
-            return existing != nil
+            let all = try context.fetch(descriptor)
+            return all.contains(where: { $0.ingredient.id == ingredientUUID })
         } catch {
-            // Log the actual RepositoryError for debugging
             let repositoryError = RepositoryError.fetchFailed(operation: "exists - checking ingredient \(ingredient.name)", underlyingError: error)
             print("Error in exists(): \(repositoryError.debugDescription)")
             return false

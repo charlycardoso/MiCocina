@@ -180,6 +180,7 @@ struct ShoppingListView: View {
                             item: item,
                             onToggle: { viewModel.toggleBought(item) }
                         )
+                        .accessibilityIdentifier("shoppingList.unboughtRow.\(item.id.uuidString)")
                     }
                     .onDelete { indexSet in
                         let itemsToDelete = indexSet.map { filteredUnboughtItems[$0] }
@@ -198,6 +199,7 @@ struct ShoppingListView: View {
                             item: item,
                             onToggle: { viewModel.toggleBought(item) }
                         )
+                        .accessibilityIdentifier("shoppingList.boughtRow.\(item.id.uuidString)")
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button {
                                 addToPantry(item)
@@ -236,6 +238,7 @@ struct ShoppingListView: View {
         } description: {
             Text("shoppingList.emptyState.description")
         }
+        .accessibilityIdentifier("shoppingList.emptyState")
     }
     
     // MARK: - Helper Methods
@@ -258,7 +261,10 @@ struct ShoppingListView: View {
         
         // Create shopping list item WITHOUT adding to pantry
         let item = ShoppingListItem(
-            ingredient: Ingredient(name: newIngredientName),
+            ingredient: Ingredient(
+                name: newIngredientName,
+                quantity: 1
+            ),
             isBought: false
         )
         viewModel?.addItem(item)
@@ -304,6 +310,7 @@ private struct ShoppingListItemRow: View {
                     .imageScale(.large)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("shoppingList.toggleButton.\(item.id.uuidString)")
             
             Text(item.ingredient.name.capitalized)
                 .strikethrough(item.isBought)
