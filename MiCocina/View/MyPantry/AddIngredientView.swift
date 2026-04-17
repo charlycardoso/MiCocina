@@ -14,7 +14,6 @@ struct AddIngredientView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var name: String = ""
-    @State private var quantity: Int = 1
     @State private var showAlert: (show: Bool, title: String, message: String) = (false, "", "")
     @State private var showBarcodeScanner = false
     @State private var isLoadingProduct = false
@@ -51,16 +50,6 @@ struct AddIngredientView: View {
                     TextField("common.ingredient.namePlaceholder", text: $name)
                         .textFieldStyle(.plain)
                         .accessibilityIdentifier("addIngredient.nameField")
-
-                    Stepper(value: $quantity, in: 1...999) {
-                        HStack {
-                            Text("common.quantity")
-                            Spacer()
-                            Text("\(quantity)")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .accessibilityIdentifier("addIngredient.quantityStepper")
                 } header: {
                     Text("common.details")
                 } footer: {
@@ -143,7 +132,7 @@ struct AddIngredientView: View {
             return
         }
 
-        let newIngredient = Ingredient(name: trimmedName, quantity: quantity)
+        let newIngredient = Ingredient(name: trimmedName)
 
         if viewModel.exists(newIngredient) {
             shouldDismissOnOK = false

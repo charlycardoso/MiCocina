@@ -47,6 +47,9 @@ enum RepositoryError: Error, LocalizedError, CustomDebugStringConvertible {
     /// The requested entity was not found
     case entityNotFound(entityType: String, identifier: String)
     
+    /// An entity with the same name already exists
+    case duplicateEntry(entityType: String, name: String)
+    
     /// Invalid data provided for the operation
     case invalidData(field: String, value: Any?, reason: String)
     
@@ -92,6 +95,9 @@ enum RepositoryError: Error, LocalizedError, CustomDebugStringConvertible {
         case .entityNotFound(let entityType, let identifier):
             return "\(entityType) with identifier '\(identifier)' not found"
             
+        case .duplicateEntry(let entityType, let name):
+            return "\(entityType) named '\(name)' already exists"
+            
         case .invalidData(let field, _, let reason):
             return "Invalid data for field '\(field)': \(reason)"
             
@@ -132,6 +138,9 @@ enum RepositoryError: Error, LocalizedError, CustomDebugStringConvertible {
             
         case .entityNotFound:
             return "The requested item could not be found in the database"
+            
+        case .duplicateEntry:
+            return "A duplicate entry was found. Each name must be unique."
             
         case .invalidData(_, let value, let reason):
             if let value = value {
@@ -178,6 +187,9 @@ enum RepositoryError: Error, LocalizedError, CustomDebugStringConvertible {
         case .entityNotFound:
             return "The item may have been deleted. Please refresh the list and try again."
             
+        case .duplicateEntry:
+            return "Please choose a different name."
+            
         case .invalidData:
             return "Please check the data format and try again."
             
@@ -220,6 +232,9 @@ enum RepositoryError: Error, LocalizedError, CustomDebugStringConvertible {
             
         case .entityNotFound(let entityType, let identifier):
             return "RepositoryError.entityNotFound(entityType: \"\(entityType)\", identifier: \"\(identifier)\")"
+            
+        case .duplicateEntry(let entityType, let name):
+            return "RepositoryError.duplicateEntry(entityType: \"\(entityType)\", name: \"\(name)\")"
             
         case .invalidData(let field, let value, let reason):
             return "RepositoryError.invalidData(field: \"\(field)\", value: \(String(describing: value)), reason: \"\(reason)\")"

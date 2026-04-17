@@ -34,67 +34,69 @@ struct RecipeDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                cookingStatusSection
-                ingredientsSection
-            }
-            .padding()
-        }
-        .navigationTitle(recipe.name)
-        .navigationSubtitle(recipe.mealType.rawValue)
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button {
-                    markAsFavorite.toggle()
-                } label: {
-                    Image(systemName: recipe.isFavorite ? "heart.fill" : "heart")
-                        .foregroundStyle(Color.cPrimary)
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    cookingStatusSection
+                    ingredientsSection
                 }
-                .accessibilityIdentifier("recipeDetail.favoriteButton")
-
-                Menu {
-                    Button("recipeDetail.edit") {
-                        showEditView = true
+                .padding()
+            }
+            .navigationTitle(recipe.name)
+            .navigationSubtitle(recipe.mealType.rawValue)
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button {
+                        markAsFavorite.toggle()
+                    } label: {
+                        Image(systemName: recipe.isFavorite ? "heart.fill" : "heart")
+                            .foregroundStyle(Color.cPrimary)
                     }
+                    .accessibilityIdentifier("recipeDetail.favoriteButton")
 
-                    Button("recipeDetail.delete", role: .destructive) {
-                        showDeleteAlert = true
+                    Menu {
+                        Button("recipeDetail.edit") {
+                            showEditView = true
+                        }
+
+                        Button("recipeDetail.delete", role: .destructive) {
+                            showDeleteAlert = true
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                     }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
                 }
             }
-        }
-        .onAppear {
-            loadFullRecipe()
-        }
-        .alert(alertViewMessage, isPresented: $markAsFavorite, actions: {
-            Button(String(localized: "common.confirm"), role: .confirm) {
-                toggleFavorite()
+            .onAppear {
+                loadFullRecipe()
             }
-            .accessibilityIdentifier("recipeDetailView.alert.confirmButton")
+            .alert(alertViewMessage, isPresented: $markAsFavorite, actions: {
+                Button(String(localized: "common.confirm"), role: .confirm) {
+                    toggleFavorite()
+                }
+                .accessibilityIdentifier("recipeDetailView.alert.confirmButton")
 
-            Button(String(localized: "common.cancel"), role: .cancel) {
-                markAsFavorite = false
+                Button(String(localized: "common.cancel"), role: .cancel) {
+                    markAsFavorite = false
+                }
+                .accessibilityIdentifier("recipeDetailView.alert.cancelButton")
+            })
+            .alert(helpMessage.message, isPresented: $helpMessage.activate, actions: {
+                Button("common.close", role: .close) { }
+            })
+            .alert("recipeDetail.deleteAlertTitle", isPresented: $showDeleteAlert) {
+                Button("common.cancel", role: .cancel) { }
+                Button("recipeDetail.delete", role: .destructive) {
+                    deleteRecipe()
+                }
+            } message: {
+                Text(verbatim: String(format: NSLocalizedString("recipeDetail.deleteConfirmMessage", comment: ""), recipe.name))
             }
-            .accessibilityIdentifier("recipeDetailView.alert.cancelButton")
-        })
-        .alert(helpMessage.message, isPresented: $helpMessage.activate, actions: {
-            Button("common.close", role: .close) { }
-        })
-        .alert("recipeDetail.deleteAlertTitle", isPresented: $showDeleteAlert) {
-            Button("common.cancel", role: .cancel) { }
-            Button("recipeDetail.delete", role: .destructive) {
-                deleteRecipe()
-            }
-        } message: {
-            Text(verbatim: String(format: NSLocalizedString("recipeDetail.deleteConfirmMessage", comment: ""), recipe.name))
-        }
-        .sheet(isPresented: $showEditView) {
-            if let fullRecipe = fullRecipe {
-                NewRecipeView(viewModel: homeContentViewModel, recipe: fullRecipe)
+            .sheet(isPresented: $showEditView) {
+                if let fullRecipe = fullRecipe {
+                    NewRecipeView(viewModel: homeContentViewModel, recipe: fullRecipe)
+                }
             }
         }
     }
@@ -240,12 +242,15 @@ struct RecipeDetailView: View {
     private func deleteRecipe() {
         guard let fullRecipe = fullRecipe else { return }
 
-        do {
-            try homeContentViewModel.delete(fullRecipe)
-            homeContentViewModel.getAllRecipes()
-            dismiss()
-        } catch {
-            print("Error deleting recipe: \(error)")
+        dismiss()
+
+        DispatchQueue.main.async {
+            do {
+                try homeContentViewModel.delete(fullRecipe)
+                homeContentViewModel.getAllRecipes()
+            } catch {
+                print("Error deleting recipe: \(error)")
+            }
         }
     }
 }

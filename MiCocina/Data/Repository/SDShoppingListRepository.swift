@@ -141,11 +141,7 @@ final class SDShoppingListRepository: ShoppingListRepository {
         if let existingIngredient = try context.fetch(ingredientDescriptor).first {
             sdIngredient = existingIngredient
         } else {
-            sdIngredient = SDIngredient(
-                id: item.ingredient.id,
-                name: item.ingredient.name,
-                quantity: item.ingredient.quantity == 0 ? 1 : item.ingredient.quantity
-            )
+            sdIngredient = SDIngredient(id: item.ingredient.id, name: item.ingredient.name)
             context.insert(sdIngredient)
         }
         

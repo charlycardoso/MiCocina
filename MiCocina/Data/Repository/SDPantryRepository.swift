@@ -72,16 +72,13 @@ final class SDPantryProtocolRepository: PantryProtocolRepository {
     /// - Parameter ingredient: The ingredient to add
     /// - Throws: `RepositoryError` if the operation fails
     func add(_ ingredient: Ingredient) throws {
-        let ingredientUUID: UUID = ingredient.id
-        let descriptor = FetchDescriptor<SDPantryItem>(
-            predicate: #Predicate { $0.ingredient.id == ingredientUUID }
-        )
-        
+        // Compare by normalized name so that "cebolla" and "cebollas" are treated as the same ingredient
+        let normalizedName = ingredient.name // already normalized via Ingredient.init
+        let descriptor = FetchDescriptor<SDPantryItem>()
         do {
-            let existingIngredient = try context.fetch(descriptor).first
-            if existingIngredient != nil {
-                try update(ingredient)
-                return
+            let all = try context.fetch(descriptor)
+            if all.contains(where: { $0.ingredient.name.normalize() == normalizedName }) {
+                return // already in pantry under an equivalent name
             }
         } catch {
             throw RepositoryError.fetchFailed(operation: "add - checking existing ingredient", underlyingError: error)
@@ -168,11 +165,11 @@ final class SDPantryProtocolRepository: PantryProtocolRepository {
     /// - Parameter ingredient: The ingredient to check
     /// - Returns: `true` if the ingredient exists, `false` otherwise
     func exists(_ ingredient: Ingredient) -> Bool {
-        let ingredientUUID: UUID = ingredient.id
+        let normalizedName = ingredient.name // already normalized via Ingredient.init
         let descriptor = FetchDescriptor<SDPantryItem>()
         do {
             let all = try context.fetch(descriptor)
-            return all.contains(where: { $0.ingredient.id == ingredientUUID })
+            return all.contains(where: { $0.ingredient.name.normalize() == normalizedName })
         } catch {
             let repositoryError = RepositoryError.fetchFailed(operation: "exists - checking ingredient \(ingredient.name)", underlyingError: error)
             print("Error in exists(): \(repositoryError.debugDescription)")

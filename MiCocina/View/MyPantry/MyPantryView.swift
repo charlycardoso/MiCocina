@@ -143,19 +143,7 @@ struct MyPantryView: View {
 
     @ViewBuilder
     private func IngredientRow(for ingredient: Ingredient) -> some View {
-        HStack(alignment: .center) {
-            Text(ingredient.name.capitalized)
-            Spacer()
-            Text("\(ingredient.quantity)")
-                .frame(width: 20, height: 20)
-                .font(.footnote)
-                .fontWeight(.regular)
-                .foregroundStyle(.white)
-                .background {
-                    Circle()
-                        .fill(ingredient.quantity <= 3 ? Color.cPrimary : Color.cSecondary)
-                }
-        }
+        Text(ingredient.name.capitalized)
     }
 }
 

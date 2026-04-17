@@ -262,8 +262,7 @@ struct ShoppingListView: View {
         // Create shopping list item WITHOUT adding to pantry
         let item = ShoppingListItem(
             ingredient: Ingredient(
-                name: newIngredientName,
-                quantity: 1
+                name: newIngredientName
             ),
             isBought: false
         )
@@ -276,16 +275,9 @@ struct ShoppingListView: View {
     
     /// Adds a bought item to the pantry
     private func addToPantry(_ item: ShoppingListItem) {
-        // Create pantry repository and add the ingredient
         let pantryRepo = SDPantryProtocolRepository(context: modelContext)
-        
         do {
-            // Add ingredient to pantry with default quantity of 1
-            var ingredientWithQuantity = item.ingredient
-            ingredientWithQuantity.quantity = 1
-            try pantryRepo.add(ingredientWithQuantity)
-            
-            // Remove from shopping list
+            try pantryRepo.add(item.ingredient)
             viewModel?.removeItem(item)
         } catch {
             print("Error adding to pantry: \(error)")

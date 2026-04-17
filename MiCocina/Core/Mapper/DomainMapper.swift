@@ -54,9 +54,9 @@ final class DomainMapper {
     /// Converts a storage ingredient model to a domain ingredient model.
     ///
     /// - Parameter ingredient: The storage ingredient model to convert
-    /// - Returns: A domain `Ingredient` model with quantity
+    /// - Returns: A domain `Ingredient` model
     static func toDomain(ingredient: SDIngredient) -> Ingredient {
-        return .init(id: ingredient.id, name: ingredient.name, quantity: ingredient.quantity)
+        return .init(id: ingredient.id, name: ingredient.name)
     }
 
     // MARK: - RecipeIngredient Mapping

@@ -27,7 +27,7 @@ import Foundation
 ///     isFavorite: false
 /// )
 /// ```
-struct Recipe: Equatable {
+struct Recipe: Equatable, Hashable {
     /// Unique identifier for the recipe
     let id: UUID
     
@@ -57,5 +57,9 @@ struct Recipe: Equatable {
         self.ingredients = ingredients
         self.mealType = mealType
         self.isFavorite = isFavorite
+    }
+
+    static func == (lhs: Recipe, rhs: Recipe) -> Bool {
+        lhs.name.normalize() == rhs.name.normalize()
     }
 }

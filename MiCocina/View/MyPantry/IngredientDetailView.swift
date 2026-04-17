@@ -14,7 +14,6 @@ struct IngredientDetailView: View {
     
     private let originalIngredient: Ingredient
     @State private var name: String
-    @State private var quantity: Int
     @State private var isEditing: Bool = false
     @State private var showAlert: (show: Bool, title: String, message: String) = (false, "", "")
     @State private var showDeleteConfirmation: Bool = false
@@ -24,7 +23,6 @@ struct IngredientDetailView: View {
         self.originalIngredient = ingredient
         self.viewModel = viewModel
         self._name = State(initialValue: ingredient.name.capitalized)
-        self._quantity = State(initialValue: ingredient.quantity)
     }
     
     var body: some View {
@@ -44,29 +42,6 @@ struct IngredientDetailView: View {
                         }
                     }
                     
-                    if isEditing {
-                        Stepper(value: $quantity, in: 0...999) {
-                            HStack {
-                                Text("common.quantity")
-                                Spacer()
-                                Text("\(quantity)")
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        .accessibilityIdentifier("ingredientDetail.quantityStepper")
-                    } else {
-                        HStack {
-                            Text("common.quantity")
-                            Spacer()
-                            HStack {
-                                Text("\(quantity)")
-                                    .foregroundColor(.secondary)
-                                Circle()
-                                    .fill(quantity <= 3 ? Color.red : Color.green)
-                                    .frame(width: 12, height: 12)
-                            }
-                        }
-                    }
                 } header: {
                     Text("ingredientDetail.sectionHeader")
                 } footer: {
@@ -166,7 +141,6 @@ struct IngredientDetailView: View {
     
     private func cancelEditing() {
         name = originalIngredient.name.capitalized
-        quantity = originalIngredient.quantity
         isEditing = false
     }
     
@@ -184,7 +158,7 @@ struct IngredientDetailView: View {
         let normalizedOriginalName = originalIngredient.name
         
         if normalizedNewName != normalizedOriginalName {
-            let testIngredient = Ingredient(name: trimmedName, quantity: quantity)
+            let testIngredient = Ingredient(name: trimmedName)
             if viewModel.exists(testIngredient) {
                 shouldDismissOnOK = false
                 showAlert = (
@@ -201,11 +175,7 @@ struct IngredientDetailView: View {
             try viewModel.remove(originalIngredient)
             
             // Add the updated ingredient
-            let updatedIngredient = Ingredient(
-                id: originalIngredient.id,
-                name: trimmedName,
-                quantity: quantity
-            )
+            let updatedIngredient = Ingredient(id: originalIngredient.id, name: trimmedName)
             try viewModel.add(updatedIngredient)
             
             shouldDismissOnOK = true
@@ -239,7 +209,7 @@ struct IngredientDetailView: View {
     let container = try! ModelContainer(for: schema, configurations: [config])
     
     let mockVM = MyPantryModuleViewModel.mockForPreview(context: container.mainContext)
-    let sampleIngredient = Ingredient(name: "Tomate", quantity: 2)
+    let sampleIngredient = Ingredient(name: "Tomate")
     
     return IngredientDetailView(ingredient: sampleIngredient, viewModel: mockVM)
         .modelContainer(container)

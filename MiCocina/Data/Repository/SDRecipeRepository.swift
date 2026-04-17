@@ -139,7 +139,20 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
         } catch {
             throw RepositoryError.fetchFailed(operation: "save - checking existing recipe", underlyingError: error)
         }
-        
+
+        // Check for duplicate name (normalized comparison for case/accent/plural insensitivity)
+        let normalizedName = recipe.name.normalize()
+        do {
+            let all = try context.fetch(FetchDescriptor<SDRecipe>())
+            if all.contains(where: { $0.name.normalize() == normalizedName }) {
+                throw RepositoryError.duplicateEntry(entityType: "Recipe", name: recipe.name)
+            }
+        } catch let error as RepositoryError {
+            throw error
+        } catch {
+            throw RepositoryError.fetchFailed(operation: "save - checking duplicate name", underlyingError: error)
+        }
+
         _ = StorageMapper.toStorage(recipe: recipe, context: context)
         do {
             try context.save()
@@ -166,14 +179,12 @@ final class SDRecipeProtocolRepository: RecipeProtocolRepository {
                 context.delete(sdRecipe)
                 try context.save()
             }
-        } catch let error where error is NSError {
+        } catch let error {
             if (error as NSError).domain.contains("delete") || (error as NSError).localizedDescription.lowercased().contains("delete") {
                 throw RepositoryError.deleteFailed(operation: "delete recipe \(recipe.id)", underlyingError: error)
             } else {
                 throw RepositoryError.fetchFailed(operation: "delete - finding recipe to delete", underlyingError: error)
             }
-        } catch {
-            throw RepositoryError.fetchFailed(operation: "delete - finding recipe to delete", underlyingError: error)
         }
     }
 

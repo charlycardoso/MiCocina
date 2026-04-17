@@ -72,11 +72,11 @@ extension MyPantryModuleViewModel {
     static func mockForPreview(context: ModelContext) -> MyPantryModuleViewModel {
         let vm = MyPantryModuleViewModel(context: context, isPreviewMode: true)
         vm.pantry = [
-            .init(name: "Tomate", quantity: 1),
-            .init(name: "Leche", quantity: 3),
-            .init(name: "Huevos", quantity: 6),
-            .init(name: "Mantequilla", quantity: 1),
-            .init(name: "Arroz", quantity: 1),
+            .init(name: "Tomate"),
+            .init(name: "Leche"),
+            .init(name: "Huevos"),
+            .init(name: "Mantequilla"),
+            .init(name: "Arroz"),
         ]
         return vm
     }

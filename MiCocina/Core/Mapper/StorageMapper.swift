@@ -47,7 +47,6 @@ final class StorageMapper {
     ) -> SDIngredient {
         let name = ingredient.name
         let id = ingredient.id
-        let quantity = ingredient.quantity
         let descriptor = FetchDescriptor<SDIngredient>(
             predicate: #Predicate { $0.id == id }
         )
@@ -56,8 +55,7 @@ final class StorageMapper {
             return existing
         }
 
-        // Create new if it doesn't exist - preserve the original ID and quantity
-        let new = SDIngredient(id: id, name: name, quantity: quantity)
+        let new = SDIngredient(id: id, name: name)
         context.insert(new)
         return new
     }

@@ -53,6 +53,12 @@ struct ShoppingListViewModelTests {
         func exists(_ ingredient: Ingredient) -> Bool {
             return items.contains { $0.ingredient.id == ingredient.id }
         }
+
+        func addItem(_ item: MiCocina.ShoppingListItem) throws {
+            addCalled = true
+            let newItem = ShoppingListItem(ingredient: item.ingredient, isBought: false)
+            items.insert(newItem)
+        }
     }
     
     // MARK: - Initialization Tests

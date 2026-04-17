@@ -37,15 +37,13 @@ struct RecipeMatcher {
     /// - The number of missing **required** ingredients is 3 or fewer
     ///
     /// **Architecture**: Compares recipe ingredient names against pantry ingredient names.
-    /// - Recipe ingredients: Just names (no quantity)
-    /// - Pantry ingredients: Names with quantities (quantity > 0 means you have it)
     ///
     /// This tolerance mechanism allows users to cook recipes even when they're missing
     /// a few items, promoting flexibility in meal planning.
     ///
     /// - Parameters:
     ///   - recipe: The recipe to evaluate
-    ///   - pantry: A set of ingredients available in the pantry (with quantities > 0)
+    ///   - pantry: A set of ingredients available in the pantry
     ///
     /// - Returns: `true` if the recipe can be cooked with the available ingredients,
     ///           `false` otherwise
@@ -61,7 +59,7 @@ struct RecipeMatcher {
                 .map { $0.ingredientName.normalize() }
         )
         
-        // Get available ingredient names from pantry (only items with quantity > 0)
+        // Get available ingredient names from pantry
         let pantryNames = Set(
             pantry
                 .map { $0.name.normalize() }

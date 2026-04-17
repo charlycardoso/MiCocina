@@ -117,7 +117,7 @@ struct MyPantryModuleViewModelTests {
     func addSameIngredientTwiceDoesNotDuplicate() throws {
         let container = try makeContainer()
         let viewModel = MyPantryModuleViewModel(context: container.mainContext)
-        let ingredient = Ingredient(name: "Rice", quantity: 1)
+        let ingredient = Ingredient(name: "Rice")
 
         try viewModel.add(ingredient)
         try viewModel.add(ingredient) // same UUID → update, not insert
@@ -148,7 +148,7 @@ struct MyPantryModuleViewModelTests {
     func removeNonExistentIngredientDoesNotThrow() throws {
         let container = try makeContainer()
         let viewModel = MyPantryModuleViewModel(context: container.mainContext)
-        let ghost = Ingredient(name: "NonExistent", quantity: 1)
+        let ghost = Ingredient(name: "NonExistent")
 
         #expect(throws: Never.self) {
             try viewModel.remove(ghost)
@@ -162,7 +162,7 @@ struct MyPantryModuleViewModelTests {
     func updateExistingIngredientDoesNotThrow() throws {
         let container = try makeContainer()
         let viewModel = MyPantryModuleViewModel(context: container.mainContext)
-        let ingredient = Ingredient(name: "Apple", quantity: 1)
+        let ingredient = Ingredient(name: "Apple")
         try viewModel.add(ingredient)
 
         #expect(throws: Never.self) {
@@ -175,7 +175,7 @@ struct MyPantryModuleViewModelTests {
     func updateNonExistentIngredientDoesNotThrow() throws {
         let container = try makeContainer()
         let viewModel = MyPantryModuleViewModel(context: container.mainContext)
-        let ingredient = Ingredient(name: "Ghost", quantity: 1)
+        let ingredient = Ingredient(name: "Ghost")
 
         #expect(throws: Never.self) {
             try viewModel.update(ingredient)
@@ -188,9 +188,9 @@ struct MyPantryModuleViewModelTests {
     func clearRemovesAllIngredients() throws {
         let container = try makeContainer()
         let viewModel = MyPantryModuleViewModel(context: container.mainContext)
-        try viewModel.add(Ingredient(name: "Milk",   quantity: 1))
-        try viewModel.add(Ingredient(name: "Eggs",   quantity: 6))
-        try viewModel.add(Ingredient(name: "Cheese", quantity: 2))
+        try viewModel.add(Ingredient(name: "Milk"))
+        try viewModel.add(Ingredient(name: "Eggs"))
+        try viewModel.add(Ingredient(name: "Cheese"))
         #expect(viewModel.getPantry().count == 3)
 
         try viewModel.clear()
@@ -214,7 +214,7 @@ struct MyPantryModuleViewModelTests {
     func existsReturnsTrueForAddedIngredient() throws {
         let container = try makeContainer()
         let viewModel = MyPantryModuleViewModel(context: container.mainContext)
-        let butter = Ingredient(name: "Butter", quantity: 1)
+        let butter = Ingredient(name: "Butter")
         try viewModel.add(butter)
 
         #expect(viewModel.exists(butter))
@@ -224,7 +224,7 @@ struct MyPantryModuleViewModelTests {
     func existsReturnsFalseForMissingIngredient() throws {
         let container = try makeContainer()
         let viewModel = MyPantryModuleViewModel(context: container.mainContext)
-        let truffle = Ingredient(name: "Truffle", quantity: 1)
+        let truffle = Ingredient(name: "Truffle")
 
         #expect(!viewModel.exists(truffle))
     }
@@ -233,7 +233,7 @@ struct MyPantryModuleViewModelTests {
     func existsReturnsFalseAfterRemoval() throws {
         let container = try makeContainer()
         let viewModel = MyPantryModuleViewModel(context: container.mainContext)
-        let parsley = Ingredient(name: "Parsley", quantity: 1)
+        let parsley = Ingredient(name: "Parsley")
         try viewModel.add(parsley)
         #expect(viewModel.exists(parsley))
 
@@ -246,7 +246,7 @@ struct MyPantryModuleViewModelTests {
     func existsReturnsFalseAfterClear() throws {
         let container = try makeContainer()
         let viewModel = MyPantryModuleViewModel(context: container.mainContext)
-        let cumin = Ingredient(name: "Cumin", quantity: 1)
+        let cumin = Ingredient(name: "Cumin")
         try viewModel.add(cumin)
 
         try viewModel.clear()
@@ -277,16 +277,5 @@ struct MyPantryModuleViewModelTests {
         #expect(names.contains("huevos"))
         #expect(names.contains("mantequilla"))
         #expect(names.contains("arroz"))
-    }
-
-    @MainActor @Test("mockForPreview ingredients all have quantity greater than zero")
-    func mockForPreviewIngredientsHavePositiveQuantity() throws {
-        let container = try makeContainer()
-
-        let viewModel = MyPantryModuleViewModel.mockForPreview(context: container.mainContext)
-
-        for ingredient in viewModel.pantry {
-            #expect(ingredient.quantity > 0)
-        }
     }
 }

@@ -13,9 +13,6 @@ import Foundation
 /// stored in a user's pantry or used in recipes. The ingredient name is automatically
 /// normalized upon initialization to ensure consistent matching across the application.
 ///
-/// - Important: The `quantity` property is provided for future extensibility but
-///   is not currently used in the pantry tracking system.
-///
 /// - Note: Ingredient names are normalized (case-insensitive, diacritics removed)
 ///   to improve recipe matching accuracy.
 ///
@@ -31,9 +28,6 @@ struct Ingredient: Identifiable, Equatable, Hashable {
     
     /// Human-readable name of the ingredient (automatically normalized)
     let name: String
-    
-    /// Quantity of the ingredient
-    var quantity: Int
 
     /// Initializes a new `Ingredient` instance.
     ///
@@ -46,11 +40,9 @@ struct Ingredient: Identifiable, Equatable, Hashable {
     /// - Parameters:
     ///   - id: A unique identifier for the ingredient. Defaults to a newly generated UUID.
     ///   - name: The name of the ingredient. Will be normalized automatically.
-    ///   - quantity: The quantity you have of the ingredient.
-    init(id: UUID = .init(), name: String, quantity: Int = 0) {
+    init(id: UUID = .init(), name: String) {
         self.id = id
         self.name = name.normalize()
-        self.quantity = quantity
     }
 
     static func == (lhs: Self, rhs: Self) -> Bool {
