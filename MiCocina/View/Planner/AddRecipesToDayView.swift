@@ -51,13 +51,13 @@ struct AddRecipesToDayView: View {
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var searchText: String = ""
-
+    
     private var displayedRecipes: [RecipeViewData] {
         let sorted = availableRecipes.sorted { $0.canCook && !$1.canCook }
         guard !searchText.isEmpty else { return sorted }
         return sorted.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
     }
-
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -95,8 +95,8 @@ struct AddRecipesToDayView: View {
                         Text(searchText.isEmpty
                              ? NSLocalizedString("planner.addRecipes.noRecipesAvailable", comment: "")
                              : NSLocalizedString("homeContent.noSearchResults", comment: ""))
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
                         Spacer()
                     }
                     .accessibilityIdentifier("addRecipes.emptyState")
@@ -119,22 +119,24 @@ struct AddRecipesToDayView: View {
             .navigationTitle(NSLocalizedString("planner.addRecipes.title", comment: "Select recipes navigation title"))
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: Text("homeContent.searchPrompt"))
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+            .safeAreaInset(edge: .top, content: {
+                HStack {
                     Button(NSLocalizedString("common.cancel", comment: "Cancel button")) {
                         dismiss()
                     }
                     .accessibilityIdentifier("addRecipes.cancelButton")
-                }
-                
-                ToolbarItem(placement: .confirmationAction) {
+
+                    Spacer()
+
                     Button(NSLocalizedString("planner.addRecipes.addButton", comment: "Add button")) {
                         saveRecipesToDay()
                     }
                     .disabled(selectedRecipes.isEmpty)
                     .accessibilityIdentifier("addRecipes.addButton")
+                    .buttonStyle(.borderedProminent)
                 }
-            }
+                .padding(.horizontal, 16)
+            })
             .alert(NSLocalizedString("common.information", comment: "Information alert title"), isPresented: $showAlert) {
                 Button(NSLocalizedString("common.ok", comment: "OK button")) { }
             } message: {
@@ -148,12 +150,12 @@ struct AddRecipesToDayView: View {
             }
         }
     }
-
+    
     /// Loads available recipes filtered by the selected meal type.
     private func loadRecipes() {
         availableRecipes = viewModel.getRecipes(by: selectedMealType)
     }
-
+    
     /// Toggles the selection state of a recipe.
     ///
     /// - Parameter id: The unique identifier of the recipe to toggle
@@ -232,4 +234,20 @@ struct AddRecipesToDayView: View {
         formatter.dateStyle = .long
         return formatter.string(from: date)
     }
+    
+}
+
+// MARK: - Preview
+#Preview {
+    let container = try! ModelContainer(for: SDPlannerData.self, SDRecipe.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+    let context = container.mainContext
+
+    let mockViewModel = PlannerViewModel(context: context)
+
+    AddRecipesToDayView(
+        viewModel: mockViewModel,
+        selectedDate: Date(),
+        onSave: {}
+    )
+    .modelContainer(container)
 }

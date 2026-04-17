@@ -180,25 +180,25 @@ struct NewRecipeView: View {
                         .italic()
                 } else {
                     LazyVStack(alignment: .leading, spacing: 8) {
-                        ForEach(ingredients.indices, id: \.self) { index in
+                        ForEach($ingredients) { $ingredient in
                             VStack(spacing: 8) {
                                 HStack {
                                     Image(systemName: "circle.fill")
                                         .font(.caption2)
                                         .foregroundStyle(.secondary)
 
-                                    Text(ingredients[index].name)
+                                    Text(ingredient.name)
                                         .font(.body)
 
                                     Spacer()
 
                                     Button {
-                                        removeIngredient(ingredient: ingredients[index])
+                                        removeIngredient(ingredient: ingredient)
                                     } label: {
                                         Image(systemName: "minus.circle.fill")
                                             .foregroundStyle(.red)
                                     }
-                                    .accessibilityIdentifier("newRecipe.removeIngredient.\(ingredients[index].id)")
+                                    .accessibilityIdentifier("newRecipe.removeIngredient.\(ingredient.id)")
                                 }
                                 
                                 HStack {
@@ -214,10 +214,7 @@ struct NewRecipeView: View {
                                     
                                     Spacer()
                                     
-                                    Toggle("", isOn: Binding(
-                                        get: { ingredients[index].isRequired },
-                                        set: { ingredients[index].isRequired = $0 }
-                                    ))
+                                    Toggle("", isOn: $ingredient.isRequired)
                                         .labelsHidden()
                                         .toggleStyle(SwitchToggleStyle())
                                 }

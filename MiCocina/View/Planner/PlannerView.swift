@@ -52,7 +52,7 @@ struct PlannerView: View {
     @State private var showAddRecipesSheet: Bool = false
     @State private var selectedDate: Date = Date()
     @State private var selectedRecipeForMove: RecipeViewData?
-    @State private var showMoveRecipeSheet: Bool = false
+
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var currentWeekOffset: Int = 0
@@ -166,18 +166,17 @@ struct PlannerView: View {
                 )
                 .presentationDetents([.medium, .large])
             }
-            .sheet(isPresented: $showMoveRecipeSheet) {
-                refreshRecipes()
-            } content: {
-                if let recipe = selectedRecipeForMove {
-                    MoveRecipeView(
-                        viewModel: viewModel,
-                        recipe: recipe,
-                        currentDate: selectedDate,
-                        onMove: { newDate in
-                            moveRecipe(recipe, to: newDate)
-                        }
-                    )
+            .sheet(item: $selectedRecipeForMove) { recipe in
+                MoveRecipeView(
+                    viewModel: viewModel,
+                    recipe: recipe,
+                    currentDate: selectedDate,
+                    onMove: { newDate in
+                        moveRecipe(recipe, to: newDate)
+                    }
+                )
+                .onDisappear {
+                    refreshRecipes()
                 }
             }
             .alert(NSLocalizedString("common.information", comment: "Alert title"), isPresented: $showAlert) {
@@ -235,7 +234,6 @@ struct PlannerView: View {
                                     recipe: recipe,
                                     onMove: {
                                         selectedRecipeForMove = recipe
-                                        showMoveRecipeSheet = true
                                     },
                                     onDelete: {
                                         deleteRecipe(recipe)
@@ -365,9 +363,8 @@ struct PlannerView: View {
     private func moveRecipe(_ recipe: RecipeViewData, to newDate: Date) {
         do {
             try viewModel.movePlanner(recipeID: recipe.id, from: selectedDate, to: newDate)
-            refreshRecipes()
-            showMoveRecipeSheet = false
             selectedRecipeForMove = nil
+            refreshRecipes()
         } catch {
             alertMessage = String(format: NSLocalizedString("planner.error.moveRecipe", comment: "Error moving recipe"), error.localizedDescription)
             showAlert = true
