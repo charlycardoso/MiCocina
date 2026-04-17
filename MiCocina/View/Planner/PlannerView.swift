@@ -56,6 +56,25 @@ struct PlannerView: View {
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var currentWeekOffset: Int = 0
+    @State private var showDatePicker: Bool = false
+
+    private static let weekRange = -12...24  // 3 months back, 6 months forward
+    private static let todayWeekOffset = 0
+
+    private var currentMonthYearLabel: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale.current
+        formatter.dateFormat = "MMMM yyyy"
+        return formatter.string(from: selectedDate).capitalized
+    }
+
+    /// Returns the week offset (relative to the current week) for the week containing the given date.
+    private func weekOffset(for date: Date) -> Int {
+        let calendar = Calendar(identifier: .iso8601)
+        let todayStart = calendar.startOfWeek(for: Date())
+        let targetStart = calendar.startOfWeek(for: date)
+        return calendar.dateComponents([.weekOfYear], from: todayStart, to: targetStart).weekOfYear ?? 0
+    }
 
     /// Initializes the planner view with a view model.
     ///
@@ -67,20 +86,52 @@ struct PlannerView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                // Month label — tapping opens full calendar picker
+                Button {
+                    showDatePicker = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(currentMonthYearLabel)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.primary)
+                        Image(systemName: "chevron.down")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
                 // Scrollable Week Planner with Paging
                 ScrollViewReader { proxy in
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 0) {
-                            ForEach(0...1, id: \.self) { weekOffset in
-                                WeekPlannerView(weekOffset: weekOffset)
+                            ForEach(Self.weekRange, id: \.self) { offset in
+                                WeekPlannerView(weekOffset: offset)
                                     .frame(width: UIScreen.main.bounds.width)
-                                    .id(weekOffset)
+                                    .id(offset)
                             }
                         }
                         .scrollTargetLayout()
                     }
                     .scrollTargetBehavior(.paging)
-                    .frame(height: 100)
+                    .frame(height: 90)
+                    .onAppear {
+                        proxy.scrollTo(Self.todayWeekOffset, anchor: .center)
+                    }
+                    .onChange(of: selectedDate) { _, newDate in
+                        let offset = weekOffset(for: newDate)
+                        let clamped = max(Self.weekRange.lowerBound, min(Self.weekRange.upperBound, offset))
+                        withAnimation {
+                            proxy.scrollTo(clamped, anchor: .center)
+                        }
+                    }
+                }
+                .sheet(isPresented: $showDatePicker) {
+                    DatePickerSheet(selectedDate: $selectedDate, isPresented: $showDatePicker)
+                        .presentationDetents([.medium])
                 }
 
                 Divider()
@@ -374,6 +425,52 @@ struct PlannerView: View {
                 date: date
             )
         }
+    }
+}
+
+// MARK: - DatePickerSheet
+
+/// A sheet that presents a graphical date picker for navigating to a specific week.
+private struct DatePickerSheet: View {
+    @Binding var selectedDate: Date
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text(String(localized: "planner.datePicker.title"))
+                    .font(.headline)
+                Spacer()
+                Button(String(localized: "common.done")) {
+                    isPresented = false
+                }
+                .fontWeight(.semibold)
+            }
+            .padding(.horizontal, 32)
+
+            DatePicker(
+                "",
+                selection: $selectedDate,
+                displayedComponents: .date
+            )
+            .datePickerStyle(.graphical)
+            .padding(.horizontal)
+            .onChange(of: selectedDate) { _, _ in
+                isPresented = false
+            }
+
+            Spacer()
+        }
+        .padding(.top, 32)
+    }
+}
+
+// MARK: - Calendar Extension
+
+private extension Calendar {
+    /// Returns the start of the ISO week (Monday) containing the given date.
+    func startOfWeek(for date: Date) -> Date {
+        dateInterval(of: .weekOfYear, for: date)?.start ?? date
     }
 }
 

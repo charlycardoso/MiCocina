@@ -245,12 +245,11 @@ struct ShoppingListView: View {
     
     /// Sets up the view model with the repository
     private func setupViewModel() {
-        guard viewModel == nil else { return }
-        
-        let repository = SDShoppingListRepository(context: modelContext)
-        let vm = ShoppingListViewModel(repository: repository)
-        vm.loadShoppingList()
-        viewModel = vm
+        if viewModel == nil {
+            let repository = SDShoppingListRepository(context: modelContext)
+            viewModel = ShoppingListViewModel(repository: repository)
+        }
+        viewModel?.loadShoppingList()
     }
     
     /// Adds a new ingredient to the shopping list

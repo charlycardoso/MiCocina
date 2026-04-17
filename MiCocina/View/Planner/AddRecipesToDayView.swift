@@ -50,7 +50,14 @@ struct AddRecipesToDayView: View {
     @State private var selectedRecipes: Set<UUID> = []
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
-    
+    @State private var searchText: String = ""
+
+    private var displayedRecipes: [RecipeViewData] {
+        let sorted = availableRecipes.sorted { $0.canCook && !$1.canCook }
+        guard !searchText.isEmpty else { return sorted }
+        return sorted.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -79,13 +86,15 @@ struct AddRecipesToDayView: View {
                 .accessibilityIdentifier("addRecipes.mealTypePicker")
                 
                 // Recipes List
-                if availableRecipes.isEmpty {
+                if displayedRecipes.isEmpty {
                     VStack(spacing: 16) {
                         Spacer()
-                        Image(systemName: "fork.knife.circle")
+                        Image(systemName: searchText.isEmpty ? "fork.knife.circle" : "magnifyingglass")
                             .font(.system(size: 50))
                             .foregroundStyle(.secondary)
-                        Text(NSLocalizedString("planner.addRecipes.noRecipesAvailable", comment: "No recipes available message"))
+                        Text(searchText.isEmpty
+                             ? NSLocalizedString("planner.addRecipes.noRecipesAvailable", comment: "")
+                             : NSLocalizedString("homeContent.noSearchResults", comment: ""))
                             .font(.headline)
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -93,7 +102,7 @@ struct AddRecipesToDayView: View {
                     .accessibilityIdentifier("addRecipes.emptyState")
                 } else {
                     List {
-                        ForEach(availableRecipes) { recipe in
+                        ForEach(displayedRecipes) { recipe in
                             RecipeSelectionRow(
                                 recipe: recipe,
                                 isSelected: selectedRecipes.contains(recipe.id)
@@ -109,6 +118,7 @@ struct AddRecipesToDayView: View {
             }
             .navigationTitle(NSLocalizedString("planner.addRecipes.title", comment: "Select recipes navigation title"))
             .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $searchText, prompt: Text("homeContent.searchPrompt"))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(NSLocalizedString("common.cancel", comment: "Cancel button")) {

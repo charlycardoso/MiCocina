@@ -41,6 +41,7 @@
 "homeContent.filter.showAll" = "Ver todas";
 "homeContent.filter.optionsSection" = "Opciones";
 "homeContent.filter.onlyCookable" = "Ver solo cocinables";
+"homeContent.filter.deleteFilters" = "Borrar filtros";
 "homeContent.filter.deleteFilters" = "Eliminar filtros";
 
 /* NewRecipeView */
@@ -157,6 +158,10 @@
 "planner.moveRecipe.newDate" = "Nueva fecha";
 "planner.moveRecipe.moveButton" = "Mover Receta";
 "planner.moveRecipe.navigationTitle" = "Mover Receta";
+"planner.datePicker.title" = "Ir a fecha";
+
+// MARK: - Common extras
+"common.done" = "Listo";
 
 // MARK: - Shopping List View
 

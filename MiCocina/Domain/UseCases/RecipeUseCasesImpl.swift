@@ -44,6 +44,7 @@ struct RecipeMapper {
         // Get required ingredient names from recipe
         let requiredIngredientNames = Set(
             recipe.ingredients
+                .filter { $0.isRequired }
                 .map { $0.ingredientName.normalize() }
         )
         

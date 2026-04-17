@@ -78,28 +78,32 @@ struct RecipeRowView: View {
             }
             
             Spacer()
-            
-            // Chevron to indicate row is tappable for navigation
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+
+            HStack(spacing: 20) {
+                Button {
+                    onMove()
+                } label: {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.body)
+                        .foregroundStyle(.blue)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(NSLocalizedString("planner.recipe.moveToAnotherDay", comment: ""))
+
+                Button(role: .destructive) {
+                    onDelete()
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.body)
+                        .foregroundStyle(.red)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(NSLocalizedString("planner.recipe.delete", comment: ""))
+            }
         }
         .padding()
         .background(Color(.secondarySystemBackground))
         .cornerRadius(12)
-        .contextMenu {
-            Button {
-                onMove()
-            } label: {
-                Label(NSLocalizedString("planner.recipe.moveToAnotherDay", comment: "Move to another day action"), systemImage: "calendar.badge.clock")
-            }
-            
-            Button(role: .destructive) {
-                onDelete()
-            } label: {
-                Label(NSLocalizedString("planner.recipe.delete", comment: "Delete recipe action"), systemImage: "trash")
-            }
-        }
         .padding(.horizontal)
         .accessibilityIdentifier("planner.recipeRowView.\(recipe.id.uuidString)")
     }

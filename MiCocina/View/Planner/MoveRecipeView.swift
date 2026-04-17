@@ -47,7 +47,7 @@ struct MoveRecipeView: View {
     /// Closure called when the user confirms the move with the selected date
     let onMove: (Date) -> Void
     
-    @State private var selectedDate: Date?
+    @State private var selectedDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
     
     var body: some View {
         NavigationStack {
@@ -78,10 +78,7 @@ struct MoveRecipeView: View {
                     
                     DatePicker(
                         NSLocalizedString("planner.moveRecipe.newDate", comment: "New date picker label"),
-                        selection: Binding(
-                            get: { selectedDate ?? Date() },
-                            set: { selectedDate = $0 }
-                        ),
+                        selection: $selectedDate,
                         displayedComponents: [.date]
                     )
                     .datePickerStyle(.graphical)
@@ -92,19 +89,16 @@ struct MoveRecipeView: View {
                 
                 // Move Button
                 Button {
-                    if let newDate = selectedDate {
-                        onMove(newDate)
-                    }
+                    onMove(selectedDate)
                 } label: {
                     Text(NSLocalizedString("planner.moveRecipe.moveButton", comment: "Move recipe button"))
                         .font(.headline)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(selectedDate != nil ? Color.blue : Color.gray)
+                        .background(Color.blue)
                         .cornerRadius(12)
                 }
-                .disabled(selectedDate == nil)
                 .padding()
             }
             .navigationTitle(NSLocalizedString("planner.moveRecipe.navigationTitle", comment: "Move recipe navigation title"))
@@ -125,7 +119,7 @@ struct MoveRecipeView: View {
     /// - Returns: Localized medium-length date string
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "es_MX")
+        formatter.locale = Locale.current
         formatter.dateStyle = .medium
         return formatter.string(from: date)
     }

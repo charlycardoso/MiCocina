@@ -42,7 +42,11 @@ final class PlannerViewModel: ObservableObject {
             
             if let planner = planners.first {
                 let plannerData = DomainMapper.toDomain(planner: planner)
-                recipeGroups = plannerData.groupedRecipes
+                let pantry = SDPantryProtocolRepository(context: context).getPantry()
+                let mapper = RecipeMapper()
+                let matcher = RecipeMatcher()
+                let mapped = plannerData.recipes.map { mapper.map($0, pantry: pantry, matcher: matcher) }
+                recipeGroups = RecipeGrouper.group(mapped)
             } else {
                 recipeGroups = []
             }

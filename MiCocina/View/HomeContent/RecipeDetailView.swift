@@ -13,7 +13,13 @@ struct RecipeDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     private let recipe: RecipeViewData
-    private let homeContentViewModel: HomeContentViewModel
+    @ObservedObject private var homeContentViewModel: HomeContentViewModel
+
+    private var currentRecipe: RecipeViewData {
+        homeContentViewModel.recipes
+            .flatMap { $0.recipes }
+            .first { $0.id == recipe.id } ?? recipe
+    }
 
     @State private var showDeleteAlert: Bool = false
     @State private var showEditView: Bool = false
@@ -103,6 +109,7 @@ struct RecipeDetailView: View {
                 }
             }
             .onAppear {
+                homeContentViewModel.getAllRecipes()
                 loadFullRecipe()
             }
             .alert(alertViewMessage, isPresented: $markAsFavorite, actions: {
@@ -170,25 +177,25 @@ struct RecipeDetailView: View {
     private var cookingStatusSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Image(systemName: recipe.canCook ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                Image(systemName: currentRecipe.canCook ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                     .font(.title2)
-                    .foregroundStyle(recipe.canCook ? .green : .orange)
+                    .foregroundStyle(currentRecipe.canCook ? .green : .orange)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(recipe.canCook ? (recipe.missingCount == 0 ? "recipeDetail.canCookStatus" : "recipeDetail.canCookWithMissing") : "recipeDetail.cannotCookStatus")
+                    Text(currentRecipe.canCook ? (currentRecipe.missingCount == 0 ? "recipeDetail.canCookStatus" : "recipeDetail.canCookWithMissing") : "recipeDetail.cannotCookStatus")
                         .font(.body)
                         .fontWeight(.medium)
-                        .foregroundStyle(recipe.canCook ? .green : .orange)
+                        .foregroundStyle(currentRecipe.canCook ? .green : .orange)
 
-                    if recipe.canCook && recipe.missingCount != 0 {
-                        Text(verbatim: String(format: NSLocalizedString("recipeDetail.needMoreIngredients", comment: ""), recipe.missingCount))
+                    if currentRecipe.canCook && currentRecipe.missingCount != 0 {
+                        Text(verbatim: String(format: NSLocalizedString("recipeDetail.needMoreIngredients", comment: ""), currentRecipe.missingCount))
                             .font(.caption)
                             .foregroundStyle(.secondary)
-                    } else if !recipe.canCook {
-                        let key = recipe.missingCount == 1
+                    } else if !currentRecipe.canCook {
+                        let key = currentRecipe.missingCount == 1
                             ? "recipeDetail.missingIngredients.singular"
                             : "recipeDetail.missingIngredients.plural"
-                        Text(verbatim: String(format: NSLocalizedString(key, comment: ""), recipe.missingCount))
+                        Text(verbatim: String(format: NSLocalizedString(key, comment: ""), currentRecipe.missingCount))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -199,8 +206,8 @@ struct RecipeDetailView: View {
         .padding()
         .background {
             RoundedRectangle(cornerRadius: 16)
-                .fill(recipe.canCook ? Color.green.opacity(0.05) : Color.orange.opacity(0.05))
-                .stroke((recipe.canCook ? Color.green : Color.orange).opacity(0.3), lineWidth: 1)
+                .fill(currentRecipe.canCook ? Color.green.opacity(0.05) : Color.orange.opacity(0.05))
+                .stroke((currentRecipe.canCook ? Color.green : Color.orange).opacity(0.3), lineWidth: 1)
         }
         .accessibilityIdentifier("recipeDetail.cookingStatusSection")
     }
