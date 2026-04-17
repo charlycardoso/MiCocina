@@ -14,8 +14,8 @@
             filePath = "MiCocina/View/HomeContent/NewRecipeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "273"
-            endingLineNumber = "273"
+            startingLineNumber = "276"
+            endingLineNumber = "276"
             landmarkName = "saveRecipe()"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,9 +30,9 @@
             filePath = "MiCocina/View/HomeContent/NewRecipeView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "244"
-            endingLineNumber = "244"
-            landmarkName = "saveRecipe()"
+            startingLineNumber = "247"
+            endingLineNumber = "247"
+            landmarkName = "removeIngredient(ingredient:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

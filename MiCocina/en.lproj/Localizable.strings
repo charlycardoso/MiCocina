@@ -36,6 +36,12 @@
 "homeContent.removeFavorite.accessibilityLabel" = "Remove from favorites";
 "homeContent.noSearchResults" = "No results found";
 "homeContent.noSearchResultsMessage" = "No recipes match \"%@\"";
+"homeContent.filter.label" = "Filter";
+"homeContent.filter.mealTypeSection" = "Meal Type";
+"homeContent.filter.showAll" = "Show All";
+"homeContent.filter.optionsSection" = "Options";
+"homeContent.filter.onlyCookable" = "Show only cookable";
+"homeContent.filter.deleteFilters" = "Remove filters";
 
 /* NewRecipeView */
 "newRecipe.navigationTitle" = "New Recipe";

@@ -23,7 +23,10 @@
 /// let rawValue = mealType.rawValue    // "lunch"
 /// let restored = MealType.rawValue("lunch")  // .lunch
 /// ```
-enum MealType: Comparable {
+
+import Foundation
+
+enum MealType: Comparable, CaseIterable {
     /// Meals typically consumed in the morning
     case breakFast
     
@@ -62,7 +65,10 @@ enum MealType: Comparable {
     ///   - rhs: The right-hand side meal type
     /// - Returns: `true` if the left meal type is less than the right meal type
     static func < (lhs: MealType, rhs: MealType) -> Bool {
-        lhs.rawValue < rhs.rawValue
+        let order = MealType.allCases
+        guard let lhsIndex = order.firstIndex(of: lhs),
+              let rhsIndex = order.firstIndex(of: rhs) else { return false }
+        return lhsIndex < rhsIndex
     }
 
     /// Creates a `MealType` from a raw string value.

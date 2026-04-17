@@ -20,6 +20,11 @@ struct RecipeDetailView: View {
     @State private var markAsFavorite: Bool = false
     @State private var fullRecipe: Recipe?
     @State private var helpMessage: (activate: Bool, message: String) = (false, "")
+    private var sortedIngredients: [RecipeIngredient] {
+        guard let fullRecipe = fullRecipe else { return [] }
+        return Array(fullRecipe.ingredients).sorted { $0.ingredientName < $1.ingredientName }
+    }
+
     private var alertViewMessage: String {
         let action = (fullRecipe?.isFavorite ?? false)
             ? String(localized: "homeContent.alert.removeFavorite")
@@ -35,15 +40,44 @@ struct RecipeDetailView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    cookingStatusSection
-                    ingredientsSection
+            List {
+                cookingStatusSection
+                    .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 8, trailing: 16))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+
+                Section(header: Text("common.ingredients")
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                    .textCase(nil)) {
+                    if fullRecipe == nil {
+                        HStack {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text("recipeDetail.loadingIngredients")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        ForEach(sortedIngredients) { recipeIngredient in
+                            ingredientRow(for: recipeIngredient)
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    if !homeContentViewModel.exists(Ingredient(name: recipeIngredient.ingredientName)) {
+                                        Button {
+                                            homeContentViewModel.addToShoppingList(recipeIngredient.ingredientName)
+                                        } label: {
+                                            Label("ingredientDetail.addToShoppingList", systemImage: "cart.badge.plus")
+                                        }
+                                        .tint(.blue)
+                                    }
+                                }
+                        }
+                    }
                 }
-                .padding()
             }
+            .listStyle(.plain)
             .navigationTitle(recipe.name)
-            .navigationSubtitle(recipe.mealType.rawValue)
+            .navigationSubtitle(mealTypeName(for: recipe.mealType))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -82,9 +116,6 @@ struct RecipeDetailView: View {
                 }
                 .accessibilityIdentifier("recipeDetailView.alert.cancelButton")
             })
-            .alert(helpMessage.message, isPresented: $helpMessage.activate, actions: {
-                Button("common.close", role: .close) { }
-            })
             .alert("recipeDetail.deleteAlertTitle", isPresented: $showDeleteAlert) {
                 Button("common.cancel", role: .cancel) { }
                 Button("recipeDetail.delete", role: .destructive) {
@@ -102,68 +133,37 @@ struct RecipeDetailView: View {
     }
 
     @ViewBuilder
-    private var ingredientsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("common.ingredients")
-                .font(.headline)
-                .foregroundStyle(.primary)
+    private func ingredientRow(for recipeIngredient: RecipeIngredient) -> some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(recipeIngredient.ingredientName.capitalized)
+                    .font(.body)
+                    .fontWeight(.medium)
 
-            if let fullRecipe = fullRecipe {
-                let sortedIngredients = Array(fullRecipe.ingredients).sorted(by: { $0.ingredientName < $1.ingredientName })
-                
-                LazyVStack(alignment: .leading, spacing: 12) {
-                    ForEach(sortedIngredients) { recipeIngredient in
-                        HStack(alignment: .center, spacing: 12) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(recipeIngredient.ingredientName.capitalized)
-                                    .font(.body)
-                                    .fontWeight(.medium)
-                                
-                                Text(recipeIngredient.isRequired ? "common.ingredient.required" : "recipeDetail.optional")
-                                    .font(.caption)
-                                    .foregroundStyle(.systemBackground)
-                                    .padding(2)
-                                    .padding(.horizontal, 2)
-                                    .background {
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .fill(recipeIngredient.isRequired ? Color.cAccent : Color.cSecondary)
-                                    }
-                            }
-                            
-                            Spacer()
-                            
-                            // Show if ingredient is available in pantry
-                            if homeContentViewModel.exists(Ingredient(name: recipeIngredient.ingredientName)) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.body)
-                                    .foregroundStyle(.green)
-                            } else {
-                                Button {
-                                    withAnimation(.bouncy) {
-                                        let toggle = !helpMessage.activate
-                                        helpMessage = (toggle, "No cuentas con este ingrediente. Puedes agregarlo desde la sección de ingredientes.")
-                                    }
-                                } label: {
-                                    Image(systemName: "exclamationmark.circle")
-                                        .font(.body)
-                                        .foregroundStyle(.orange)
-                                }
-                            }
-                        }
-                        .accessibilityIdentifier("recipeDetail.ingredientRow.\(recipeIngredient.id.uuidString)")
-                        Divider()
+                Text(recipeIngredient.isRequired ? "common.ingredient.required" : "recipeDetail.optional")
+                    .font(.caption)
+                    .foregroundStyle(.systemBackground)
+                    .padding(2)
+                    .padding(.horizontal, 2)
+                    .background {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(recipeIngredient.isRequired ? Color.cAccent : Color.cSecondary)
                     }
-                }
+            }
+
+            Spacer()
+
+            if homeContentViewModel.exists(Ingredient(name: recipeIngredient.ingredientName)) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.body)
+                    .foregroundStyle(.green)
             } else {
-                HStack {
-                    ProgressView()
-                        .scaleEffect(0.8)
-                    Text("recipeDetail.loadingIngredients")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                Image(systemName: "exclamationmark.circle")
+                    .font(.body)
+                    .foregroundStyle(.orange)
             }
         }
+        .accessibilityIdentifier("recipeDetail.ingredientRow.\(recipeIngredient.id.uuidString)")
     }
 
     @ViewBuilder

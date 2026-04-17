@@ -56,6 +56,19 @@ final class HomeContentViewModel: ObservableObject {
     }
 }
 
+// MARK: Shopping List methods
+extension HomeContentViewModel {
+    func addToShoppingList(_ ingredientName: String) {
+        let shoppingListRepo = SDShoppingListRepository(context: context)
+        let item = ShoppingListItem(ingredient: Ingredient(name: ingredientName))
+        do {
+            try shoppingListRepo.addItem(item)
+        } catch {
+            print("Error adding ingredient to shopping list: \(error)")
+        }
+    }
+}
+
 // MARK: Pantry Repository methods
 extension HomeContentViewModel: PantryProtocolRepository {
     func getPantry() -> Set<Ingredient> {

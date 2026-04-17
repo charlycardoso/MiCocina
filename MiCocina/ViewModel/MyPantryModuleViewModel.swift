@@ -37,6 +37,18 @@ final class MyPantryModuleViewModel: ObservableObject {
     }
 }
 
+// MARK: Shopping List methods
+extension MyPantryModuleViewModel {
+    func addToShoppingList(_ ingredient: Ingredient) {
+        let shoppingListRepo = SDShoppingListRepository(context: context)
+        do {
+            try shoppingListRepo.add(ingredient)
+        } catch {
+            print("Error adding ingredient to shopping list: \(error)")
+        }
+    }
+}
+
 // MARK: Pantry Repository methods
 extension MyPantryModuleViewModel: PantryProtocolRepository {
     func getPantry() -> Set<Ingredient> {

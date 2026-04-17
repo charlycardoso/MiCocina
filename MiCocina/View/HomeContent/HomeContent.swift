@@ -15,21 +15,34 @@ struct HomeContent: View {
     @State private var showSaveNewRecipeView: Bool = false
     @State private var markRecipeAsFavorite: Bool = false
     @State private var selectedRecipe: RecipeViewData?
+    @State private var applyFilters: Bool = false
+    @State private var mealTypeFilter: MealType = .other
+    @State private var filterOnlyCookables: Bool = false
     
     private var filteredRecipes: [RecipeGroup] {
-        guard !searchRecipe.isEmpty else {
-            return viewModel.recipes
+        var groups = viewModel.recipes
+
+        if applyFilters {
+            groups = groups.filter { $0.mealType == mealTypeFilter }
         }
-        
-        return viewModel.recipes.compactMap { group in
-            let filteredRecipesInGroup = group.recipes.filter { recipe in
-                recipe.name.localizedCaseInsensitiveContains(searchRecipe)
+
+        if filterOnlyCookables {
+            groups = groups.compactMap { group in
+                let cookable = group.recipes.filter { $0.canCook }
+                guard !cookable.isEmpty else { return nil }
+                return RecipeGroup(mealType: group.mealType, recipes: cookable)
             }
-            
-            guard !filteredRecipesInGroup.isEmpty else { return nil }
-            
-            return RecipeGroup(mealType: group.mealType, recipes: filteredRecipesInGroup)
         }
+
+        if !searchRecipe.isEmpty {
+            groups = groups.compactMap { group in
+                let matched = group.recipes.filter { $0.name.localizedCaseInsensitiveContains(searchRecipe) }
+                guard !matched.isEmpty else { return nil }
+                return RecipeGroup(mealType: group.mealType, recipes: matched)
+            }
+        }
+
+        return groups
     }
     
     private var alertViewMessage: String {
@@ -48,6 +61,9 @@ struct HomeContent: View {
         NavigationStack {
             Group {
                 if filteredRecipes.isEmpty {
+                    FilterRow()
+                        .padding(.horizontal)
+                    Spacer()
                     if searchRecipe.isEmpty {
                         Text("homeContent.emptyState")
                             .padding()
@@ -72,7 +88,11 @@ struct HomeContent: View {
                         }
                         .padding()
                     }
+                    Spacer()
                 } else {
+                    FilterRow()
+                        .padding(.horizontal)
+
                     ScrollView {
                         ForEach(filteredRecipes, id: \.mealType) { recipeGroup in
                             Section(header:
@@ -93,6 +113,9 @@ struct HomeContent: View {
                     }
                     .accessibilityIdentifier("homeContent.recipeList")
                 }
+
+                Spacer()
+
             }
             .alert(alertViewMessage, isPresented: $markRecipeAsFavorite, actions: {
                 Button(role: .confirm) {
@@ -127,6 +150,62 @@ struct HomeContent: View {
             }
             .sheet(isPresented: $showSaveNewRecipeView) {
                 NewRecipeView(viewModel: viewModel)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func FilterRow() -> some View {
+        HStack {
+            Spacer()
+
+            Menu {
+                Section(String(localized: "homeContent.filter.mealTypeSection")) {
+                    Button(String(localized: "homeContent.filter.showAll")) {
+                        applyFilters = false
+                    }
+                    ForEach(MealType.allCases, id: \.self) { mealType in
+                        FilterRowContent(mealType: mealType)
+                    }
+                }
+
+                Section(String(localized: "homeContent.filter.optionsSection")) {
+                    Button(action: {
+                        filterOnlyCookables.toggle()
+                    }) {
+                        Label {
+                            Text("homeContent.filter.onlyCookable")
+                        } icon: {
+                            Image(systemName: filterOnlyCookables ? "checkmark" : "circle")
+                        }
+                    }
+                    Button(action: {
+                        applyFilters = false
+                        filterOnlyCookables = false
+                        mealTypeFilter = .other
+                    }) {
+                        Label("homeContent.filter.deleteFilters", systemImage: "trash")
+                    }
+                }
+
+            } label: {
+                Label("homeContent.filter.label", systemImage: "line.3.horizontal.decrease")
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func FilterRowContent(mealType: MealType) -> some View {
+        let isSelected = applyFilters == false ? false : mealTypeFilter == mealType
+
+        Button(action: {
+            applyFilters = true
+            mealTypeFilter = mealType
+        }) {
+            Label {
+                Text(mealTypeName(for: mealType))
+            } icon: {
+                Image(systemName: isSelected ? "checkmark" : "circle")
             }
         }
     }

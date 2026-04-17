@@ -34,6 +34,14 @@
 "homeContent.addRecipe.accessibilityLabel" = "Añadir nueva receta";
 "homeContent.addFavorite.accessibilityLabel" = "Marcar como favorito";
 "homeContent.removeFavorite.accessibilityLabel" = "Quitar de favoritos";
+"homeContent.noSearchResults" = "Sin resultados";
+"homeContent.noSearchResultsMessage" = "Ninguna receta coincide con \"%@\"";
+"homeContent.filter.label" = "Filtrar";
+"homeContent.filter.mealTypeSection" = "Tipo de comida";
+"homeContent.filter.showAll" = "Ver todas";
+"homeContent.filter.optionsSection" = "Opciones";
+"homeContent.filter.onlyCookable" = "Ver solo cocinables";
+"homeContent.filter.deleteFilters" = "Eliminar filtros";
 
 /* NewRecipeView */
 "newRecipe.navigationTitle" = "Nueva Receta";

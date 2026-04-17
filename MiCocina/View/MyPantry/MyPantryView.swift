@@ -55,7 +55,7 @@ struct MyPantryView: View {
                             }
                             .swipeActions(allowsFullSwipe: false) {
                                 Button(role: .confirm) {
-                                    // TODO: Add to shopping list functionality
+                                    viewModel.addToShoppingList(ingredient)
                                 } label: {
                                     Label("myPantry.swipe.buy", systemImage: "basket")
                                 }
