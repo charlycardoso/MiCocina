@@ -150,7 +150,7 @@ struct ShoppingListHelperTests {
         let container = try makeContainer()
         let context = container.mainContext
         
-        let tomato = Ingredient(id: UUID(), name: "tomato", quantity: 0)
+        let tomato = Ingredient(id: UUID(), name: "tomato")
         let ingredients = [
             tomato,
             tomato,  // Same ingredient twice
@@ -199,11 +199,11 @@ struct ShoppingListHelperTests {
         let container = try makeContainer()
         let context = container.mainContext
         
-        let originalIngredient = Ingredient(id: UUID(), name: "cheese", quantity: 0)
+        let originalIngredient = Ingredient(id: UUID(), name: "cheese")
         ShoppingListHelper.addToShoppingList(originalIngredient, context: context)
         
         // Same ID, different name (shouldn't happen in practice, but tests ID matching)
-        let sameIDIngredient = Ingredient(id: originalIngredient.id, name: "different", quantity: 0)
+        let sameIDIngredient = Ingredient(id: originalIngredient.id, name: "different")
         let exists = ShoppingListHelper.isInShoppingList(sameIDIngredient, context: context)
         
         #expect(exists == true)

@@ -122,8 +122,8 @@ struct RecipeIntegrationTests {
     @Test
     func missing_count_and_canCook_propagate_correctly_through_pipeline() {
         // Given
-        let pasta = Ingredient(name: "Pasta", quantity: 1)
-        let tomato = Ingredient(name: "Tomate", quantity: 1)  // Not in pantry
+        let pasta = Ingredient(name: "Pasta")
+        let tomato = Ingredient(name: "Tomate")  // Not in pantry
 
         let recipe = Recipe(
             name: "Pasta",
@@ -156,11 +156,11 @@ struct RecipeIntegrationTests {
     @Test
     func getPossibleRecipes_filters_correctly_through_matcher_mapper_grouper_pipeline() {
         // Given
-        let water = Ingredient(name: "water", quantity: 1)
-        let sugar = Ingredient(name: "sugar", quantity: 0)
-        let salt = Ingredient(name: "salt", quantity: 1)
-        let oil = Ingredient(name: "oil", quantity: 0)
-        let vinegar = Ingredient(name: "vinegar", quantity: 0)
+        let water = Ingredient(name: "water")
+        let sugar = Ingredient(name: "sugar")
+        let salt = Ingredient(name: "salt")
+        let oil = Ingredient(name: "oil")
+        let vinegar = Ingredient(name: "vinegar")
 
         // Recipe 1: 0 missing (should be in possible)
         let recipe1 = Recipe(
@@ -220,7 +220,7 @@ struct RecipeIntegrationTests {
     @Test
     func pipeline_preserves_recipe_ids_through_mapping() {
         // Given
-        let water = Ingredient(name: "water", quantity: 1)
+        let water = Ingredient(name: "water")
         let recipe = Recipe(
             name: "Water",
             ingredients: [.init(ingredientName: "water")],
@@ -243,7 +243,7 @@ struct RecipeIntegrationTests {
     @Test
     func pipeline_handles_multiple_meal_types_with_correct_grouping_and_sorting() {
         // Given
-        let water = Ingredient(name: "water", quantity: 1)
+        let water = Ingredient(name: "water")
 
         let recipes: [Recipe] = [
             Recipe(
@@ -316,7 +316,7 @@ struct RecipeIntegrationTests {
     @Test
     func pipeline_complex_scenario_with_favorites_and_cookability() {
         // Given
-        let water = Ingredient(name: "water", quantity: 1)
+        let water = Ingredient(name: "water")
 
         let recipes: [Recipe] = [
             Recipe(

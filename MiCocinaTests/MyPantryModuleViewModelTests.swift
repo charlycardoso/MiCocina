@@ -274,7 +274,7 @@ struct MyPantryModuleViewModelTests {
         let names = Set(viewModel.pantry.map { $0.name })
         #expect(names.contains("tomate"))
         #expect(names.contains("leche"))
-        #expect(names.contains("huevos"))
+        #expect(names.contains("huevo"))
         #expect(names.contains("mantequilla"))
         #expect(names.contains("arroz"))
     }

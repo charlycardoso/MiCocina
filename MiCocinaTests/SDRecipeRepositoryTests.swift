@@ -245,8 +245,8 @@ struct SDRecipeProtocolRepositoryTests {
     @Test
     func getFavorites_returns_only_favorite_recipes() throws {
         // Given
-        let favorite1 = createTestRecipe(name: "Favorite1", isFavorite: true)
-        let favorite2 = createTestRecipe(name: "Favorite2", isFavorite: true)
+        let favorite1 = createTestRecipe(name: "Arriz", isFavorite: true)
+        let favorite2 = createTestRecipe(name: "Manteca", isFavorite: true)
         let notFavorite = createTestRecipe(name: "NotFavorite", isFavorite: false)
         
         try repository.save(favorite1)
@@ -258,8 +258,8 @@ struct SDRecipeProtocolRepositoryTests {
 
         // Then
         #expect(favorites.count == 2)
-        #expect(favorites.contains { $0.name == "Favorite1" })
-        #expect(favorites.contains { $0.name == "Favorite2" })
+        #expect(favorites.contains { $0.name == "Arriz" })
+        #expect(favorites.contains { $0.name == "Manteca" })
         #expect(!favorites.contains { $0.name == "NotFavorite" })
     }
 
@@ -363,7 +363,7 @@ struct SDRecipeProtocolRepositoryTests {
     @Test
     func delete_removes_correct_recipe_from_multiple() throws {
         // Given
-        let recipe1 = createTestRecipe(name: "Keep1")
+        let recipe1 = createTestRecipe(name: "Arroz")
         let recipe2 = createTestRecipe(name: "Delete")
         let recipe3 = createTestRecipe(name: "Keep2")
         

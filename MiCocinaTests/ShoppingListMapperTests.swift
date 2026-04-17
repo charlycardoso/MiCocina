@@ -195,7 +195,7 @@ struct ShoppingListMapperTests {
         let container = try makeContainer()
         let context = container.mainContext
         
-        let originalIngredient = Ingredient(id: UUID(), name: "garlic", quantity: 0)
+        let originalIngredient = Ingredient(id: UUID(), name: "garlic")
         let originalItem = ShoppingListItem(
             id: UUID(),
             ingredient: originalIngredient,
