@@ -179,8 +179,14 @@ struct NewRecipeView: View {
                         .foregroundStyle(.secondary)
                         .italic()
                 } else {
-                    LazyVStack(alignment: .leading, spacing: 8) {
-                        ForEach($ingredients) { $ingredient in
+                    // Use VStack (not LazyVStack) with value-based ForEach.
+                    // ForEach($array) in a LazyVStack crashes when an element is
+                    // deleted because the lazy renderer may still hold a binding
+                    // to the removed element. A regular VStack renders eagerly and
+                    // handles removal safely. The toggle binding is constructed
+                    // manually via index lookup to avoid dangling-binding crashes.
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(ingredients) { ingredient in
                             VStack(spacing: 8) {
                                 HStack {
                                     Image(systemName: "circle.fill")
@@ -200,23 +206,30 @@ struct NewRecipeView: View {
                                     }
                                     .accessibilityIdentifier("newRecipe.removeIngredient.\(ingredient.id)")
                                 }
-                                
+
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text("common.ingredient.required")
                                             .font(.subheadline)
                                             .fontWeight(.medium)
-                                        
+
                                         Text("common.ingredient.requiredDescription")
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
                                     }
-                                    
+
                                     Spacer()
-                                    
-                                    Toggle("", isOn: $ingredient.isRequired)
-                                        .labelsHidden()
-                                        .toggleStyle(SwitchToggleStyle())
+
+                                    Toggle("", isOn: Binding(
+                                        get: { ingredient.isRequired },
+                                        set: { newValue in
+                                            if let index = ingredients.firstIndex(where: { $0.id == ingredient.id }) {
+                                                ingredients[index].isRequired = newValue
+                                            }
+                                        }
+                                    ))
+                                    .labelsHidden()
+                                    .toggleStyle(SwitchToggleStyle())
                                 }
                                 .padding(.leading, 20)
                             }

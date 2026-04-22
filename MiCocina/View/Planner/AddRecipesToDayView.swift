@@ -188,14 +188,13 @@ struct AddRecipesToDayView: View {
             
             let existingPlanner = try modelContext.fetch(plannerDescriptor).first
             
-            // Fetch the SDRecipe objects for the selected recipe IDs
-            let recipeDescriptor = FetchDescriptor<SDRecipe>(
-                predicate: #Predicate<SDRecipe> { recipe in
-                    selectedRecipeIDs.contains(recipe.id)
-                }
-            )
-            
-            let selectedSDRecipes = try modelContext.fetch(recipeDescriptor)
+            // Fetch SDRecipe objects for the selected IDs.
+            // Avoid using Array.contains() in #Predicate – it is not reliably
+            // supported by SwiftData's predicate compiler and can crash at runtime.
+            // Instead, fetch all recipes and filter in memory.
+            let allRecipesDescriptor = FetchDescriptor<SDRecipe>()
+            let allSDRecipes = try modelContext.fetch(allRecipesDescriptor)
+            let selectedSDRecipes = allSDRecipes.filter { selectedRecipeIDs.contains($0.id) }
             
             // Update or create planner
             if let planner = existingPlanner {

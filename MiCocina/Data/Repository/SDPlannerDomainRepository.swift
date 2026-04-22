@@ -46,8 +46,12 @@ final class SDPlannerDomainRepository: PlannerProtocolRepository {
     /// - Parameter day: The calendar day to look up.
     /// - Returns: The matching `PlannerData`, or `nil`.
     func get(by day: Date) -> PlannerData? {
+        // Normalize to midnight so the predicate matches stored records, which are
+        // always saved as start-of-day. Without this, a Date() with a time component
+        // never equals a midnight-stored date, causing silent nil returns.
+        let normalizedDay = Calendar.current.startOfDay(for: day)
         let descriptor = FetchDescriptor<SDPlannerData>(
-            predicate: #Predicate { $0.day == day }
+            predicate: #Predicate { $0.day == normalizedDay }
         )
         do {
             let sdPlannerDay = try context.fetch(descriptor).first
@@ -108,8 +112,9 @@ final class SDPlannerDomainRepository: PlannerProtocolRepository {
     /// - Parameter day: The calendar day whose plan should be deleted.
     /// - Throws: `RepositoryError.saveFailed` if the deletion cannot be persisted.
     func removePlanner(day: Date) throws {
+        let normalizedDay = Calendar.current.startOfDay(for: day)
         let descriptor = FetchDescriptor<SDPlannerData>(
-            predicate: #Predicate { $0.day == day }
+            predicate: #Predicate { $0.day == normalizedDay }
         )
 
         do {

@@ -97,6 +97,15 @@ final class StorageMapper {
         recipe domain: Recipe,
         context: ModelContext
     ) -> SDRecipe {
+        // Return the existing record if one with this UUID is already in the store.
+        // SDRecipe.id is @Attribute(.unique), so inserting a duplicate UUID causes
+        // a SwiftData constraint-violation crash.
+        let id = domain.id
+        let existingDescriptor = FetchDescriptor<SDRecipe>(predicate: #Predicate { $0.id == id })
+        if let existing = try? context.fetch(existingDescriptor).first {
+            return existing
+        }
+
         let sdRecipe = SDRecipe(
             id: domain.id,
             name: domain.name,
