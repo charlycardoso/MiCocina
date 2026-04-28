@@ -100,6 +100,7 @@ struct MoveRecipeView: View {
                         .cornerRadius(12)
                 }
                 .padding()
+                .accessibilityIdentifier("moveRecipe.moveButton")
             }
             .navigationTitle(NSLocalizedString("planner.moveRecipe.navigationTitle", comment: "Move recipe navigation title"))
             .navigationBarTitleDisplayMode(.inline)

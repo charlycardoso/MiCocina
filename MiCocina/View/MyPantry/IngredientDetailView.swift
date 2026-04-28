@@ -171,12 +171,8 @@ struct IngredientDetailView: View {
         }
         
         do {
-            // Remove the old ingredient
-            try viewModel.remove(originalIngredient)
-            
-            // Add the updated ingredient
             let updatedIngredient = Ingredient(id: originalIngredient.id, name: trimmedName)
-            try viewModel.add(updatedIngredient)
+            try viewModel.update(updatedIngredient)
             
             shouldDismissOnOK = true
             showAlert = (true, String(localized: "ingredientDetail.saved.title"), String(localized: "ingredientDetail.saved.message"))

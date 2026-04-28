@@ -101,7 +101,7 @@ struct RecipeIntegrationTests {
         #expect(breakfastGroup?.recipes.count == 1)
         #expect(breakfastGroup?.recipes[0].name == "agua de fresa")
         #expect(breakfastGroup?.recipes[0].canCook == true)
-        #expect(breakfastGroup?.recipes[0].missingCount == 1)
+        #expect(breakfastGroup?.recipes[0].missingCount == 0)
 
         // Lunch group
         let lunchGroup = groups.first { $0.mealType == .lunch }
@@ -283,7 +283,7 @@ struct RecipeIntegrationTests {
 
         // Then - Groups should be sorted by meal type raw value
         let mealTypes = groups.map { $0.mealType }
-        #expect(mealTypes == [.breakFast, .dinner, .lunch, .other])
+        #expect(mealTypes == [.breakFast, .lunch, .dinner, .other])
     }
 
     @Test

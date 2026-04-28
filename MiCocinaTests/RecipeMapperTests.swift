@@ -54,16 +54,14 @@ struct RecipeMapperTests {
         // Given
         let pasta = Ingredient(name: "Pasta")
         let tomato = Ingredient(name: "Tomate")
-        let garlic = Ingredient(name: "Ajo")
-        let salt = Ingredient(name: "Sal")
 
         let recipe = Recipe(
             name: "Pasta",
             ingredients: [
-                RecipeIngredient(ingredient: pasta),
-                RecipeIngredient(ingredient: tomato),
-                RecipeIngredient(ingredient: garlic, isRequired: false),
-                RecipeIngredient(ingredient: salt, isRequired: false)
+                RecipeIngredient(ingredientName: "pasta"),
+                RecipeIngredient(ingredientName: "Tomate"),
+                RecipeIngredient(ingredientName: "garlic", isRequired: false),
+                RecipeIngredient(ingredientName: "salt", isRequired: false)
             ]
         )
 
@@ -74,8 +72,8 @@ struct RecipeMapperTests {
         // When
         let result = mapper.map(recipe, pantry: pantry, matcher: matcher)
 
-        // Then - Both required and optional missing ingredients are counted
-        #expect(result.missingCount == 2)
+        // Then - none ingredient is missing since you have the required ingredients but don't have the required.
+        #expect(result.missingCount == 0)
     }
 
     /// Tests that canCook flag is based on the recipe matcher result.

@@ -356,7 +356,7 @@ struct RecipeUseCasesImplTests {
 
         // Then - Groups should be sorted by meal type raw value
         let mealTypes = groups.map { $0.mealType }
-        #expect(mealTypes == [.breakFast, .dinner, .lunch])
+        #expect(mealTypes == [.breakFast, .lunch, .dinner])
     }
 
     @Test

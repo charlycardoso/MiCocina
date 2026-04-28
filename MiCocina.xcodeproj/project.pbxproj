@@ -24,6 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2775844E2FA0FD6D00E18120 /* MiCocinaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiCocinaUITests.swift; sourceTree = "<group>"; };
 		27802A1C2F644A1200F1A59C /* MiCocina.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MiCocina.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27802A2B2F644A1300F1A59C /* MiCocinaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiCocinaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		27802A352F644A1300F1A59C /* MiCocinaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiCocinaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -67,12 +68,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2775844D2FA0FD2A00E18120 /* MiCocinaUITests */ = {
+			isa = PBXGroup;
+			children = (
+				2775844E2FA0FD6D00E18120 /* MiCocinaUITests.swift */,
+			);
+			path = MiCocinaUITests;
+			sourceTree = "<group>";
+		};
 		27802A132F644A1200F1A59C = {
 			isa = PBXGroup;
 			children = (
 				27802A1E2F644A1200F1A59C /* MiCocina */,
 				27802A2E2F644A1300F1A59C /* MiCocinaTests */,
 				27802A1D2F644A1200F1A59C /* Products */,
+				2775844D2FA0FD2A00E18120 /* MiCocinaUITests */,
 			);
 			sourceTree = "<group>";
 		};

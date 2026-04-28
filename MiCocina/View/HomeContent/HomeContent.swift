@@ -141,6 +141,7 @@ struct HomeContent: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .accessibilityIdentifier("homeContent.addButton")
                 }
             })
             .navigationTitle("homeContent.navigationTitle")

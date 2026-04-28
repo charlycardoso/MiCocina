@@ -11,6 +11,7 @@ import SwiftData
 @main
 struct MiCocinaApp: App {
     var sharedModelContainer: ModelContainer = {
+        let isUITesting = CommandLine.arguments.contains("--uitesting")
         let schema = Schema([
             SDPantryItem.self,
             SDShoppingListItem.self,
@@ -21,8 +22,8 @@ struct MiCocinaApp: App {
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,
-            isStoredInMemoryOnly: false,
-            allowsSave: true
+            isStoredInMemoryOnly: isUITesting,
+            allowsSave: !isUITesting
         )
 
         do {

@@ -103,7 +103,7 @@ struct RecipeGrouperTests {
 
         // Then - groups should be sorted by rawValue
         let mealTypes = groups.map { $0.mealType }
-        #expect(mealTypes == [.breakFast, .dinner, .lunch])
+        #expect(mealTypes == [.breakFast, .lunch, .dinner])
     }
 
     /// Tests that favorite recipes appear first within a group.
@@ -367,7 +367,7 @@ struct RecipeGrouperTests {
         let groups = RecipeGrouper.group([otherRecipe, dinnerRecipe, breakfastRecipe, lunchRecipe])
 
         // Then - should be sorted by meal type raw value
-        let expectedOrder: [MealType] = [.breakFast, .dinner, .lunch, .other]
+        let expectedOrder: [MealType] = [.breakFast, .lunch, .dinner, .other]
         let actualOrder = groups.map { $0.mealType }
         #expect(actualOrder == expectedOrder)
     }

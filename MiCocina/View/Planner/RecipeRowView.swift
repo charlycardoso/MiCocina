@@ -89,6 +89,7 @@ struct RecipeRowView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(NSLocalizedString("planner.recipe.moveToAnotherDay", comment: ""))
+                .accessibilityIdentifier("planner.recipeRowView.moveButton.\(recipe.id.uuidString)")
 
                 Button(role: .destructive) {
                     onDelete()
@@ -99,6 +100,7 @@ struct RecipeRowView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(NSLocalizedString("planner.recipe.delete", comment: ""))
+                .accessibilityIdentifier("planner.recipeRowView.deleteButton.\(recipe.id.uuidString)")
             }
         }
         .padding()

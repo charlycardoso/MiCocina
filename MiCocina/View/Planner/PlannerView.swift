@@ -57,6 +57,7 @@ struct PlannerView: View {
     @State private var alertMessage: String = ""
     @State private var currentWeekOffset: Int = 0
     @State private var showDatePicker: Bool = false
+    @State private var weekScrollPosition: Int? = Self.todayWeekOffset
 
     private static let weekRange = -12...24  // 3 months back, 6 months forward
     private static let todayWeekOffset = 0
@@ -117,6 +118,7 @@ struct PlannerView: View {
                         .scrollTargetLayout()
                     }
                     .scrollTargetBehavior(.paging)
+                    .scrollPosition(id: $weekScrollPosition)
                     .frame(height: 90)
                     .onAppear {
                         proxy.scrollTo(Self.todayWeekOffset, anchor: .center)
@@ -127,6 +129,17 @@ struct PlannerView: View {
                         withAnimation {
                             proxy.scrollTo(clamped, anchor: .center)
                         }
+                    }
+                    .onChange(of: weekScrollPosition) { _, newOffset in
+                        guard let offset = newOffset else { return }
+                        let weekDays = currentWeekDaysFormatted(weekOffset: offset)
+                        let currentWeekday = Calendar.current.component(.weekday, from: selectedDate)
+                        guard let matchingDay = weekDays.first(where: {
+                            Calendar.current.component(.weekday, from: $0.date) == currentWeekday
+                        }) else { return }
+                        // Only update if the user actually scrolled to a different day
+                        guard !Calendar.current.isDate(matchingDay.date, inSameDayAs: selectedDate) else { return }
+                        selectedDate = matchingDay.date
                     }
                 }
                 .sheet(isPresented: $showDatePicker) {

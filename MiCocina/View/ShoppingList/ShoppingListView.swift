@@ -104,12 +104,14 @@ struct ShoppingListView: View {
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
+                    .accessibilityIdentifier("shoppingList.toolbar.menuButton")
                 } else {
                     Button {
                         showAddIngredient = true
                     } label: {
                         Label("shoppingList.toolbar.addIngredient", systemImage: "plus")
                     }
+                    .accessibilityIdentifier("shoppingList.toolbar.addButton")
                 }
             }
         }
@@ -339,6 +341,7 @@ private struct AddIngredientSheet: View {
                         }
                     }
                     .padding()
+                    .accessibilityIdentifier("shoppingList.add.ingredientField")
                 
                 Spacer()
             }
@@ -356,6 +359,7 @@ private struct AddIngredientSheet: View {
                         onAdd()
                     }
                     .disabled(ingredientName.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .accessibilityIdentifier("shoppingList.add.addButton")
                 }
             }
             .onAppear {
