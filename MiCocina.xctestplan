@@ -1,0 +1,39 @@
+{
+  "configurations" : [
+    {
+      "id" : "8D9EF45C-67C2-4E2D-8854-3D9D513106AD",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:MiCocina.xcodeproj",
+      "identifier" : "27802A1B2F644A1200F1A59C",
+      "name" : "MiCocina"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:MiCocina.xcodeproj",
+        "identifier" : "27802A2A2F644A1300F1A59C",
+        "name" : "MiCocinaTests"
+      }
+    },
+    {
+      "enabled" : false,
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:MiCocina.xcodeproj",
+        "identifier" : "27802A342F644A1300F1A59C",
+        "name" : "MiCocinaUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

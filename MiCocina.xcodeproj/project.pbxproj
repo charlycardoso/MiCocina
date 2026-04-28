@@ -25,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		2775844E2FA0FD6D00E18120 /* MiCocinaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiCocinaUITests.swift; sourceTree = "<group>"; };
+		2775844F2FA1076100E18120 /* MiCocina.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = MiCocina.xctestplan; sourceTree = "<group>"; };
 		27802A1C2F644A1200F1A59C /* MiCocina.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MiCocina.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27802A2B2F644A1300F1A59C /* MiCocinaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiCocinaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		27802A352F644A1300F1A59C /* MiCocinaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MiCocinaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,6 +90,7 @@
 		27802A1D2F644A1200F1A59C /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				2775844F2FA1076100E18120 /* MiCocina.xctestplan */,
 				27802A1C2F644A1200F1A59C /* MiCocina.app */,
 				27802A2B2F644A1300F1A59C /* MiCocinaTests.xctest */,
 				27802A352F644A1300F1A59C /* MiCocinaUITests.xctest */,
@@ -404,7 +406,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8.0;
+				CURRENT_PROJECT_VERSION = 9.0;
 				DEVELOPMENT_TEAM = 8LBZQ6N8Y2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -422,7 +424,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = NO;
-				MARKETING_VERSION = 1.7.1;
+				MARKETING_VERSION = 1.7.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.charlycardoso.MiCocina;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -445,7 +447,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8.0;
+				CURRENT_PROJECT_VERSION = 9.0;
 				DEVELOPMENT_TEAM = 8LBZQ6N8Y2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -463,7 +465,7 @@
 					"@executable_path/Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = NO;
-				MARKETING_VERSION = 1.7.1;
+				MARKETING_VERSION = 1.7.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.charlycardoso.MiCocina;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
