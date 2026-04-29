@@ -159,6 +159,7 @@
 "planner.moveRecipe.moveButton" = "Move Recipe";
 "planner.moveRecipe.navigationTitle" = "Move Recipe";
 "planner.datePicker.title" = "Go to date";
+"planner.goToToday" = "Today";
 
 // MARK: - Common extras
 "common.done" = "Done";

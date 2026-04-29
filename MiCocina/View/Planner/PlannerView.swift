@@ -130,17 +130,7 @@ struct PlannerView: View {
                             proxy.scrollTo(clamped, anchor: .center)
                         }
                     }
-                    .onChange(of: weekScrollPosition) { _, newOffset in
-                        guard let offset = newOffset else { return }
-                        let weekDays = currentWeekDaysFormatted(weekOffset: offset)
-                        let currentWeekday = Calendar.current.component(.weekday, from: selectedDate)
-                        guard let matchingDay = weekDays.first(where: {
-                            Calendar.current.component(.weekday, from: $0.date) == currentWeekday
-                        }) else { return }
-                        // Only update if the user actually scrolled to a different day
-                        guard !Calendar.current.isDate(matchingDay.date, inSameDayAs: selectedDate) else { return }
-                        selectedDate = matchingDay.date
-                    }
+
                 }
                 .sheet(isPresented: $showDatePicker) {
                     DatePickerSheet(selectedDate: $selectedDate, isPresented: $showDatePicker)
@@ -158,6 +148,15 @@ struct PlannerView: View {
             .navigationTitle(NSLocalizedString("planner.title", comment: "Navigation title for the planner view"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(NSLocalizedString("planner.goToToday", comment: "Button to scroll planner to today")) {
+                        withAnimation {
+                            selectedDate = Date()
+                            weekScrollPosition = Self.todayWeekOffset
+                        }
+                    }
+                    .font(.subheadline)
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         showAddRecipesSheet = true
