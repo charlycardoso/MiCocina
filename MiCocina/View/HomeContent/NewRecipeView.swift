@@ -19,6 +19,16 @@ struct NewRecipeView: View {
     @State private var ingredients: [IngredientItem] = []
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
+    @State private var pantryIngredientNames: [String] = []
+
+    private var filteredSuggestions: [String] {
+        let trimmed = ingredientText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+        return pantryIngredientNames.filter { name in
+            name.localizedCaseInsensitiveContains(trimmed) &&
+            !ingredients.contains(where: { $0.name.lowercased() == name.lowercased() })
+        }
+    }
 
     private var homeContentViewModel: HomeContentViewModel
     private var existingRecipe: Recipe?
@@ -110,6 +120,10 @@ struct NewRecipeView: View {
             } message: {
                 Text(alertMessage)
             }
+            .onAppear {
+                let pantry = homeContentViewModel.getPantry()
+                pantryIngredientNames = pantry.map { $0.name }.sorted()
+            }
         }
     }
 
@@ -171,6 +185,33 @@ struct NewRecipeView: View {
                     .tint(.cSecondary)
                     .disabled(ingredientText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .accessibilityIdentifier("newRecipe.addIngredientButton")
+                }
+
+                if !filteredSuggestions.isEmpty {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(filteredSuggestions.prefix(5), id: \.self) { suggestion in
+                            Button {
+                                ingredientText = suggestion
+                                addIngredient()
+                            } label: {
+                                HStack {
+                                    Image(systemName: "basket")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Text(suggestion)
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                            }
+                            if suggestion != filteredSuggestions.prefix(5).last {
+                                Divider().padding(.leading, 32)
+                            }
+                        }
+                    }
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
 
                 if ingredients.isEmpty {
