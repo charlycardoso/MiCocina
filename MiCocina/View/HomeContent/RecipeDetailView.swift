@@ -90,7 +90,7 @@ struct RecipeDetailView: View {
                     Button {
                         markAsFavorite.toggle()
                     } label: {
-                        Image(systemName: recipe.isFavorite ? "heart.fill" : "heart")
+                        Image(systemName: currentRecipe.isFavorite ? "heart.fill" : "heart")
                             .foregroundStyle(Color.cPrimary)
                     }
                     .accessibilityIdentifier("recipeDetail.favoriteButton")
@@ -131,7 +131,10 @@ struct RecipeDetailView: View {
             } message: {
                 Text(verbatim: String(format: NSLocalizedString("recipeDetail.deleteConfirmMessage", comment: ""), recipe.name))
             }
-            .sheet(isPresented: $showEditView) {
+            .sheet(isPresented: $showEditView, onDismiss: {
+                loadFullRecipe()
+                homeContentViewModel.getAllRecipes()
+            }) {
                 if let fullRecipe = fullRecipe {
                     NewRecipeView(viewModel: homeContentViewModel, recipe: fullRecipe)
                 }
@@ -233,15 +236,12 @@ struct RecipeDetailView: View {
         guard var fullRecipe = fullRecipe else { return }
 
         do {
-            fullRecipe.isFavorite = true
+            fullRecipe.isFavorite.toggle()
             try homeContentViewModel.update(fullRecipe)
             homeContentViewModel.getAllRecipes()
-
-            // Update local state
             self.fullRecipe = fullRecipe
             self.markAsFavorite = false
         } catch {
-            // Handle error
             print("Error updating favorite status: \(error)")
         }
     }
