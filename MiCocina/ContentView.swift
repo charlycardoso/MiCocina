@@ -64,51 +64,50 @@ struct ContentView: View {
     /// The SwiftData model context for database operations
     @Environment(\.modelContext) private var modelContext
     @State private var navigation: NavigationViews = .Home
-    
+
+    // ViewModels are stored here so they survive tab switches and are never recreated.
+    @State private var homeVM: HomeContentViewModel?
+    @State private var plannerVM: PlannerViewModel?
+
     var body: some View {
         TabView(selection: $navigation) {
             Tab(String(localized: "homeContent.navigationTitle"), systemImage: "house.fill", value: .Home) {
                 NavigationStack {
-                    Navigate(to: .Home)
+                    if let vm = homeVM {
+                        HomeContent(viewModel: vm)
+                    }
                 }
             }
             .accessibilityIdentifier("contentView.homeTab")
-            
+
             Tab(String(localized: "myPantry.navigationTitle"), systemImage: "refrigerator.fill", value: .MyPantry) {
                 NavigationStack {
-                    Navigate(to: .MyPantry)
+                    MyPantryView(viewModel: .init(context: modelContext))
                 }
             }
             .accessibilityIdentifier("contentView.pantryTab")
-            
+
             Tab(String(localized: "planner.title"), systemImage: "calendar", value: .Planner) {
                 NavigationStack {
-                    Navigate(to: .Planner)
+                    if let vm = plannerVM {
+                        PlannerView(viewModel: vm)
+                    }
                 }
             }
             .accessibilityIdentifier("contentView.plannerTab")
-            
+
             Tab(String(localized: "shoppingList.title"), systemImage: "cart.fill", value: .ShoppingList) {
                 NavigationStack {
-                    Navigate(to: .ShoppingList)
+                    ShoppingListView()
                 }
             }
             .accessibilityIdentifier("contentView.shoppingListTab")
         }
         .accessibilityIdentifier("contentView.tabView")
-    }
-
-    @ViewBuilder
-    private func Navigate(to: NavigationViews) -> some View {
-        switch to {
-        case .Home:
-            HomeContent(viewModel: .init(context: modelContext))
-        case .MyPantry:
-            MyPantryView(viewModel: .init(context: modelContext))
-        case .Planner:
-            PlannerView(viewModel: .init(context: modelContext))
-        case .ShoppingList:
-            ShoppingListView()
+        .onAppear {
+            guard homeVM == nil else { return }
+            homeVM = HomeContentViewModel(context: modelContext)
+            plannerVM = PlannerViewModel(context: modelContext)
         }
     }
 }

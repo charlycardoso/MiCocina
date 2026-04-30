@@ -60,7 +60,12 @@ struct HomeContent: View {
     var body: some View {
         NavigationStack {
             Group {
-                if filteredRecipes.isEmpty {
+                if viewModel.isLoading && viewModel.recipes.isEmpty {
+                    Spacer()
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                    Spacer()
+                } else if filteredRecipes.isEmpty {
                     FilterRow()
                         .padding(.horizontal)
                     Spacer()

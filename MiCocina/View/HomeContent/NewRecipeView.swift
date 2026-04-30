@@ -20,6 +20,8 @@ struct NewRecipeView: View {
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var pantryIngredientNames: [String] = []
+    private enum FocusField: Hashable { case recipeName, ingredient }
+    @FocusState private var focusedField: FocusField?
 
     private var filteredSuggestions: [String] {
         let trimmed = ingredientText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -65,37 +67,47 @@ struct NewRecipeView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Mark as Favorite Section
-                    HStack {
-                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                            .foregroundStyle(isFavorite ? .red : .gray)
-                            .font(.title3)
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("common.markAsFavorite")
-                                .font(.body)
-                                .fontWeight(.medium)
-                            
-                            Text("common.recipe.favoriteDescription")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        Toggle("", isOn: $isFavorite)
-                            .labelsHidden()
-                            .toggleStyle(SwitchToggleStyle())
-                            .accessibilityIdentifier("newRecipe.favoriteToggle")
-                    }
-                    .padding(8)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Mark as Favorite Section
+                        HStack {
+                            Image(systemName: isFavorite ? "heart.fill" : "heart")
+                                .foregroundStyle(isFavorite ? .red : .gray)
+                                .font(.title3)
 
-                    recipeBasicInfo
-                    ingredientsSection
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("common.markAsFavorite")
+                                    .font(.body)
+                                    .fontWeight(.medium)
+
+                                Text("common.recipe.favoriteDescription")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            Toggle("", isOn: $isFavorite)
+                                .labelsHidden()
+                                .toggleStyle(SwitchToggleStyle())
+                                .accessibilityIdentifier("newRecipe.favoriteToggle")
+                        }
+                        .padding(8)
+
+                        recipeBasicInfo
+                        ingredientsSection
+                            .id("ingredientsSection")
+                    }
+                    .padding()
                 }
-                .padding()
+                .scrollDismissesKeyboard(.interactively)
+                .onChange(of: focusedField) { _, newField in
+                    guard newField == .ingredient else { return }
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        proxy.scrollTo("ingredientsSection", anchor: .top)
+                    }
+                }
             }
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
@@ -141,6 +153,7 @@ struct NewRecipeView: View {
 
                 TextField("common.recipeNamePlaceholder", text: $recipeName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .focused($focusedField, equals: .recipeName)
                     .accessibilityIdentifier("newRecipe.recipeNameField")
             }
 
@@ -175,6 +188,7 @@ struct NewRecipeView: View {
                     TextField("common.addIngredientPlaceholder", text: $ingredientText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .accessibilityIdentifier("newRecipe.ingredientTextField")
+                        .focused($focusedField, equals: .ingredient)
                         .onSubmit {
                             addIngredient()
                         }

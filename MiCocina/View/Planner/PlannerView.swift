@@ -139,7 +139,12 @@ struct PlannerView: View {
 
                 Divider()
 
-                if viewModel.recipeGroups.isEmpty {
+                if viewModel.isLoading {
+                    Spacer()
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                    Spacer()
+                } else if viewModel.recipeGroups.isEmpty {
                     emptyStateView
                 } else {
                     recipesListView

@@ -15,6 +15,7 @@ final class PlannerViewModel: ObservableObject {
         return .init(repo: SDPlannerDomainRepository(context: context))
     }
     @Published var recipeGroups = [RecipeGroup]()
+    @Published var isLoading: Bool = false
 
     init(context: ModelContext) {
         self.context = context
@@ -28,31 +29,31 @@ final class PlannerViewModel: ObservableObject {
     ///
     /// - Parameter date: The date to fetch recipes for
     func fetchRecipeGroups(with date: Date) {
-        // Normalize the date to start of day
-        let calendar = Calendar.current
-        let normalizedDate = calendar.startOfDay(for: date)
-        
-        // Fetch directly from SwiftData to ensure fresh data
-        let descriptor = FetchDescriptor<SDPlannerData>(
-            predicate: #Predicate<SDPlannerData> { $0.day == normalizedDate }
-        )
-        
-        do {
-            let planners = try context.fetch(descriptor)
-            
-            if let planner = planners.first {
-                let plannerData = DomainMapper.toDomain(planner: planner)
-                let pantry = SDPantryProtocolRepository(context: context).getPantry()
-                let mapper = RecipeMapper()
-                let matcher = RecipeMatcher()
-                let mapped = plannerData.recipes.map { mapper.map($0, pantry: pantry, matcher: matcher) }
-                recipeGroups = RecipeGrouper.group(mapped)
-            } else {
-                recipeGroups = []
+        isLoading = recipeGroups.isEmpty
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let calendar = Calendar.current
+            let normalizedDate = calendar.startOfDay(for: date)
+            let descriptor = FetchDescriptor<SDPlannerData>(
+                predicate: #Predicate<SDPlannerData> { $0.day == normalizedDate }
+            )
+            do {
+                let planners = try self.context.fetch(descriptor)
+                if let planner = planners.first {
+                    let plannerData = DomainMapper.toDomain(planner: planner)
+                    let pantry = SDPantryProtocolRepository(context: self.context).getPantry()
+                    let mapper = RecipeMapper()
+                    let matcher = RecipeMatcher()
+                    let mapped = plannerData.recipes.map { mapper.map($0, pantry: pantry, matcher: matcher) }
+                    self.recipeGroups = RecipeGrouper.group(mapped)
+                } else {
+                    self.recipeGroups = []
+                }
+            } catch {
+                print("Error fetching planner data: \(error)")
+                self.recipeGroups = []
             }
-        } catch {
-            print("Error fetching planner data: \(error)")
-            recipeGroups = []
+            self.isLoading = false
         }
     }
 

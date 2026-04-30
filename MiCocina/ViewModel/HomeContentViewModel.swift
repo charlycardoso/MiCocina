@@ -32,6 +32,7 @@ final class HomeContentViewModel: ObservableObject {
     // MARK: Published properties
     @Published var recipes: [RecipeGroup] = []
     @Published var possibleRecipes: [RecipeGroup] = []
+    @Published var isLoading: Bool = false
     
     init(context: ModelContext, isPreviewMode: Bool = false) {
         self.context = context
@@ -39,20 +40,24 @@ final class HomeContentViewModel: ObservableObject {
     }
 
     // MARK: Methods
-    func getAllRecipes(){
-        // Don't try to access repositories in preview mode
+    func getAllRecipes() {
         guard !isPreviewMode else { return }
-        
-        let recipes = matcher.getAllRecipes()
-        self.recipes = recipes
+        isLoading = true
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let groups = self.matcher.getAllRecipes()
+            self.recipes = groups
+            self.isLoading = false
+        }
     }
 
     func getPossibleRecipes() {
-        // Don't try to access repositories in preview mode
         guard !isPreviewMode else { return }
-        
-        let recipes = matcher.getPossibleRecipes()
-        self.possibleRecipes = recipes
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let groups = self.matcher.getPossibleRecipes()
+            self.possibleRecipes = groups
+        }
     }
 }
 
